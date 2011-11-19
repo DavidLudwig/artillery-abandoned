@@ -127,6 +127,24 @@ function sketchProc(processing) {
 	var Tanks = new Array();
 	var CurrentTank = null;
 	var Missiles = new Array();
+	var DeadMissiles = new Array();
+	
+	// Delayed Deletion
+	function Destroy(object, deadObjects) {
+		deadObjects.push(object);
+	}
+
+	function CollectGarbage(liveObjects, deadObjects) {
+		for (var i = 0; i < deadObjects.length; i++) {
+			for (var j = 0; j < liveObjects.length; j++) {
+				if (deadObjects[i] == liveObjects[j]) {
+					liveObjects.splice(j, 1);
+				}
+			}
+		}
+		deadObjects.splice(0, deadObjects.length);
+	}
+	
 	
 	// Tank class
 	function Tank(cx, cy, color) {
@@ -151,25 +169,9 @@ function sketchProc(processing) {
 						this.width,
 						this.height);
 	}
+
 	
 	// Missile class
-	var MissilesToDestroy = new Array;
-
-	function DestroyMissile(missile) {
-		MissilesToDestroy.push(missile);
-	}
-
-	function DeleteDestroyedMissiles() {
-		for (var i = 0; i < MissilesToDestroy.length; i++) {
-			for (var j = 0; j < Missiles.length; j++) {
-				if (MissilesToDestroy[i] == Missiles[j]) {
-					Missiles.splice(j, 1);
-				}
-			}
-		}
-		MissilesToDestroy.splice(0, MissilesToDestroy.length);
-	}
-	
 	function Missile(startx, starty, vx, vy) {
 		this.lastx = startx;
 		this.lasty = starty;
@@ -192,7 +194,7 @@ function sketchProc(processing) {
 		var detectedColor = TerrainLayer.get(this.x, (ScreenHeight-this.y));
 		var detectedAlpha = processing.alpha(detectedColor);
 		if (detectedAlpha > 0) {
-			DestroyMissile(this);
+			Destroy(this, DeadMissiles);
 		}
 	}
 	
@@ -347,7 +349,7 @@ function sketchProc(processing) {
 		processing.image(ShotLayer, 0, 0);
 		
 		// Clean up garbage
-		DeleteDestroyedMissiles();
+		CollectGarbage(Missiles, DeadMissiles);
 	};
 }
 
