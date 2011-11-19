@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="processing-1.3.6.js"></script>
+</head>
+
+<body>
+<!-- <h2>to be named</h2> -->
+
+<p>
+<canvas id="canvas1" width="512" height="384"></canvas>
+</p>
+
+<script id="script1" type="text/javascript">
+
+// Simple way to attach js code to the canvas is by using a function
+function sketchProc(processing) {
+	var img;
+	
+  	processing.setup = function () {
+		console.log("setup called");
+		
+		processing.size(512, 384);
+		
+		// var processingCode = "PImage img = createImage( 120, 120, RGB ); img.pixels[0] = color(1, 2, 3, 4);";
+		// var jsCode = Processing.compile(processingCode).sourceCode;
+		// console.log(jsCode);
+		
+		console.log("processing.RGB: " + processing.RGB);
+		img = processing.createImage(66, 66, processing.RGB);
+		console.log("img: " + img);
+		console.log("img.pixels: " + img.pixels);
+		console.log("img.pixels.getLength(): " + img.pixels.getLength());
+		//console.log("pc: " + processing.color);
+		for(var i=0; i < img.pixels.getLength(); i++) {
+			var theColor = processing.color(0, 90, 102, i%img.width * 2); 
+			img.pixels.setPixel(i, theColor);
+		}
+		
+		//img.set(0, 0, processing.color(255, 0, 0, 255));
+		//img.pixels.setPixel(0, processing.color(255, 0, 0, 255));
+		
+		console.log("setup done!");
+
+	}
+
+	processing.draw = function() {
+		processing.background(204);
+		processing.image(img, 17, 17);
+		processing.image(img, 34, 34);
+	};
+  
+	processing.keyPressed = function () {
+		console.log("key pressed: " + processing.key);
+		console.log("img: " + img);
+	};
+}
+
+// attaching the sketchProc function to the canvas
+var p = new Processing("canvas1", sketchProc);
+// p.exit(); to detach it
+</script>
+
+</body>
+</html>
