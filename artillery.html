@@ -14,11 +14,6 @@
 
 <script id="script1" type="text/javascript">
 
-var Background_1 = new Image(),
-    canvas1 = document.getElementById('canvas1'),
-    sketch,
-    processing;
-
 // Simple way to attach js code to the canvas is by using a function
 function sketchProc(processing) {
 
@@ -68,10 +63,25 @@ function sketchProc(processing) {
 	};
 }
 
+sketch = new Processing.Sketch(sketchProc);
+const NumImagesToLoad = 1;
+var NumImagesLoaded = 0;
+var Background_1 = new Image(),
+    canvas1 = document.getElementById('canvas1'),
+    sketch,
+    processing;
+
+function OnImageLoaded() {
+	NumImagesLoaded++;
+	if (NumImagesLoaded == NumImagesToLoad) {
+		// Once all of the images are loaded, start the Processing sketch.
+		processing = new Processing(canvas1, sketch);
+	}
+}
+
 Background_1.onload = function() {
-  sketch = new Processing.Sketch(sketchProc);
-  sketch.imageCache.add("Assets/Images/Background_1.png", Background_1);
-  processing = new Processing(canvas1, sketch);
+	sketch.imageCache.add("Assets/Images/Background_1.png", Background_1);
+	OnImageLoaded();
 };
 
 Background_1.src = "Assets/Images/Background_1.png";
