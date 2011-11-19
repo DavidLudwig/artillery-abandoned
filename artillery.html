@@ -32,11 +32,11 @@ function sketchProc(processing) {
 		// var jsCode = Processing.compile(processingCode).sourceCode;
 		// console.log(jsCode);
 		
-		TerrainLayer = processing.createImage(ScreenWidth, ScreenHeight, processing.RGB);
-		for(var i=0; i < TerrainLayer.pixels.getLength(); i++) {
-			var theColor = processing.color(0, 0, 0, 255);
-			TerrainLayer.pixels.setPixel(i, theColor);
-		}
+		TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		TerrainLayer.beginDraw();
+		TerrainLayer.background(0);
+		TerrainLayer.endDraw();
+		
 		console.log("setup done!");
 	}
 
