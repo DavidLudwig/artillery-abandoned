@@ -70,18 +70,18 @@
 	<div class="spacer"; style="left:10px; top:327px;">
 		<div class="label" style="left:39px; top:0px; color:White; font-size:12px">Angle:</div>
 		<div class="label" style="left:36px; top:23px; color:White; font-size:18px">123&deg;</div>
-		<a href="#" class="button" style="left:0px; top:18px">+</a>
-		<a href="#" class="button" style="left:80px; top:18px">-</a>
+		<a id="AngleMinus" href="#" class="button" style="left:0px; top:18px">-</a>
+		<a id="AnglePlus" href="#" class="button" style="left:80px; top:18px">+</a>
 	</div>
 	
 	<div class="spacer"; style="left:190px; top:327px;">
 		<div class="label" style="left:39px; top:0px; color:White; font-size:12px">Power:</div>
 		<div class="label" style="left:40px; top:23px; color:White; font-size:18px">800</div>
-		<a href="#" class="button" style="left:0px; top:18px">+</a>
-		<a href="#" class="button" style="left:80px; top:18px">-</a>
+		<a id="PowerMinus" href="#" class="button" style="left:0px; top:18px">-</a>
+		<a id="PowerPlus" href="#" class="button" style="left:80px; top:18px">+</a>
 	</div>
 	
-	<a href="#" class="button" style="left:370px; top:345px">Fire Ze Missile!</a>
+	<a id="FireButton" href="#" class="button" style="left:370px; top:345px">Fire Ze Missile!</a>
 	
 	<!--
 	<div class="label" style="left:49px; top:327px; color:White; font-size:12px">Power:</div>
@@ -139,6 +139,26 @@ function sketchProc(processing) {
 						this.cy,
 						this.width,
 						this.height);
+	}
+	
+	document.getElementById('AngleMinus').onclick = function() {
+		console.log("angle -");
+	}
+
+	document.getElementById('AnglePlus').onclick = function() {
+		console.log("angle +");
+	}
+	
+	document.getElementById('PowerMinus').onclick = function() {
+		console.log("power -");
+	}
+
+	document.getElementById('PowerPlus').onclick = function() {
+		console.log("power +");
+	}
+
+	document.getElementById('FireButton').onclick = function() {
+		console.log("fire!");
 	}
 	
   	processing.setup = function () {
