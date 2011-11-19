@@ -102,13 +102,17 @@ function sketchProc(processing) {
 	const ScreenHeight = 384;
 	const Colors = {
 		"Blue": processing.color(0, 0, 255),
-		"Red": processing.color(255, 0, 0)
+		"Red": processing.color(255, 0, 0),
+		"Yellow": processing.color(255, 255, 0)
 	};
-	const DefaultAngle = 40;
-	const DefaultPower = 100;
+	const DefaultAngle = -40;
+	const DefaultPower = 160;
 	// const GameStates = {
 	// 	""
 	// };
+	
+	// Timing
+	var UpdateDurationS = 0.2;		// time to elapse when updating game state, sort-of approximately in seconds
 	
 	// Layers, listed in draw order
 	var BackgroundLayer;
@@ -117,8 +121,10 @@ function sketchProc(processing) {
 	// Images
 	var Background_1_Image;
 	
-	// Tanks
+	// Game Objects
 	var Tanks = new Array();
+	var CurrentTank = null;
+	var Missiles = new Array();
 	
 	// Tank class
 	function Tank(cx, cy, color) {
@@ -142,6 +148,29 @@ function sketchProc(processing) {
 						this.cy,
 						this.width,
 						this.height);
+	}
+	
+	// Missile class
+	function Missile(startx, starty, vx, vy) {
+		this.x = startx;
+		this.y = starty;
+		this.vx = vx;
+		this.vy = vy;
+	}
+	
+	Missile.prototype.update = function () {
+		this.x += (this.vx * UpdateDurationS);
+		this.y += (this.vy * UpdateDurationS);
+	}
+	
+	Missile.prototype.draw = function () {
+		processing.rectMode(processing.CENTER);
+		processing.fill(Colors.Yellow);
+		processing.noStroke();
+		processing.rect(this.x,
+						this.y,
+						4,	// width
+						4);	// height
 	}
 	
 	// Angle + Power Getters and Setters
@@ -189,9 +218,16 @@ function sketchProc(processing) {
 	}
 
 	document.getElementById('FireButton').onclick = function() {
-		var angle = getAngle();
+		var angleDeg = getAngle();
+		var angleRad = processing.radians(angleDeg);
 		var power = getPower();
-		console.log("fire!: angle="+angle + "; power="+power);
+		var x = CurrentTank.cx;
+		var y = CurrentTank.cy;
+		var vx = power * Math.cos(angleRad);
+		var vy = power * Math.sin(angleRad);
+		console.log("fire!: angle="+angleDeg+"; power="+power+"; x="+x+"; y="+y+"; vx="+vx+"; vy="+vy);
+		var missile = new Missile(x, y, vx, vy);
+		Missiles.push(missile);
 	}
 	
 	// Init game
@@ -226,17 +262,32 @@ function sketchProc(processing) {
 		// Init Tanks
 		Tanks.push(new Tank(60, 253, Colors.Blue));
 		Tanks.push(new Tank(410, 288, Colors.Red));
+		CurrentTank = Tanks[0];
 		
 		console.log("setup done!");
 	}
 
 	// Update and draw
+	function Update() {
+		//console.log("s: " + (processing.millis() / 1000));
+		for (var i = 0; i < Missiles.length; i++) {
+			Missiles[i].update();
+		}
+	}
+	
 	processing.draw = function() {
+		// Update
+		Update();
+		
+		// Draw
 		processing.background(204);
 		processing.image(BackgroundLayer, 0, 0);
 		processing.image(TerrainLayer, 0, 0);
 		for (var i = 0; i < Tanks.length; i++) {
 			Tanks[i].draw();
+		}
+		for (var i = 0; i < Missiles.length; i++) {
+			Missiles[i].draw();
 		}
 	};
 }
