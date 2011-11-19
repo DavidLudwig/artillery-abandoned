@@ -108,6 +108,8 @@ function sketchProc(processing) {
 	const DefaultAngle = -40;
 	const DefaultPower = 160;
 	const GravityY = 100;
+	const DefaultExplosionRadius = 10;
+	const DefaultExplosionDuration = 2;
 	// const GameStates = {
 	// 	""
 	// };
@@ -128,6 +130,8 @@ function sketchProc(processing) {
 	var CurrentTank = null;
 	var Missiles = new Array();
 	var DeadMissiles = new Array();
+	var Explosions = new Array();
+	var DeadExplosions = new Array();
 	
 	// Delayed Deletion
 	function Destroy(object, deadObjects) {
@@ -169,7 +173,45 @@ function sketchProc(processing) {
 						this.width,
 						this.height);
 	}
+	
+	
+	// Explosion class
+	function Explosion(x, y, radius) {
+		this.x = x;
+		this.y = y;
+		
+		if (radius == null) {
+			radius = DefaultExplosionRadius;
+		}
+		this.radius = radius;
+		
+		this.timeRemaining = DefaultExplosionDuration;
+		this.wasDrawn = false;
+	}
+	
+	Explosion.prototype.update = function () {
+		this.timeRemaining -= UpdateDurationS;
+		if (this.timeRemaining <= 0) {
+			Destroy(this, DeadExplosions);
+		}
+	}
+	
+	Explosion.prototype.draw = function () {
+		// if ( ! this.wasDrawn ) {
+		// 	ShotLayer.beginDraw();
+		// 	ShotLayer.ellipseMode(processing.CENTER);
+		// 	ShotLayer.fill(Colors.Yellow);
+		// 	ShotLayer.ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
+		// 	ShotLayer.endDraw();
+		// 	this.wasDrawn = true;
+		// }
 
+		processing.ellipseMode(processing.CENTER);
+		processing.fill(Colors.Yellow);
+		processing.ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
+
+	}
+	
 	
 	// Missile class
 	function Missile(startx, starty, vx, vy) {
@@ -194,13 +236,17 @@ function sketchProc(processing) {
 		var detectedColor = TerrainLayer.get(this.x, (ScreenHeight-this.y));
 		var detectedAlpha = processing.alpha(detectedColor);
 		if (detectedAlpha > 0) {
+			var explosion = new Explosion(this.x, this.y);
+			Explosions.push(explosion);
 			Destroy(this, DeadMissiles);
 		}
 	}
 	
 	Missile.prototype.draw = function () {
+		ShotLayer.beginDraw();
 		ShotLayer.stroke(Colors.Yellow);
 		ShotLayer.line(this.lastx, this.lasty, this.x, this.y);
+		ShotLayer.endDraw();
 		
 		// ShotLayer.rectMode(processing.CENTER);
 		// ShotLayer.fill(Colors.Yellow);
@@ -319,14 +365,11 @@ function sketchProc(processing) {
 	// Update and draw
 	function Update() {
 		//console.log("s: " + (processing.millis() / 1000));
-		var i = 0;
-		while (i < Missiles.length) {
+		for (var i = 0; i < Missiles.length; i++) {
 			Missiles[i].update();
-			if (Missiles[i].alive) {
-				i++;
-			} else {
-				Missiles.splice(i, 1);
-			}
+		}
+		for (var i = 0; i < Explosions.length; i++) {
+			Explosions[i].update();
 		}
 	}
 	
@@ -347,9 +390,13 @@ function sketchProc(processing) {
 			Missiles[i].draw();
 		}
 		processing.image(ShotLayer, 0, 0);
+		for (var i = 0; i < Explosions.length; i++) {
+			Explosions[i].draw();
+		}
 		
 		// Clean up garbage
 		CollectGarbage(Missiles, DeadMissiles);
+		CollectGarbage(Explosions, DeadExplosions);
 	};
 }
 
