@@ -70,7 +70,7 @@
 
 <div class="the_thing">
 	<canvas id="canvas1" width="512" height="384"></canvas>
-
+	
 	<div class="spacer"; style="left:10px; top:327px;">
 		<div class="label" style="left:39px; top:0px; color:White; font-size:12px">Angle:</div>
 		<form>
@@ -153,6 +153,23 @@ function sketchProc(processing) {
 	}
 	
 	// Missile class
+	var MissilesToDestroy = new Array;
+
+	function DestroyMissile(missile) {
+		MissilesToDestroy.push(missile);
+	}
+
+	function DeleteDestroyedMissiles() {
+		for (var i = 0; i < MissilesToDestroy.length; i++) {
+			for (var j = 0; j < Missiles.length; j++) {
+				if (MissilesToDestroy[i] == Missiles[j]) {
+					Missiles.splice(j, 1);
+				}
+			}
+		}
+		MissilesToDestroy.splice(0, MissilesToDestroy.length);
+	}
+	
 	function Missile(startx, starty, vx, vy) {
 		this.lastx = startx;
 		this.lasty = starty;
@@ -160,6 +177,7 @@ function sketchProc(processing) {
 		this.y = starty;
 		this.vx = vx;
 		this.vy = vy;
+		this.alive = true;
 	}
 	
 	Missile.prototype.update = function () {
@@ -167,8 +185,15 @@ function sketchProc(processing) {
 		this.lasty = this.y;
 		this.x += (this.vx * UpdateDurationS);
 		this.y += (this.vy * UpdateDurationS);
-		
 		this.vy += (GravityY * UpdateDurationS);
+		
+		// do collision detection against the ground
+		// NOTE: Processing.js reverses the y-axis wrt. its get() function
+		var detectedColor = TerrainLayer.get(this.x, (ScreenHeight-this.y));
+		var detectedAlpha = processing.alpha(detectedColor);
+		if (detectedAlpha > 0) {
+			DestroyMissile(this);
+		}
 	}
 	
 	Missile.prototype.draw = function () {
@@ -269,6 +294,12 @@ function sketchProc(processing) {
 		TerrainLayer.background(0, 0, 0, 0);			// fill with blank pixels
 		TerrainLayer.image(Background_1_Image, 0, 0);	// draw the image on top of it
 		TerrainLayer.endDraw();
+
+		// processing.imageMode(processing.CORNER);
+		// for (var y = 0; y < ScreenHeight; y++)
+		// {
+		// 	console.log("alpha,"+y+" = " + processing.red(TerrainLayer.get(20,y)));
+		// }
 		
 		ShotLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		ShotLayer.beginDraw();
@@ -286,12 +317,20 @@ function sketchProc(processing) {
 	// Update and draw
 	function Update() {
 		//console.log("s: " + (processing.millis() / 1000));
-		for (var i = 0; i < Missiles.length; i++) {
+		var i = 0;
+		while (i < Missiles.length) {
 			Missiles[i].update();
+			if (Missiles[i].alive) {
+				i++;
+			} else {
+				Missiles.splice(i, 1);
+			}
 		}
 	}
 	
 	processing.draw = function() {
+		//console.log("s: " + (processing.millis() / 1000));
+		
 		// Update
 		Update();
 		
@@ -306,6 +345,9 @@ function sketchProc(processing) {
 			Missiles[i].draw();
 		}
 		processing.image(ShotLayer, 0, 0);
+		
+		// Clean up garbage
+		DeleteDestroyedMissiles();
 	};
 }
 
