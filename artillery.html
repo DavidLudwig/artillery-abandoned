@@ -26,6 +26,10 @@
 		position: absolute;
 	}
 	
+	.text_input {
+		position: absolute;
+	}
+	
 	.button {
 	   position: absolute;
 	   border-top: 1px solid #7d7d7d;
@@ -69,26 +73,23 @@
 
 	<div class="spacer"; style="left:10px; top:327px;">
 		<div class="label" style="left:39px; top:0px; color:White; font-size:12px">Angle:</div>
-		<div class="label" style="left:36px; top:23px; color:White; font-size:18px">123&deg;</div>
+		<form>
+			<input id="AngleValue" class="text_input" type="text" size=3 value="123" style="left:33px; top:21px;"></input>
+		</form>
 		<a id="AngleMinus" href="#" class="button" style="left:0px; top:18px">-</a>
 		<a id="AnglePlus" href="#" class="button" style="left:80px; top:18px">+</a>
 	</div>
 	
 	<div class="spacer"; style="left:190px; top:327px;">
 		<div class="label" style="left:39px; top:0px; color:White; font-size:12px">Power:</div>
-		<div class="label" style="left:40px; top:23px; color:White; font-size:18px">800</div>
+		<form>
+			<input id="PowerValue" class="text_input" type="text" size=3 value="100" style="left:33px; top:21px;"></input>
+		</form>
 		<a id="PowerMinus" href="#" class="button" style="left:0px; top:18px">-</a>
 		<a id="PowerPlus" href="#" class="button" style="left:80px; top:18px">+</a>
 	</div>
 	
 	<a id="FireButton" href="#" class="button" style="left:370px; top:345px">Fire Ze Missile!</a>
-	
-	<!--
-	<div class="label" style="left:49px; top:327px; color:White; font-size:12px">Power:</div>
-	<div class="label" style="left:46px; top:350px; color:White; font-size:18px">300</div>
-	<a href="#" class="button" style="left:10px; top:345px">+</a>
-	<a href="#" class="button" style="left:90px; top:345px">-</a>
-	-->
 </div>
 
 <script id="script1" type="text/javascript">
