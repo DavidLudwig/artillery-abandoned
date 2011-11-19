@@ -107,16 +107,18 @@ function sketchProc(processing) {
 	};
 	const DefaultAngle = -40;
 	const DefaultPower = 160;
+	const GravityY = 100;
 	// const GameStates = {
 	// 	""
 	// };
 	
 	// Timing
-	var UpdateDurationS = 0.2;		// time to elapse when updating game state, sort-of approximately in seconds
+	var UpdateDurationS = 0.05;		// time to elapse when updating game state, sort-of approximately in seconds
 	
 	// Layers, listed in draw order
 	var BackgroundLayer;
 	var TerrainLayer;
+	var ShotLayer;
 	
 	// Images
 	var Background_1_Image;
@@ -152,6 +154,8 @@ function sketchProc(processing) {
 	
 	// Missile class
 	function Missile(startx, starty, vx, vy) {
+		this.lastx = startx;
+		this.lasty = starty;
 		this.x = startx;
 		this.y = starty;
 		this.vx = vx;
@@ -159,18 +163,25 @@ function sketchProc(processing) {
 	}
 	
 	Missile.prototype.update = function () {
+		this.lastx = this.x;
+		this.lasty = this.y;
 		this.x += (this.vx * UpdateDurationS);
 		this.y += (this.vy * UpdateDurationS);
+		
+		this.vy += (GravityY * UpdateDurationS);
 	}
 	
 	Missile.prototype.draw = function () {
-		processing.rectMode(processing.CENTER);
-		processing.fill(Colors.Yellow);
-		processing.noStroke();
-		processing.rect(this.x,
-						this.y,
-						4,	// width
-						4);	// height
+		ShotLayer.stroke(Colors.Yellow);
+		ShotLayer.line(this.lastx, this.lasty, this.x, this.y);
+		
+		// ShotLayer.rectMode(processing.CENTER);
+		// ShotLayer.fill(Colors.Yellow);
+		// ShotLayer.noStroke();
+		// ShotLayer.rect(this.x,
+		// 			   this.y,
+		// 			   4,	// width
+		// 			   4);	// height
 	}
 	
 	// Angle + Power Getters and Setters
@@ -259,6 +270,11 @@ function sketchProc(processing) {
 		TerrainLayer.image(Background_1_Image, 0, 0);	// draw the image on top of it
 		TerrainLayer.endDraw();
 		
+		ShotLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		ShotLayer.beginDraw();
+		ShotLayer.background(0, 0, 0, 0);
+		ShotLayer.endDraw();
+		
 		// Init Tanks
 		Tanks.push(new Tank(60, 253, Colors.Blue));
 		Tanks.push(new Tank(410, 288, Colors.Red));
@@ -289,6 +305,7 @@ function sketchProc(processing) {
 		for (var i = 0; i < Missiles.length; i++) {
 			Missiles[i].draw();
 		}
+		processing.image(ShotLayer, 0, 0);
 	};
 }
 
