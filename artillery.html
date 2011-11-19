@@ -144,6 +144,8 @@ function sketchProc(processing) {
 						this.height);
 	}
 	
+	// Angle + Power Getters and Setters
+	
 	function getAngle() {
 		return parseInt(document.getElementById("AngleValue").value);
 	}
@@ -159,6 +161,8 @@ function sketchProc(processing) {
 	function setPower(value) {
 		document.getElementById("PowerValue").value = value;
 	}
+	
+	// Button Handlers
 	
 	document.getElementById('AngleMinus').onclick = function() {
 		var angle = getAngle();
@@ -190,6 +194,7 @@ function sketchProc(processing) {
 		console.log("fire!: angle="+angle + "; power="+power);
 	}
 	
+	// Init game
   	processing.setup = function () {
 		console.log("setup called");
 		
@@ -225,6 +230,7 @@ function sketchProc(processing) {
 		console.log("setup done!");
 	}
 
+	// Update and draw
 	processing.draw = function() {
 		processing.background(204);
 		processing.image(BackgroundLayer, 0, 0);
@@ -232,10 +238,6 @@ function sketchProc(processing) {
 		for (var i = 0; i < Tanks.length; i++) {
 			Tanks[i].draw();
 		}
-	};
-  
-	processing.keyPressed = function () {
-		console.log("key pressed: " + processing.key);
 	};
 }
 
