@@ -24,14 +24,17 @@ function sketchProc(processing) {
 	// Layers, listed in draw order
 	var BackgroundLayer;
 	var TerrainLayer;
-	var pimg;
+	
+	// Images
+	var Background_1_Image;
 	
   	processing.setup = function () {
 		console.log("setup called");
 		
 		processing.size(ScreenWidth, ScreenHeight);
 		
-		pimg = processing.loadImage("Assets/Images/Background_1.png");
+		// Create PImages from pre-loaded images
+		Background_1_Image = processing.loadImage("Assets/Images/Background_1.png");
 		
 		// var processingCode = "PImage TerrainLayer = createImage( 120, 120, RGB ); TerrainLayer.pixels[0] = color(1, 2, 3, 4);";
 		// var jsCode = Processing.compile(processingCode).sourceCode;
@@ -44,7 +47,8 @@ function sketchProc(processing) {
 		
 		TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		TerrainLayer.beginDraw();
-		TerrainLayer.background(0, 0, 0, 0);	// fill with blank pixels
+		TerrainLayer.background(0, 0, 0, 0);			// fill with blank pixels
+		TerrainLayer.image(Background_1_Image, 0, 0);	// draw the image on top of it
 		TerrainLayer.endDraw();
 		
 		console.log("setup done!");
@@ -54,8 +58,6 @@ function sketchProc(processing) {
 		processing.background(204);
 		processing.image(BackgroundLayer, 0, 0);
 		processing.image(TerrainLayer, 0, 0);
-		processing.image(pimg, 0, 0);
-		//processing.image(TerrainLayer, 34, 34);
 	};
   
 	processing.keyPressed = function () {
