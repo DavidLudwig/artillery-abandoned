@@ -104,6 +104,8 @@ function sketchProc(processing) {
 		"Blue": processing.color(0, 0, 255),
 		"Red": processing.color(255, 0, 0)
 	};
+	const DefaultAngle = 40;
+	const DefaultPower = 100;
 	// const GameStates = {
 	// 	""
 	// };
@@ -142,24 +144,50 @@ function sketchProc(processing) {
 						this.height);
 	}
 	
+	function getAngle() {
+		return parseInt(document.getElementById("AngleValue").value);
+	}
+	
+	function setAngle(value) {
+		document.getElementById("AngleValue").value = value;
+	}
+	
+	function getPower() {
+		return parseInt(document.getElementById("PowerValue").value);
+	}
+	
+	function setPower(value) {
+		document.getElementById("PowerValue").value = value;
+	}
+	
 	document.getElementById('AngleMinus').onclick = function() {
-		console.log("angle -");
+		var angle = getAngle();
+		angle -= 2;
+		setAngle(angle);
 	}
 
 	document.getElementById('AnglePlus').onclick = function() {
-		console.log("angle +");
+		var angle = getAngle();
+		angle += 2;
+		setAngle(angle);
 	}
 	
 	document.getElementById('PowerMinus').onclick = function() {
-		console.log("power -");
+		var power = getPower();
+		power -= 10;
+		setPower(power);
 	}
 
 	document.getElementById('PowerPlus').onclick = function() {
-		console.log("power +");
+		var power = getPower();
+		power += 10;
+		setPower(power);
 	}
 
 	document.getElementById('FireButton').onclick = function() {
-		console.log("fire!");
+		var angle = getAngle();
+		var power = getPower();
+		console.log("fire!: angle="+angle + "; power="+power);
 	}
 	
   	processing.setup = function () {
@@ -173,6 +201,10 @@ function sketchProc(processing) {
 		// var processingCode = "PImage TerrainLayer = createImage( 120, 120, RGB ); TerrainLayer.pixels[0] = color(1, 2, 3, 4);";
 		// var jsCode = Processing.compile(processingCode).sourceCode;
 		// console.log(jsCode);
+		
+		// Reset controls
+		setAngle(DefaultAngle);
+		setPower(DefaultPower);
 		
 		// Init Layers
 		BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
