@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<title>Death 'til the Break of Dawn</title>
   <script src="processing-1.3.6.js"></script>
 </head>
 
@@ -13,6 +14,11 @@
 
 <script id="script1" type="text/javascript">
 
+var Background_1 = new Image(),
+    canvas1 = document.getElementById('canvas1'),
+    sketch,
+    processing;
+
 // Simple way to attach js code to the canvas is by using a function
 function sketchProc(processing) {
 
@@ -20,21 +26,30 @@ function sketchProc(processing) {
 	const ScreenWidth = 512;
 	const ScreenHeight = 384;
 	
-	// Layers
+	// Layers, listed in draw order
+	var BackgroundLayer;
 	var TerrainLayer;
+	var pimg;
 	
   	processing.setup = function () {
 		console.log("setup called");
 		
 		processing.size(ScreenWidth, ScreenHeight);
 		
+		pimg = processing.loadImage("Assets/Images/Background_1.png");
+		
 		// var processingCode = "PImage TerrainLayer = createImage( 120, 120, RGB ); TerrainLayer.pixels[0] = color(1, 2, 3, 4);";
 		// var jsCode = Processing.compile(processingCode).sourceCode;
 		// console.log(jsCode);
+
+		BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		BackgroundLayer.beginDraw();
+		BackgroundLayer.background(0, 0, 0, 255);
+		BackgroundLayer.endDraw();
 		
 		TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		TerrainLayer.beginDraw();
-		TerrainLayer.background(0);
+		TerrainLayer.background(0, 0, 0, 0);	// fill with blank pixels
 		TerrainLayer.endDraw();
 		
 		console.log("setup done!");
@@ -42,7 +57,9 @@ function sketchProc(processing) {
 
 	processing.draw = function() {
 		processing.background(204);
+		processing.image(BackgroundLayer, 0, 0);
 		processing.image(TerrainLayer, 0, 0);
+		processing.image(pimg, 0, 0);
 		//processing.image(TerrainLayer, 34, 34);
 	};
   
@@ -51,9 +68,14 @@ function sketchProc(processing) {
 	};
 }
 
-// attaching the sketchProc function to the canvas
-var p = new Processing("canvas1", sketchProc);
-// p.exit(); to detach it
+Background_1.onload = function() {
+  sketch = new Processing.Sketch(sketchProc);
+  sketch.imageCache.add("Assets/Images/Background_1.png", Background_1);
+  processing = new Processing(canvas1, sketch);
+};
+
+Background_1.src = "Assets/Images/Background_1.png";
+
 </script>
 
 </body>
