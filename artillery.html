@@ -20,6 +20,10 @@ function sketchProc(processing) {
 	// Constants
 	const ScreenWidth = 512;
 	const ScreenHeight = 384;
+	const Colors = {
+		"Blue": processing.color(0, 0, 255),
+		"Red": processing.color(255, 0, 0)
+	};
 	
 	// Layers, listed in draw order
 	var BackgroundLayer;
@@ -27,6 +31,33 @@ function sketchProc(processing) {
 	
 	// Images
 	var Background_1_Image;
+	
+	// Tanks
+	var Tanks = new Array();
+	
+	// Tank class
+	function Tank(cx, cy, color) {
+		this.cx = cx;
+		this.cy = cy;
+		this.width = 16;
+		this.height = 10;
+		
+		if (color == null) {
+			color = processing.color(255, 0, 0);
+		}
+		this.color = color;
+	}
+	
+	Tank.prototype.draw = function () {
+		//console.log("draw tank at " + this.x + ", " + this.y);
+		processing.rectMode(processing.CENTER);
+		processing.fill(this.color);
+		processing.noStroke();
+		processing.rect(this.cx,
+						this.cy,
+						this.width,
+						this.height);
+	}
 	
   	processing.setup = function () {
 		console.log("setup called");
@@ -39,7 +70,8 @@ function sketchProc(processing) {
 		// var processingCode = "PImage TerrainLayer = createImage( 120, 120, RGB ); TerrainLayer.pixels[0] = color(1, 2, 3, 4);";
 		// var jsCode = Processing.compile(processingCode).sourceCode;
 		// console.log(jsCode);
-
+		
+		// Init Layers
 		BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		BackgroundLayer.beginDraw();
 		BackgroundLayer.background(0, 0, 0, 255);
@@ -51,6 +83,10 @@ function sketchProc(processing) {
 		TerrainLayer.image(Background_1_Image, 0, 0);	// draw the image on top of it
 		TerrainLayer.endDraw();
 		
+		// Init Tanks
+		Tanks.push(new Tank(60, 253, Colors.Blue));
+		Tanks.push(new Tank(410, 288, Colors.Red));
+		
 		console.log("setup done!");
 	}
 
@@ -58,6 +94,9 @@ function sketchProc(processing) {
 		processing.background(204);
 		processing.image(BackgroundLayer, 0, 0);
 		processing.image(TerrainLayer, 0, 0);
+		for (var i = 0; i < Tanks.length; i++) {
+			Tanks[i].draw();
+		}
 	};
   
 	processing.keyPressed = function () {
