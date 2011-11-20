@@ -125,8 +125,11 @@ function sketchProc(processing) {
 	const InputIntervalInMS = 75;
 	const TurretLengthFromTankCenter = 15;
 	const TurretWeight = 4;
-	const PowerIncrementBig = 4;
+	const PowerIncrementBig = 10;
 	const AngleIncrementBig = 4;
+	const CrosshairWeight = 2;
+	const CrosshairSize = 8;
+	const CrosshairLengthFromTankCenter = 20;
 	
 	// const GameStates = {
 	// 	""
@@ -181,13 +184,14 @@ function sketchProc(processing) {
 	
 	
 	// Tank class
-	function Tank(cx, cy, color, angle, power) {
+	function Tank(cx, cy, color, angle, power, isPlayer) {
 		this.cx = cx;
 		this.cy = cy;
 		this.width = 16;
 		this.height = 10;
 		this.angle = angle;
 		this.power = power;
+		this.isPlayer = isPlayer;
 		
 		if (color == null) {
 			color = processing.color(255, 0, 0);
@@ -222,14 +226,29 @@ function sketchProc(processing) {
 						this.height);
 						
 		// Draw turret
-		processing.stroke(this.color);
-		processing.strokeWeight(TurretWeight);
+		if (this.isPlayer) {
+			processing.stroke(this.color);
+			processing.strokeWeight(TurretWeight);
+			var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
+			RotateVectorByDeg(turretVector, this.angle);
+			processing.line(this.cx, this.cy, this.cx + turretVector.x, this.cy + turretVector.y);
+		}
 		
-		var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
-		RotateVectorByDeg(turretVector, this.angle);
-		//console.log(turretVector);
-		
-		processing.line(this.cx, this.cy, this.cx + turretVector.x, this.cy + turretVector.y);
+		// Draw crosshair
+		if (this.isPlayer) {
+			processing.stroke(Colors.White);
+			processing.strokeWeight(CrosshairWeight);
+			var crosshairVector = new processing.PVector(CrosshairLengthFromTankCenter + ((this.power / 1000.0) * 120));
+			RotateVectorByDeg(crosshairVector, this.angle);
+			processing.line(this.cx + crosshairVector.x - (CrosshairSize / 2),
+							this.cy + crosshairVector.y,
+							this.cx + crosshairVector.x + (CrosshairSize / 2) - 1,
+							this.cy + crosshairVector.y);
+			processing.line(this.cx + crosshairVector.x,
+							this.cy + crosshairVector.y - (CrosshairSize / 2),
+							this.cx + crosshairVector.x,
+							this.cy + crosshairVector.y + (CrosshairSize / 2) - 1);		
+		}
 	}
 	
 	
@@ -508,8 +527,8 @@ function sketchProc(processing) {
 		ShotLayer.endDraw();
 		
 		// Init Tanks
-		Tanks.push(new Tank(60, 253, Colors.Blue, DefaultAngle, DefaultPower));
-		Tanks.push(new Tank(410, 288, Colors.Red, DefaultAngle, DefaultPower));
+		Tanks.push(new Tank(60, 253, Colors.Blue, DefaultAngle, DefaultPower, true));		// player
+		Tanks.push(new Tank(410, 288, Colors.Red, DefaultAngle, DefaultPower, false));		// AI
 		CurrentTank = Tanks[0];
 		
 		// Update angle + power views
