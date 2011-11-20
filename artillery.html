@@ -138,6 +138,7 @@ function sketchProc(processing) {
 	//const GameTimeEnd = 720; // 60 minutes)* 12 = 720 minutes
 	const PlayerWidth = 16;
 	const MonsterWidth = 6;
+	const PlayerExplodedRadius = 50;
 	
 	// const GameStates = {
 	// 	""
@@ -176,6 +177,18 @@ function sketchProc(processing) {
 	var AngleMinusDown = false;
 	var AnglePlusDown = false;
 	var AnglePlusPlusDown = false;
+	
+	// Game States
+	GameStates = {
+		"PLAYING" : 1,
+		"GAME_OVER" : 2
+	};
+	
+	var GameState = GameStates.PLAYING;
+	function SetGameState(theState) {
+		console.log("set game state: " + theState);
+		GameState = theState;
+	}
 	
 	// Delayed Deletion
 	function Destroy(object, deadObjects) {
@@ -237,8 +250,13 @@ function sketchProc(processing) {
 	
 	function MoveTank(tank, xoff) {
 		tank.cx += xoff;
-		AdjustTankDownward(tank);
-		AdjustTankUpward(tank);
+		if ( ! AdjustTankDownward(tank) ) {
+			return false;
+		}
+		if ( ! AdjustTankUpward(tank) ) {
+			return false;
+		}
+		return true;
 	}
 
 	function Tank(cx, cy, color, angle, power, isPlayer, width, xstep, xstepInterval) {
@@ -265,7 +283,34 @@ function sketchProc(processing) {
 			this.nextUpdateMS = CurrentTimeMS;
 		}
 		while (this.nextUpdateMS <= CurrentTimeMS) {
-			MoveTank(this, this.xstep);
+			// var intersectRectRect(var left, var top, var right, var bottom,
+			//                       var otherLeft, var otherTop, var otherRight, var otherBottom)
+			
+			if (this.isPlayer) {
+				for (var i = 1; i < Tanks.length; i++) {
+					var otherTank = Tanks[i];
+					if (intersectRectRect(this.cx - (this.width / 2),
+										  this.cy - (this.height / 2),
+										  this.cx + (this.width / 2),
+										  this.cy + (this.height / 2),
+										  otherTank.cx - (otherTank.width / 2),
+										  otherTank.cy - (otherTank.height / 2),
+										  otherTank.cx + (otherTank.width / 2),
+										  otherTank.cy + (otherTank.height / 2))) {
+						// console.log("tank collision");
+						var explosion = new Explosion(this.cx, this.cy, PlayerExplodedRadius);
+						Explosions.push(explosion);
+						SetGameState(GameStates.GAME_OVER);
+						return;
+					}
+				}
+			}
+			
+			if ( ! MoveTank(this, this.xstep) ) {
+				Destroy(this, DeadTanks);
+				return;
+			}
+
 			this.nextUpdateMS += this.xstepInterval;
 		}
 	}
@@ -322,7 +367,6 @@ function sketchProc(processing) {
 		}
 	}
 	
-	
 	// Explosion class
 	function Explosion(x, y, radius) {
 		this.x = x;
@@ -336,6 +380,10 @@ function sketchProc(processing) {
 		this.timeRemaining = DefaultExplosionDuration;
 		this.wasDrawn = false;
 		this.wasColliderRun = false;
+	}
+	
+	function intersectRectRect(left, top, right, bottom, otherLeft, otherTop, otherRight, otherBottom) {
+		return !(left > otherRight || right < otherLeft || top > otherBottom || bottom < otherTop);
 	}
 	
 	function intersectCircleAABB(Cx, Cy, Cradius, Rleft, Rtop, Rright, Rbottom) {
@@ -623,7 +671,7 @@ function sketchProc(processing) {
 		
 		// Init Tanks
 		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
-		Tanks.push(new Tank(430, /*268*/ 250, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -1, 250));		// AI
+		Tanks.push(new Tank(430, /*268*/ 250, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -2, 40));		// AI
 		CurrentTank = Tanks[0];
 		
 		// Update angle + power views
@@ -717,8 +765,11 @@ function sketchProc(processing) {
 	function Update() {
 		//console.log("s: " + (processing.millis() / 1000));
 		CurrentTimeMS = processing.millis();
-		for (var i = 0; i < Tanks.length; i++) {
-			Tanks[i].update();
+		
+		if (GameState == GameStates.PLAYING) {
+			for (var i = 0; i < Tanks.length; i++) {
+				Tanks[i].update();
+			}
 		}
 		for (var i = 0; i < Missiles.length; i++) {
 			Missiles[i].update();
