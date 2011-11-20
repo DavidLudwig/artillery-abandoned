@@ -112,6 +112,7 @@ function sketchProc(processing) {
 	const DefaultExplosionRadius = 10;
 	const DefaultExplosionDuration = 2;
 	const NumStars = 30;
+	const InputIntervalInMS = 100;
 	// const GameStates = {
 	// 	""
 	// };
@@ -136,7 +137,8 @@ function sketchProc(processing) {
 	var Explosions = new Array();
 	var DeadExplosions = new Array();
 	
-	// Button States
+	// Input States
+	var ProcessNextInputAtMS = 0;
 	var PowerMinusDown = false;
 	var PowerPlusDown = false;
 	var AngleMinusDown = false;
@@ -439,6 +441,10 @@ function sketchProc(processing) {
 	}
 
 	function ProcessInput() {
+		if (processing.millis() < ProcessNextInputAtMS) {
+			return;
+		}
+		
 		if (PowerPlusDown) {
 			setPower(getPower() + 1);
 		} else if (PowerMinusDown) {
@@ -450,6 +456,8 @@ function sketchProc(processing) {
 		} else if (AngleMinusDown) {
 			setAngle(getAngle() - 1);
 		}
+		
+		ProcessNextInputAtMS = processing.millis() + InputIntervalInMS;
 	}
 
 	function Update() {
