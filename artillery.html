@@ -135,7 +135,9 @@ function sketchProc(processing) {
 	const CrosshairLengthFromTankCenter = 20;
 	const GamePowerToViewPowerFactor = 2;
 	const MaxGamePower = 400;
-	const GameTimeEnd = 720; // 60 minutes)* 12 = 720 minutes
+	//const GameTimeEnd = 720; // 60 minutes)* 12 = 720 minutes
+	const PlayerWidth = 16;
+	const MonsterWidth = 6;
 	
 	// const GameStates = {
 	// 	""
@@ -192,10 +194,10 @@ function sketchProc(processing) {
 	
 	
 	// Tank class
-	function Tank(cx, cy, color, angle, power, isPlayer) {
+	function Tank(cx, cy, color, angle, power, isPlayer, width) {
 		this.cx = cx;
 		this.cy = cy;
-		this.width = 16;
+		this.width = width;
 		this.height = 10;
 		this.angle = angle;
 		this.power = power;
@@ -548,8 +550,8 @@ function sketchProc(processing) {
 		ShotLayer.endDraw();
 		
 		// Init Tanks
-		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true));		// player
-		Tanks.push(new Tank(430, 268, Colors.Red, DefaultAngle, DefaultPower, false));		// AI
+		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth));		// player
+		Tanks.push(new Tank(430, 268, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth));		// AI
 		CurrentTank = Tanks[0];
 		
 		// Update angle + power views
