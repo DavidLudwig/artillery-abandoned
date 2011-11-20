@@ -139,6 +139,11 @@ function sketchProc(processing) {
 	const PlayerWidth = 16;
 	const MonsterWidth = 6;
 	const PlayerExplodedRadius = 50;
+	const SpawnXMin = 400;
+	const SpawnXMax = 500;
+	const NextMonsterDelayMinMS = 6000;
+	const NextMonsterDelayMaxMS = 12000;
+
 	
 	// const GameStates = {
 	// 	""
@@ -671,13 +676,22 @@ function sketchProc(processing) {
 		
 		// Init Tanks
 		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
-		Tanks.push(new Tank(430, /*268*/ 250, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -2, 40));		// AI
 		CurrentTank = Tanks[0];
+
+		NextSpawnAt = processing.millis();
+		//SpawnMonster();
 		
 		// Update angle + power views
 		UpdateViewFromModel();
 		
 		console.log("setup done!");
+	}
+	
+	function SpawnMonster() {
+		var x = processing.random(SpawnXMin, SpawnXMax);
+		var monster = new Tank(x, 0, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -1, 100);
+		MoveTank(monster, 0);	// make sure it's on the ground
+		Tanks.push(monster);
 	}
 	
 	processing.keyPressed = function () {
@@ -776,6 +790,12 @@ function sketchProc(processing) {
 		}
 		for (var i = 0; i < Explosions.length; i++) {
 			Explosions[i].update();
+		}
+		
+		if (NextSpawnAt <= CurrentTimeMS) {
+			SpawnMonster();
+			var nextDelay = processing.random(NextMonsterDelayMinMS, NextMonsterDelayMaxMS);
+			NextSpawnAt = CurrentTimeMS + nextDelay;
 		}
 	}
 	
