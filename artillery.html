@@ -125,11 +125,13 @@ function sketchProc(processing) {
 	const InputIntervalInMS = 75;
 	const TurretLengthFromTankCenter = 15;
 	const TurretWeight = 4;
-	const PowerIncrementBig = 10;
-	const AngleIncrementBig = 4;
+	const PowerIncrementBig = 5;
+	const PowerIncrementSmall = 0.5;
+	const AngleIncrementBig = 2;
 	const CrosshairWeight = 2;
 	const CrosshairSize = 6;
 	const CrosshairLengthFromTankCenter = 20;
+	const GamePowerToViewPowerFactor = 2;
 	
 	// const GameStates = {
 	// 	""
@@ -427,8 +429,14 @@ function sketchProc(processing) {
 		return power;
 	}
 	
+	function GamePowerToViewPower(inPower) {
+		var outPower = (inPower * GamePowerToViewPowerFactor);
+		return outPower;
+	}
+	
 	function setPowerToView(value) {
-		document.getElementById("PowerValue").innerHTML = value;
+		var displayedValue = GamePowerToViewPower(value);
+		document.getElementById("PowerValue").innerHTML = displayedValue;
 	}
 	
 	function UpdateViewFromModel() {
@@ -552,13 +560,13 @@ function sketchProc(processing) {
 				}
 				doViewUpdate = true;
 			} else if (PowerPlusDown) {
-				CurrentTank.power++;
+				CurrentTank.power += PowerIncrementSmall;
 				if (CurrentTank.power > 500) {
 					CurrentTank.power = 500;
 				}
 				doViewUpdate = true;
 			} else if (PowerMinusDown) {
-				CurrentTank.power--;
+				CurrentTank.power -= PowerIncrementSmall;
 				if (CurrentTank.power < 0) {
 					CurrentTank.power = 0;
 				}
