@@ -361,8 +361,19 @@ function sketchProc(processing) {
 		return angle;
 	}
 	
-	function setAngleToView(value) {
-		document.getElementById("AngleValue").value = value;
+	function GameAngleToViewAngle(inAngle) {
+		var outAngle = (inAngle * -1);
+		return outAngle;
+	}
+	
+	function setAngleToView(value, isRealAngle) {
+		var displayedValue;
+		if (isRealAngle == true) {
+			displayedValue = value;
+		} else {
+			displayedValue = GameAngleToViewAngle(value);			
+		}
+		document.getElementById("AngleValue").value = displayedValue;
 	}
 	
 	function getPowerFromView() {
@@ -380,8 +391,8 @@ function sketchProc(processing) {
 	
 	function UpdateViewFromModel() {
 		if (CurrentTank == null) {
-			setAngleToView(0);
-			setPowerToView(0);
+			setAngleToView(0, true);
+			setPowerToView(0, true);
 		} else {
 			setAngleToView(CurrentTank.angle);
 			setPowerToView(CurrentTank.power);
@@ -516,22 +527,35 @@ function sketchProc(processing) {
 		if (CurrentTank) {
 			if (PowerPlusDown) {
 				CurrentTank.power++;
+				if (CurrentTank.power > 500) {
+					CurrentTank.power = 500;
+				}
 				doViewUpdate = true;
 			} else if (PowerMinusDown) {
 				CurrentTank.power--;
+				if (CurrentTank.power < 0) {
+					CurrentTank.power = 0;
+				}
 				doViewUpdate = true;
 			}
 		
 			if (AnglePlusDown) {
 				CurrentTank.angle++;
+				if (CurrentTank.angle > 0) {
+					CurrentTank.angle = -180;
+				}
 				doViewUpdate = true;
 			} else if (AngleMinusDown) {
 				CurrentTank.angle--;
+				if (CurrentTank.angle < -180) {
+					CurrentTank.angle = 0;
+				}
 				doViewUpdate = true;
 			}
 		}
 		
 		if (doViewUpdate) {
+			console.log(CurrentTank.angle);
 			UpdateViewFromModel();
 		}
 		
