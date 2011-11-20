@@ -162,11 +162,13 @@ function sketchProc(processing) {
 	
 	
 	// Tank class
-	function Tank(cx, cy, color) {
+	function Tank(cx, cy, color, angle, power) {
 		this.cx = cx;
 		this.cy = cy;
 		this.width = 16;
 		this.height = 10;
+		this.angle = angle;
+		this.power = power;
 		
 		if (color == null) {
 			color = processing.color(255, 0, 0);
@@ -319,22 +321,32 @@ function sketchProc(processing) {
 		// 			   4);	// height
 	}
 	
-	// Angle + Power Getters and Setters
-	
-	function getAngle() {
+	// Angle + Power management
+		
+	function getAngleFromView() {
 		return parseInt(document.getElementById("AngleValue").value);
 	}
 	
-	function setAngle(value) {
+	function setAngleToView(value) {
 		document.getElementById("AngleValue").value = value;
 	}
 	
-	function getPower() {
+	function getPowerFromView() {
 		return parseInt(document.getElementById("PowerValue").value);
 	}
 	
-	function setPower(value) {
+	function setPowerToView(value) {
 		document.getElementById("PowerValue").value = value;
+	}
+	
+	function UpdateViewsFromModel() {
+		if (CurrentTank == null) {
+			setAngleToView(0);
+			setPowerToView(0);
+		} else {
+			setAngleToView(CurrentTank.angle);
+			setPowerToView(CurrentTank.power);
+		}
 	}
 	
 	// Button Handlers
@@ -354,14 +366,7 @@ function sketchProc(processing) {
 	document.getElementById('AnglePlus').onmouseup = function () {
 		AnglePlusDown = false;
 	}
-	
-	
-	// document.getElementById('PowerMinus').onclick = function() {
-	// 	var power = getPower();
-	// 	power -= 10;
-	// 	setPower(power);
-	// }
-	
+		
 	document.getElementById('PowerMinus').onmousedown = function () {
 		PowerMinusDown = true;
 	}
@@ -379,9 +384,13 @@ function sketchProc(processing) {
 	}
 
 	document.getElementById('FireButton').onclick = function() {
-		var angleDeg = getAngle();
+		if (CurrentTank == null) {
+			return;
+		}
+		
+		var angleDeg = CurrentTank.angle;
 		var angleRad = processing.radians(angleDeg);
-		var power = getPower();
+		var power = CurrentTank.power;
 		var x = CurrentTank.cx;
 		var y = CurrentTank.cy;
 		var vx = power * Math.cos(angleRad);
@@ -399,15 +408,7 @@ function sketchProc(processing) {
 		
 		// Create PImages from pre-loaded images
 		Background_1_Image = processing.loadImage("Assets/Images/Background_1.png");
-		
-		// var processingCode = "PImage TerrainLayer = createImage( 120, 120, RGB ); TerrainLayer.pixels[0] = color(1, 2, 3, 4);";
-		// var jsCode = Processing.compile(processingCode).sourceCode;
-		// console.log(jsCode);
-		
-		// Reset controls
-		setAngle(DefaultAngle);
-		setPower(DefaultPower);
-		
+				
 		// Init Layers
 		BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		BackgroundLayer.beginDraw();
@@ -441,9 +442,12 @@ function sketchProc(processing) {
 		ShotLayer.endDraw();
 		
 		// Init Tanks
-		Tanks.push(new Tank(60, 253, Colors.Blue));
-		Tanks.push(new Tank(410, 288, Colors.Red));
+		Tanks.push(new Tank(60, 253, Colors.Blue, DefaultAngle, DefaultPower));
+		Tanks.push(new Tank(410, 288, Colors.Red, DefaultAngle, DefaultPower));
 		CurrentTank = Tanks[0];
+		
+		// Update angle + power views
+		UpdateViewsFromModel();
 		
 		console.log("setup done!");
 	}
@@ -452,17 +456,29 @@ function sketchProc(processing) {
 		if (processing.millis() < ProcessNextInputAtMS) {
 			return;
 		}
+
+		var doViewUpdate = false;
 		
-		if (PowerPlusDown) {
-			setPower(getPower() + 1);
-		} else if (PowerMinusDown) {
-			setPower(getPower() - 1);
+		if (CurrentTank) {
+			if (PowerPlusDown) {
+				CurrentTank.power++;
+				doViewUpdate = true;
+			} else if (PowerMinusDown) {
+				CurrentTank.power--;
+				doViewUpdate = true;
+			}
+		
+			if (AnglePlusDown) {
+				CurrentTank.angle++;
+				doViewUpdate = true;
+			} else if (AngleMinusDown) {
+				CurrentTank.angle--;
+				doViewUpdate = true;
+			}
 		}
 		
-		if (AnglePlusDown) {
-			setAngle(getAngle() + 1);
-		} else if (AngleMinusDown) {
-			setAngle(getAngle() - 1);
+		if (doViewUpdate) {
+			UpdateViewsFromModel();
 		}
 		
 		ProcessNextInputAtMS = processing.millis() + InputIntervalInMS;
