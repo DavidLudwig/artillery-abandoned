@@ -136,6 +136,12 @@ function sketchProc(processing) {
 	var Explosions = new Array();
 	var DeadExplosions = new Array();
 	
+	// Button States
+	var PowerMinusDown = false;
+	var PowerPlusDown = false;
+	var AngleMinusDown = false;
+	var AnglePlusDown = false;
+	
 	// Delayed Deletion
 	function Destroy(object, deadObjects) {
 		deadObjects.push(object);
@@ -322,29 +328,44 @@ function sketchProc(processing) {
 	}
 	
 	// Button Handlers
-	
-	document.getElementById('AngleMinus').onclick = function() {
-		var angle = getAngle();
-		angle -= 2;
-		setAngle(angle);
+
+	document.getElementById('AngleMinus').onmousedown = function () {
+		AngleMinusDown = true;
 	}
 
-	document.getElementById('AnglePlus').onclick = function() {
-		var angle = getAngle();
-		angle += 2;
-		setAngle(angle);
+	document.getElementById('AngleMinus').onmouseup = function () {
+		AngleMinusDown = false;
 	}
 	
-	document.getElementById('PowerMinus').onclick = function() {
-		var power = getPower();
-		power -= 10;
-		setPower(power);
+	document.getElementById('AnglePlus').onmousedown = function () {
+		AnglePlusDown = true;
 	}
 
-	document.getElementById('PowerPlus').onclick = function() {
-		var power = getPower();
-		power += 10;
-		setPower(power);
+	document.getElementById('AnglePlus').onmouseup = function () {
+		AnglePlusDown = false;
+	}
+	
+	
+	// document.getElementById('PowerMinus').onclick = function() {
+	// 	var power = getPower();
+	// 	power -= 10;
+	// 	setPower(power);
+	// }
+	
+	document.getElementById('PowerMinus').onmousedown = function () {
+		PowerMinusDown = true;
+	}
+
+	document.getElementById('PowerMinus').onmouseup = function () {
+		PowerMinusDown = false;
+	}
+	
+	document.getElementById('PowerPlus').onmousedown = function () {
+		PowerPlusDown = true;
+	}
+
+	document.getElementById('PowerPlus').onmouseup = function () {
+		PowerPlusDown = false;
 	}
 
 	document.getElementById('FireButton').onclick = function() {
@@ -417,7 +438,20 @@ function sketchProc(processing) {
 		console.log("setup done!");
 	}
 
-	// Update and draw
+	function ProcessInput() {
+		if (PowerPlusDown) {
+			setPower(getPower() + 1);
+		} else if (PowerMinusDown) {
+			setPower(getPower() - 1);
+		}
+		
+		if (AnglePlusDown) {
+			setAngle(getAngle() + 1);
+		} else if (AngleMinusDown) {
+			setAngle(getAngle() - 1);
+		}
+	}
+
 	function Update() {
 		//console.log("s: " + (processing.millis() / 1000));
 		for (var i = 0; i < Missiles.length; i++) {
@@ -430,6 +464,9 @@ function sketchProc(processing) {
 	
 	processing.draw = function() {
 		//console.log("s: " + (processing.millis() / 1000));
+		
+		// Process Input
+		ProcessInput();
 		
 		// Update
 		Update();
