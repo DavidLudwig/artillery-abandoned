@@ -143,7 +143,8 @@ function sketchProc(processing) {
 	const SpawnXMax = 500;
 	const NextMonsterDelayMinMS = 2000;
 	const NextMonsterDelayMaxMS = 7000;
-
+	const MonsterXStepMin = 70;
+	const MonsterXStepMax = 250;
 	
 	// const GameStates = {
 	// 	""
@@ -689,7 +690,8 @@ function sketchProc(processing) {
 	
 	function SpawnMonster() {
 		var x = processing.random(SpawnXMin, SpawnXMax);
-		var monster = new Tank(x, 0, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -1, 100);
+		var monsterXStep = processing.random(MonsterXStepMin, MonsterXStepMax);
+		var monster = new Tank(x, 0, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
 		MoveTank(monster, 0);	// make sure it's on the ground
 		Tanks.push(monster);
 	}
@@ -780,11 +782,11 @@ function sketchProc(processing) {
 		//console.log("s: " + (processing.millis() / 1000));
 		CurrentTimeMS = processing.millis();
 		
-		if (GameState == GameStates.PLAYING) {
+		//if (GameState == GameStates.PLAYING) {
 			for (var i = 0; i < Tanks.length; i++) {
 				Tanks[i].update();
 			}
-		}
+		//}
 		for (var i = 0; i < Missiles.length; i++) {
 			Missiles[i].update();
 		}
