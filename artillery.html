@@ -120,7 +120,7 @@ function sketchProc(processing) {
 	const DefaultPower = 150; // 190;
 	const GravityY = 100;
 	const DefaultExplosionRadius = 10;
-	const DefaultExplosionDuration = 2;
+	const DefaultExplosionDuration = 0.3;
 	const NumStars = 200;
 	const MinStarIntensity = 100;
 	const MaxStarIntensity = 175;
@@ -556,6 +556,10 @@ function sketchProc(processing) {
 		if (CurrentTank == null) {
 			return;
 		}
+		
+		ShotLayer.beginDraw();
+		ShotLayer.background(0,0,0,0);
+		ShotLayer.endDraw();
 		
 		var angleDeg = CurrentTank.angle;
 		var angleRad = processing.radians(angleDeg);
