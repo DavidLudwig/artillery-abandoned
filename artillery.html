@@ -145,6 +145,7 @@ function sketchProc(processing) {
 	
 	// Timing
 	var UpdateDurationS = 0.05;		// time to elapse when updating game state, sort-of approximately in seconds
+	var CurrentTimeMS = 0;
 	
 	// Layers
 	var BackgroundLayer;
@@ -240,7 +241,7 @@ function sketchProc(processing) {
 		AdjustTankUpward(tank);
 	}
 
-	function Tank(cx, cy, color, angle, power, isPlayer, width) {
+	function Tank(cx, cy, color, angle, power, isPlayer, width, xstep, xstepInterval) {
 		this.cx = cx;
 		this.cy = cy;
 		this.width = width;
@@ -248,11 +249,25 @@ function sketchProc(processing) {
 		this.angle = angle;
 		this.power = power;
 		this.isPlayer = isPlayer;
+		this.xstep = xstep;
+		this.xstepInterval = xstepInterval;
+		this.nextUpdateMS = null;
 		
 		if (color == null) {
 			color = processing.color(255, 0, 0);
 		}
 		this.color = color;
+	}
+	
+	Tank.prototype.update = function () {
+		if (this.nextUpdateMS == null) {
+			// set nextUpdateMS on the first tick
+			this.nextUpdateMS = CurrentTimeMS;
+		}
+		while (this.nextUpdateMS <= CurrentTimeMS) {
+			MoveTank(this, this.xstep);
+			this.nextUpdateMS += this.xstepInterval;
+		}
 	}
 	
 	function RotateVectorByRad(v, rad) {
@@ -603,8 +618,8 @@ function sketchProc(processing) {
 		ShotLayer.endDraw();
 		
 		// Init Tanks
-		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth));		// player
-		Tanks.push(new Tank(430, /*268*/ 250, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth));		// AI
+		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
+		Tanks.push(new Tank(430, /*268*/ 250, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -1, 250));		// AI
 		CurrentTank = Tanks[0];
 		
 		// Update angle + power views
@@ -697,6 +712,10 @@ function sketchProc(processing) {
 
 	function Update() {
 		//console.log("s: " + (processing.millis() / 1000));
+		CurrentTimeMS = processing.millis();
+		for (var i = 0; i < Tanks.length; i++) {
+			Tanks[i].update();
+		}
 		for (var i = 0; i < Missiles.length; i++) {
 			Missiles[i].update();
 		}
