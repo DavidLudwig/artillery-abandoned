@@ -73,18 +73,24 @@
 	
 	<div class="spacer"; style="left:10px; top:327px;">
 		<div class="label" style="left:39px; top:0px; color:White; font-size:12px">Angle:</div>
+		<!--
 		<form>
-			<input id="AngleValue" class="text_input" type="text" size=3 value="123" style="left:33px; top:21px;"></input>
+			<input id="AngleValue" class="text_input" type="text" size=3 value="45" style="left:33px; top:21px;"></input>
 		</form>
+		-->
+		<div id="AngleValue" class="label" style="left:46px; top:23px; color:White; font-size:16px">45</div>
 		<a id="AngleMinus" href="#" class="button" style="left:0px; top:18px">&lt;</a>
 		<a id="AnglePlus" href="#" class="button" style="left:80px; top:18px">&gt;</a>
 	</div>
 	
 	<div class="spacer"; style="left:190px; top:327px;">
 		<div class="label" style="left:39px; top:0px; color:White; font-size:12px">Power:</div>
+		<!--
 		<form>
 			<input id="PowerValue" class="text_input" type="text" size=3 value="100" style="left:33px; top:21px;"></input>
 		</form>
+		-->
+		<div id="PowerValue" class="label" style="left:40px; top:23px; color:White; font-size:16px">100</div>
 		<a id="PowerMinus" href="#" class="button" style="left:0px; top:18px">-</a>
 		<a id="PowerPlus" href="#" class="button" style="left:80px; top:18px">+</a>
 	</div>
@@ -353,9 +359,9 @@ function sketchProc(processing) {
 	// Angle + Power management
 		
 	function getAngleFromView() {
-		var angle = parseInt(document.getElementById("AngleValue").value);
+		var angle = parseInt(document.getElementById("AngleValue").innerHTML);
 		if (isNaN(angle)) {
-			console.log("Unable to parse angle: " + document.getElementById("AngleValue").value)
+			console.log("Unable to parse angle: " + document.getElementById("AngleValue").innerHTML)
 			return 0;
 		}
 		return angle;
@@ -379,20 +385,20 @@ function sketchProc(processing) {
 		} else {
 			displayedValue = GameAngleToViewAngle(value);			
 		}
-		document.getElementById("AngleValue").value = displayedValue;
+		document.getElementById("AngleValue").innerHTML = displayedValue;
 	}
 	
 	function getPowerFromView() {
-		var power = parseInt(document.getElementById("PowerValue").value);
+		var power = parseInt(document.getElementById("PowerValue").innerHTML);
 		if (isNaN(power)) {
-			console.log("Unable to parse power: " + document.getElementById("PowerValue").value)
+			console.log("Unable to parse power: " + document.getElementById("PowerValue").innerHTML)
 			return 0;
 		}
 		return power;
 	}
 	
 	function setPowerToView(value) {
-		document.getElementById("PowerValue").value = value;
+		document.getElementById("PowerValue").innerHTML = value;
 	}
 	
 	function UpdateViewFromModel() {
@@ -430,9 +436,11 @@ function sketchProc(processing) {
 		AnglePlusDown = false;
 	}
 	
+	/*
 	document.getElementById('AngleValue').onchange = function () {
 		UpdateModelFromView();
 	}
+	*/
 		
 	document.getElementById('PowerMinus').onmousedown = function () {
 		PowerMinusDown = true;
@@ -450,9 +458,11 @@ function sketchProc(processing) {
 		PowerPlusDown = false;
 	}
 
+	/*
 	document.getElementById('PowerValue').onchange = function () {
 		UpdateModelFromView();
 	}
+	*/
 
 	document.getElementById('FireButton').onclick = function() {
 		if (CurrentTank == null) {
