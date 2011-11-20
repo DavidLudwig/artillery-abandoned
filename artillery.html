@@ -86,7 +86,7 @@
 	</div>
 	
 	<div class="spacer"; style="left:205px; top:327px;">
-		<div class="label" style="left:70px; top:0px; color:White; font-size:12px">Power:</div>
+		<div class="label" style="left:45px; top:0px; color:White; font-size:12px; width:100px">Power (0-800):</div>
 		<!--
 		<form>
 			<input id="PowerValue" class="text_input" type="text" size=3 value="100" style="left:33px; top:21px;"></input>
@@ -132,6 +132,7 @@ function sketchProc(processing) {
 	const CrosshairSize = 6;
 	const CrosshairLengthFromTankCenter = 20;
 	const GamePowerToViewPowerFactor = 2;
+	const MaxGamePower = 400;
 	
 	// const GameStates = {
 	// 	""
@@ -556,14 +557,14 @@ function sketchProc(processing) {
 		if (CurrentTank) {
 			if (PowerPlusPlusDown) {
 				CurrentTank.power += PowerIncrementBig;
-				if (CurrentTank.power > 500) {
-					CurrentTank.power = 500;
+				if (CurrentTank.power > MaxGamePower) {
+					CurrentTank.power = MaxGamePower;
 				}
 				doViewUpdate = true;
 			} else if (PowerPlusDown) {
 				CurrentTank.power += PowerIncrementSmall;
-				if (CurrentTank.power > 500) {
-					CurrentTank.power = 500;
+				if (CurrentTank.power > MaxGamePower) {
+					CurrentTank.power = MaxGamePower;
 				}
 				doViewUpdate = true;
 			} else if (PowerMinusDown) {
