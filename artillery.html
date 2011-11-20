@@ -125,6 +125,9 @@ function sketchProc(processing) {
 	const InputIntervalInMS = 75;
 	const TurretLengthFromTankCenter = 15;
 	const TurretWeight = 4;
+	const PowerIncrementBig = 4;
+	const AngleIncrementBig = 4;
+	
 	// const GameStates = {
 	// 	""
 	// };
@@ -151,10 +154,14 @@ function sketchProc(processing) {
 	
 	// Input States
 	var ProcessNextInputAtMS = 0;
+	var PowerMinusMinusDown = false;
 	var PowerMinusDown = false;
 	var PowerPlusDown = false;
+	var PowerPlusPlusDown = false;
+	var AngleMinusMinusDown = false;
 	var AngleMinusDown = false;
 	var AnglePlusDown = false;
+	var AnglePlusPlusDown = false;
 	
 	// Delayed Deletion
 	function Destroy(object, deadObjects) {
@@ -423,50 +430,24 @@ function sketchProc(processing) {
 	}
 	
 	// UI Handlers
-
-	document.getElementById('AngleMinus').onmousedown = function () {
-		AngleMinusDown = true;
-	}
-
-	document.getElementById('AngleMinus').onmouseup = function () {
-		AngleMinusDown = false;
-	}
 	
-	document.getElementById('AnglePlus').onmousedown = function () {
-		AnglePlusDown = true;
-	}
-
-	document.getElementById('AnglePlus').onmouseup = function () {
-		AnglePlusDown = false;
-	}
-	
-	/*
-	document.getElementById('AngleValue').onchange = function () {
-		UpdateModelFromView();
-	}
-	*/
+	document.getElementById('AngleMinusMinus').onmousedown = function () { AngleMinusMinusDown = true; }
+	document.getElementById('AngleMinusMinus').onmouseup = function () { AngleMinusMinusDown = false; }
+	document.getElementById('AngleMinus').onmousedown = function () { AngleMinusDown = true; }
+	document.getElementById('AngleMinus').onmouseup = function () { AngleMinusDown = false; }
+	document.getElementById('AnglePlus').onmousedown = function () { AnglePlusDown = true; }
+	document.getElementById('AnglePlus').onmouseup = function () { AnglePlusDown = false; }
+	document.getElementById('AnglePlusPlus').onmousedown = function () { AnglePlusPlusDown = true; }
+	document.getElementById('AnglePlusPlus').onmouseup = function () { AnglePlusPlusDown = false; }
 		
-	document.getElementById('PowerMinus').onmousedown = function () {
-		PowerMinusDown = true;
-	}
-
-	document.getElementById('PowerMinus').onmouseup = function () {
-		PowerMinusDown = false;
-	}
-	
-	document.getElementById('PowerPlus').onmousedown = function () {
-		PowerPlusDown = true;
-	}
-
-	document.getElementById('PowerPlus').onmouseup = function () {
-		PowerPlusDown = false;
-	}
-
-	/*
-	document.getElementById('PowerValue').onchange = function () {
-		UpdateModelFromView();
-	}
-	*/
+	document.getElementById('PowerMinusMinus').onmousedown = function () { PowerMinusMinusDown = true; }
+	document.getElementById('PowerMinusMinus').onmouseup = function () { PowerMinusMinusDown = false; }
+	document.getElementById('PowerMinus').onmousedown = function () { PowerMinusDown = true; }
+	document.getElementById('PowerMinus').onmouseup = function () { PowerMinusDown = false; }
+	document.getElementById('PowerPlus').onmousedown = function () { PowerPlusDown = true; }
+	document.getElementById('PowerPlus').onmouseup = function () { PowerPlusDown = false; }
+	document.getElementById('PowerPlusPlus').onmousedown = function () { PowerPlusPlusDown = true; }
+	document.getElementById('PowerPlusPlus').onmouseup = function () { PowerPlusPlusDown = false; }
 
 	document.getElementById('FireButton').onclick = function() {
 		if (CurrentTank == null) {
@@ -543,9 +524,15 @@ function sketchProc(processing) {
 		}
 
 		var doViewUpdate = false;
-		
+				
 		if (CurrentTank) {
-			if (PowerPlusDown) {
+			if (PowerPlusPlusDown) {
+				CurrentTank.power += PowerIncrementBig;
+				if (CurrentTank.power > 500) {
+					CurrentTank.power = 500;
+				}
+				doViewUpdate = true;
+			} else if (PowerPlusDown) {
 				CurrentTank.power++;
 				if (CurrentTank.power > 500) {
 					CurrentTank.power = 500;
@@ -557,9 +544,21 @@ function sketchProc(processing) {
 					CurrentTank.power = 0;
 				}
 				doViewUpdate = true;
+			} else if (PowerMinusMinusDown) {
+				CurrentTank.power -= PowerIncrementBig;
+				if (CurrentTank.power < 0) {
+					CurrentTank.power = 0;
+				}
+				doViewUpdate = true;
 			}
 		
-			if (AnglePlusDown) {
+			if (AnglePlusPlusDown) {
+				CurrentTank.angle += AngleIncrementBig;
+				if (CurrentTank.angle > 0) {
+					CurrentTank.angle = -180;
+				}
+				doViewUpdate = true;
+			} else if (AnglePlusDown) {
 				CurrentTank.angle++;
 				if (CurrentTank.angle > 0) {
 					CurrentTank.angle = -180;
@@ -569,6 +568,12 @@ function sketchProc(processing) {
 				CurrentTank.angle--;
 				if (CurrentTank.angle < -180) {
 					CurrentTank.angle = 0;
+				}
+				doViewUpdate = true;
+			} else if (AngleMinusMinusDown) {
+				CurrentTank.angle -= AngleIncrementBig;
+				if (CurrentTank.angle < -180) {
+					CurrentTank.angle = 0;		// BUG: set to higher than 0 if CurrentTank.angle was considerably less than -180
 				}
 				doViewUpdate = true;
 			}
