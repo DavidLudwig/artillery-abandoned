@@ -76,8 +76,8 @@
 		<form>
 			<input id="AngleValue" class="text_input" type="text" size=3 value="123" style="left:33px; top:21px;"></input>
 		</form>
-		<a id="AngleMinus" href="#" class="button" style="left:0px; top:18px">-</a>
-		<a id="AnglePlus" href="#" class="button" style="left:80px; top:18px">+</a>
+		<a id="AngleMinus" href="#" class="button" style="left:0px; top:18px">&lt;</a>
+		<a id="AnglePlus" href="#" class="button" style="left:80px; top:18px">&gt;</a>
 	</div>
 	
 	<div class="spacer"; style="left:190px; top:327px;">
@@ -362,7 +362,13 @@ function sketchProc(processing) {
 	}
 	
 	function GameAngleToViewAngle(inAngle) {
-		var outAngle = (inAngle * -1);
+		var outAngle;
+		if (inAngle < -90) {
+			outAngle = (inAngle * -1);
+			outAngle = 180 - outAngle;
+		} else {
+			outAngle = (inAngle * -1);
+		}
 		return outAngle;
 	}
 	
@@ -555,7 +561,7 @@ function sketchProc(processing) {
 		}
 		
 		if (doViewUpdate) {
-			console.log(CurrentTank.angle);
+			//console.log(CurrentTank.angle);
 			UpdateViewFromModel();
 		}
 		
