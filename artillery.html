@@ -158,7 +158,7 @@ function sketchProc(processing) {
 	var DeadExplosions = new Array();
 	
 	// Input States
-	var ProcessNextInputAtMS = 0;
+	var ProcessInputsAfterAppTimeMS = 0;
 	var PowerMinusMinusDown = false;
 	var PowerMinusDown = false;
 	var PowerPlusDown = false;
@@ -546,7 +546,8 @@ function sketchProc(processing) {
 	}
 
 	function ProcessInput() {
-		if (processing.millis() < ProcessNextInputAtMS) {
+		if (processing.millis() < ProcessInputsAfterAppTimeMS) {
+			//console.log("ignoring inputs: cur=" + processing.millis() + "; next=" + ProcessInputsAfterAppTimeMS);
 			return;
 		}
 
@@ -609,9 +610,8 @@ function sketchProc(processing) {
 		if (doViewUpdate) {
 			//console.log(CurrentTank.angle);
 			UpdateViewFromModel();
-		}
-		
-		ProcessNextInputAtMS = processing.millis() + InputIntervalInMS;
+			ProcessInputsAfterAppTimeMS = processing.millis() + InputIntervalInMS;
+		}		
 	}
 
 	function Update() {
