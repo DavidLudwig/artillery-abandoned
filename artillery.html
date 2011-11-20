@@ -355,6 +355,12 @@ function sketchProc(processing) {
 		this.alive = true;
 	}
 	
+	function HackedGetAlpha(layer, x, y) {
+		var detectedColor = TerrainLayer.get(x, (ScreenHeight - y));
+		var detectedAlpha = processing.alpha(detectedColor);
+		return detectedAlpha;
+	}
+	
 	Missile.prototype.update = function () {
 		//console.log("missile active at ms: " + processing.millis());
 		
@@ -372,8 +378,9 @@ function sketchProc(processing) {
 		
 		// do collision detection against the ground
 		// NOTE: Processing.js reverses the y-axis wrt. its get() function
-		var detectedColor = TerrainLayer.get(this.x, (ScreenHeight-this.y));
-		var detectedAlpha = processing.alpha(detectedColor);
+		var detectedAlpha = HackedGetAlpha(TerrainLayer, this.x, this.y);
+		// var detectedColor = TerrainLayer.get(this.x, (ScreenHeight-this.y));
+		// var detectedAlpha = processing.alpha(detectedColor);
 		if (detectedAlpha > 0) {
 			var explosion = new Explosion(this.x, this.y);
 			Explosions.push(explosion);
@@ -551,7 +558,7 @@ function sketchProc(processing) {
 		
 		// Init Tanks
 		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth));		// player
-		Tanks.push(new Tank(430, 268, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth));		// AI
+		Tanks.push(new Tank(430, /*268*/ 250, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth));		// AI
 		CurrentTank = Tanks[0];
 		
 		// Update angle + power views
@@ -559,6 +566,65 @@ function sketchProc(processing) {
 		
 		console.log("setup done!");
 	}
+	
+	function AdjustTankDownward(tank) {
+		var x = tank.cx;
+		var yadjustment = (tank.height / 2);
+		var y = tank.cy + yadjustment;
+		while (true) {
+			var alpha = HackedGetAlpha(TerrainLayer, x, y);
+			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
+			if (y >= ScreenHeight) {
+				console.log("AdjustTankDownward hit bottom")
+				return false;
+			} else if (alpha == 0) {
+				y++;
+			} else {
+				//console.log("AdjustTankDownward got it!")
+				tank.cy = y - yadjustment;
+				return true;
+			}
+		}
+	}
+	
+	function AdjustTankUpward(tank) {
+		var x = tank.cx;
+		var yadjustment = (tank.height / 2);
+		var y = tank.cy + yadjustment;
+		while (true) {
+			var alpha = HackedGetAlpha(TerrainLayer, x, y - 1);
+			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
+			if (y < 0) {
+				console.log("AdjustTankUpward hit top")
+				return false;
+			} else if (alpha != 0) {
+				y--;
+			} else {
+				//console.log("AdjustTankUpward got it!")
+				tank.cy = y - yadjustment;
+				return true;
+			}
+		}
+	}
+	
+	function MoveTank(tank, xoff) {
+		tank.cx += xoff;
+		AdjustTankDownward(tank);
+		AdjustTankUpward(tank);
+	}
+	
+	processing.keyPressed = function () {
+		if (processing.keyCode == processing.LEFT) {
+			console.log("left");
+			MoveTank(Tanks[1], -1);
+		} else if (processing.keyCode == processing.RIGHT) {
+			console.log("right");
+			MoveTank(Tanks[1], 1);
+		} else if (processing.keyCode == processing.DOWN) {
+			AdjustTankDownward(Tanks[1]);
+		}
+		//console.log("key pressed: " + processing.key);
+	};
 
 	function ProcessInput() {
 		if (processing.millis() < ProcessInputsAfterAppTimeMS) {
