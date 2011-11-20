@@ -194,6 +194,52 @@ function sketchProc(processing) {
 	
 	
 	// Tank class
+	function AdjustTankDownward(tank) {
+		var x = tank.cx;
+		var yadjustment = (tank.height / 2);
+		var y = tank.cy + yadjustment;
+		while (true) {
+			var alpha = HackedGetAlpha(TerrainLayer, x, y);
+			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
+			if (y >= ScreenHeight) {
+				console.log("AdjustTankDownward hit bottom")
+				return false;
+			} else if (alpha == 0) {
+				y++;
+			} else {
+				//console.log("AdjustTankDownward got it!")
+				tank.cy = y - yadjustment;
+				return true;
+			}
+		}
+	}
+	
+	function AdjustTankUpward(tank) {
+		var x = tank.cx;
+		var yadjustment = (tank.height / 2);
+		var y = tank.cy + yadjustment;
+		while (true) {
+			var alpha = HackedGetAlpha(TerrainLayer, x, y - 1);
+			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
+			if (y < 0) {
+				console.log("AdjustTankUpward hit top")
+				return false;
+			} else if (alpha != 0) {
+				y--;
+			} else {
+				//console.log("AdjustTankUpward got it!")
+				tank.cy = y - yadjustment;
+				return true;
+			}
+		}
+	}
+	
+	function MoveTank(tank, xoff) {
+		tank.cx += xoff;
+		AdjustTankDownward(tank);
+		AdjustTankUpward(tank);
+	}
+
 	function Tank(cx, cy, color, angle, power, isPlayer, width) {
 		this.cx = cx;
 		this.cy = cy;
@@ -565,52 +611,6 @@ function sketchProc(processing) {
 		UpdateViewFromModel();
 		
 		console.log("setup done!");
-	}
-	
-	function AdjustTankDownward(tank) {
-		var x = tank.cx;
-		var yadjustment = (tank.height / 2);
-		var y = tank.cy + yadjustment;
-		while (true) {
-			var alpha = HackedGetAlpha(TerrainLayer, x, y);
-			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
-			if (y >= ScreenHeight) {
-				console.log("AdjustTankDownward hit bottom")
-				return false;
-			} else if (alpha == 0) {
-				y++;
-			} else {
-				//console.log("AdjustTankDownward got it!")
-				tank.cy = y - yadjustment;
-				return true;
-			}
-		}
-	}
-	
-	function AdjustTankUpward(tank) {
-		var x = tank.cx;
-		var yadjustment = (tank.height / 2);
-		var y = tank.cy + yadjustment;
-		while (true) {
-			var alpha = HackedGetAlpha(TerrainLayer, x, y - 1);
-			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
-			if (y < 0) {
-				console.log("AdjustTankUpward hit top")
-				return false;
-			} else if (alpha != 0) {
-				y--;
-			} else {
-				//console.log("AdjustTankUpward got it!")
-				tank.cy = y - yadjustment;
-				return true;
-			}
-		}
-	}
-	
-	function MoveTank(tank, xoff) {
-		tank.cx += xoff;
-		AdjustTankDownward(tank);
-		AdjustTankUpward(tank);
 	}
 	
 	processing.keyPressed = function () {
