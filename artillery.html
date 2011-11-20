@@ -112,7 +112,7 @@ function sketchProc(processing) {
 	const DefaultExplosionRadius = 10;
 	const DefaultExplosionDuration = 2;
 	const NumStars = 30;
-	const InputIntervalInMS = 100;
+	const InputIntervalInMS = 75;
 	// const GameStates = {
 	// 	""
 	// };
@@ -279,11 +279,19 @@ function sketchProc(processing) {
 	}
 	
 	Missile.prototype.update = function () {
+		//console.log("missile active at ms: " + processing.millis());
+		
 		this.lastx = this.x;
 		this.lasty = this.y;
 		this.x += (this.vx * UpdateDurationS);
 		this.y += (this.vy * UpdateDurationS);
 		this.vy += (GravityY * UpdateDurationS);
+		
+		// make sure the missile does not continue offscreen to either the left or right
+		if (this.x < 0 || this.x >= ScreenWidth) {
+			Destroy(this, DeadMissiles);
+			return;
+		}
 		
 		// do collision detection against the ground
 		// NOTE: Processing.js reverses the y-axis wrt. its get() function
