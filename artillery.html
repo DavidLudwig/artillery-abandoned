@@ -113,6 +113,8 @@ function sketchProc(processing) {
 	const DefaultExplosionDuration = 2;
 	const NumStars = 30;
 	const InputIntervalInMS = 75;
+	const TurretLengthFromTankCenter = 15;
+	const TurretWeight = 4;
 	// const GameStates = {
 	// 	""
 	// };
@@ -176,8 +178,24 @@ function sketchProc(processing) {
 		this.color = color;
 	}
 	
+	function RotateVectorByRad(v, rad) {
+		var cs = Math.cos(rad);
+		var sn = Math.sin(rad);
+		var px = v.x * cs - v.y * sn; 
+		var py = v.x * sn + v.y * cs;
+		v.x = px;
+		v.y = py;
+	}
+	
+	function RotateVectorByDeg(v, deg) {
+		var rad = processing.radians(deg);
+		RotateVectorByRad(v, rad);
+	}
+	
 	Tank.prototype.draw = function () {
 		//console.log("draw tank at " + this.x + ", " + this.y);
+		
+		// Draw tank body
 		processing.rectMode(processing.CENTER);
 		processing.fill(this.color);
 		processing.noStroke();
@@ -185,6 +203,16 @@ function sketchProc(processing) {
 						this.cy,
 						this.width,
 						this.height);
+						
+		// Draw turret
+		processing.stroke(this.color);
+		processing.strokeWeight(TurretWeight);
+		
+		var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
+		RotateVectorByDeg(turretVector, this.angle);
+		//console.log(turretVector);
+		
+		processing.line(this.cx, this.cy, this.cx + turretVector.x, this.cy + turretVector.y);
 	}
 	
 	
@@ -264,6 +292,7 @@ function sketchProc(processing) {
 
 		processing.ellipseMode(processing.CENTER);
 		processing.fill(Colors.Yellow);
+		processing.noStroke();
 		processing.ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
 
 	}
@@ -532,13 +561,13 @@ function sketchProc(processing) {
 		processing.background(204);
 		processing.image(BackgroundLayer, 0, 0);
 		processing.image(TerrainLayer, 0, 0);
-		for (var i = 0; i < Tanks.length; i++) {
-			Tanks[i].draw();
-		}
 		for (var i = 0; i < Missiles.length; i++) {
 			Missiles[i].draw();
 		}
 		processing.image(ShotLayer, 0, 0);
+		for (var i = 0; i < Tanks.length; i++) {
+			Tanks[i].draw();
+		}
 		for (var i = 0; i < Explosions.length; i++) {
 			Explosions[i].draw();
 		}
