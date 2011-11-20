@@ -106,8 +106,8 @@ function sketchProc(processing) {
 		"White": processing.color(255, 255, 255),
 		"Yellow": processing.color(255, 255, 0)
 	};
-	const DefaultAngle = -40;
-	const DefaultPower = 160;
+	const DefaultAngle = -56;
+	const DefaultPower = 190;
 	const GravityY = 100;
 	const DefaultExplosionRadius = 10;
 	const DefaultExplosionDuration = 2;
@@ -129,6 +129,7 @@ function sketchProc(processing) {
 	
 	// Game Objects
 	var Tanks = new Array();
+	var DeadTanks = new Array();
 	var CurrentTank = null;
 	var Missiles = new Array();
 	var DeadMissiles = new Array();
@@ -189,9 +190,52 @@ function sketchProc(processing) {
 		
 		this.timeRemaining = DefaultExplosionDuration;
 		this.wasDrawn = false;
+		this.wasColliderRun = false;
+	}
+	
+	function intersectCircleAABB(Cx, Cy, Cradius, Rleft, Rtop, Rright, Rbottom) {
+		var closestPointX = Cx;
+		var closestPointY = Cy;
+
+		if (Cx < Rleft) {
+			closestPointX = Rleft;
+		} else if (Cx > Rright) {
+			closestPointX = Rright;
+		}
+	
+		if (Cy < Rtop) {
+			closestPointY = Rtop;
+		} else if (Cy > Rbottom) {
+			closestPointY = Rbottom;
+		}
+
+		var diffX = closestPointX - Cx;
+		var diffY = closestPointY - Cy;
+	
+		if (diffX * diffX + diffY * diffY > Cradius * Cradius) {
+			return null;
+		}
+
+		return [closestPointX, closestPointY];
 	}
 	
 	Explosion.prototype.update = function () {
+		if ( ! this.wasColliderRun ) {
+			for (var i = 0; i < Tanks.length; i++) {
+				var tank = Tanks[i];
+				var collisionPoint = intersectCircleAABB(this.x, this.y, this.radius,
+					(tank.cx - (tank.width / 2)),
+					(tank.cy - (tank.height / 2)),
+					(tank.cx + (tank.width / 2)),
+					(tank.cy + (tank.height / 2)));
+				// console.log("collision pt: " + pt);
+				if (collisionPoint) {
+					Destroy(tank, DeadTanks);
+				}
+			}
+			this.wasColliderRun = true;
+		}
+		
 		this.timeRemaining -= UpdateDurationS;
 		if (this.timeRemaining <= 0) {
 			Destroy(this, DeadExplosions);
@@ -408,6 +452,7 @@ function sketchProc(processing) {
 		// Clean up garbage
 		CollectGarbage(Missiles, DeadMissiles);
 		CollectGarbage(Explosions, DeadExplosions);
+		CollectGarbage(Tanks, DeadTanks);
 	};
 }
 
