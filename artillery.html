@@ -121,7 +121,9 @@ function sketchProc(processing) {
 	const GravityY = 100;
 	const DefaultExplosionRadius = 10;
 	const DefaultExplosionDuration = 2;
-	const NumStars = 30;
+	const NumStars = 200;
+	const MinStarIntensity = 100;
+	const MaxStarIntensity = 175;
 	const InputIntervalInMS = 75;
 	const TurretLengthFromTankCenter = 15;
 	const TurretWeight = 4;
@@ -507,15 +509,17 @@ function sketchProc(processing) {
 		BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		BackgroundLayer.beginDraw();
 		BackgroundLayer.background(0, 0, 0, 255);
-		// for (var i = 0; i < NumStars; i++) {
-		// 	var x = processing.random(0, ScreenWidth);
-		// 	var y = processing.random(0, ScreenHeight);
-		// 	var intensity = processing.random(128, 255);
-		// 	var color = Colors.White;
-		// 	console.log("x="+x+"; y="+y+"; color="+color);
-		// 	//BackgroundLayer.set(x, y, color);
-		// 	BackgroundLayer.rect(x, y, 1, 1);
-		// }
+		BackgroundLayer.noStroke();
+		for (var i = 0; i < NumStars; i++) {
+			var x = processing.random(0, ScreenWidth);
+			var y = processing.random(0, ScreenHeight);
+			var intensity = processing.random(MinStarIntensity, MaxStarIntensity);
+			var color = processing.color(intensity, intensity, intensity);
+			//console.log("x="+x+"; y="+y+"; intensity="+intensity + "; ni=" + processing.random(0.0, 1.0));
+			BackgroundLayer.fill(color);
+			BackgroundLayer.rect(x, y, 1, 1);
+		}
+		
 		BackgroundLayer.endDraw();
 		
 		TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
