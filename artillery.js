@@ -728,36 +728,85 @@ function sketchProc(processing) {
 	};
 }
 
-sketch = new Processing.Sketch(sketchProc);
+// RemoteImage.prototype.onload = function () {
+//     console.log("RemoteImage loaded");
+// }
+
 const NumImagesToLoad = 2;
 var NumImagesLoaded = 0;
-var Background_2 = new Image(),
-    canvas1 = document.getElementById('canvas1'),
-    sketch,
-    processing;
-var Sunscape = new Image(),
-	canvas1 = document.getElementById('canvas1'),
-	sketch,
-	processing;
 
-function OnImageLoaded() {
-	NumImagesLoaded++;
-	if (NumImagesLoaded == NumImagesToLoad) {
-		// Once all of the images are loaded, start the Processing sketch.
-		processing = new Processing(canvas1, sketch);
-	}
+
+
+var sketch = new Processing.Sketch(sketchProc);
+var canvas1 = document.getElementById('canvas1');
+
+
+// function ProcessingApp(canvasName, sketchFunction) {
+//     this.theCanvas = document.getElementById(canvasName);
+//     this.sketch = new Processing.Sketch(sketchFunction);
+//     this.remoteImageNames = new Array();
+//     this.imageObjects = null;
+//     this.loadedImageCount = 0;
+// }
+// 
+// ProcessingApp.prototype.AddRemoteImage = function (src) {
+//     if (src.imageObjects != null) {
+//         console.error("Cannot add another image after the app has been launched!");
+//         return;
+//     }
+// 
+//     this.remoteImageNames.push(src);
+// }
+// 
+// ProcessingApp.prototype.LoadImagesAndRun = function () {
+//     var app = this;
+//     this.imageObjects = new Array();
+//     for (var i = 0; i < this.remoteImageNames.length; i++) {
+//         var imageObject = new Image();
+//         imageObject.onload = function () {
+//             app.sketch.imageCache.add(app.remoteImageNames[i], imageObject);
+//             app.OnRemoteImageLoaded();
+//         }
+//         imageObject.src = this.remoteImageNames[i];
+//     }
+// }
+// 
+// ProcessingApp.prototype.OnRemoteImageLoaded = function () {
+//     this.loadedImageCount++;
+//     if (this.loadedImageCount == this.remoteImageNames.length) {
+//         this.OnAllImagesLoaded();
+//     }
+// }
+// var processing = null;
+// ProcessingApp.prototype.OnAllImagesLoaded = function () {
+//     processing = new Processing(this.theCanvas, this.sketch);
+// }
+// 
+// 
+// var app = new ProcessingApp("canvas1", sketchProc);
+// app.AddRemoteImage("Assets/Images/Background_2.png");
+// app.AddRemoteImage("Assets/Images/Sunscape.png");
+// app.LoadImagesAndRun();
+
+
+
+function RemoteImage(src, processingSketch) {
+    this.innerImage = new Image();
+    this.innerImage.onload = function () {
+        console.log("RemoteImage loaded, src=" + src);
+        processingSketch.imageCache.add(src, this.innerImage);
+        OnImageLoaded();
+    }
+    this.innerImage.src = src;
 }
 
-Background_2.onload = function() {
-	sketch.imageCache.add("Assets/Images/Background_2.png", Background_2);
-	OnImageLoaded();
-};
+function OnImageLoaded() {
+    NumImagesLoaded++;
+    if (NumImagesLoaded == NumImagesToLoad) {
+     // Once all of the images are loaded, start the Processing sketch.
+		processing = new Processing(canvas1, sketch);
+    }
+}
 
-Sunscape.onload = function() {
-	sketch.imageCache.add("Assets/Images/Sunscape.png", Sunscape);
-	OnImageLoaded();
-};
-
-
-Background_2.src = "Assets/Images/Background_2.png";
-Sunscape.src = "Assets/Images/Sunscape.png";
+var Background_2 = new RemoteImage("Assets/Images/Background_2.png", sketch);
+var Sunscape = new RemoteImage("Assets/Images/Sunscape.png", sketch);
