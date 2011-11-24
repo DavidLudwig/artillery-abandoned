@@ -104,6 +104,11 @@ function Game(processing) {
 	var AnglePlusDown = false;
 	var AnglePlusPlusDown = false;
 	
+	// Sunscape
+	var Sunscape_YPos = 0;
+	const Sunscape_YPos_Sunrise = -45;
+	const Sunscape_YPos_Night = 384;
+	
 	// Game States
 	var GameStates = {
 		"PLAYING" : 1,
@@ -602,6 +607,9 @@ function Game(processing) {
 		NextSpawnAt = processing.millis();
 		//SpawnMonster();
 		
+		// Init Sunrise
+		Sunscape_YPos = Sunscape_YPos_Night;
+		
 		// Update angle + power views
 		UpdateViewFromModel();
 		
@@ -714,6 +722,16 @@ function Game(processing) {
 			Explosions[i].update();
 		}
 		
+		// Update sunscape position
+
+		// if (NextRiseAt <= CurrentTimeMS) {
+		// 	Sunscape_YPos--;
+		// 	if (Sunscape_YPos < Sunscape_YPos_Sunrise) {
+		// 		Sunscape_YPos = Sunscape_YPos_Sunrise;
+		// 	}
+		// 	NextRiseAt = CurrentTimeMS + 
+		// }
+				
 		if (NextSpawnAt <= CurrentTimeMS) {
 			SpawnMonster();
 			var nextDelay = processing.random(NextMonsterDelayMinMS, NextMonsterDelayMaxMS);
@@ -733,7 +751,7 @@ function Game(processing) {
 		// Draw
 		processing.background(204);
 		processing.image(BackgroundLayer, 0, 0);
-		processing.image(Sunscape_Image, 0, 0);
+		processing.image(Sunscape_Image, 0, Sunscape_YPos);
 		processing.image(TerrainLayer, 0, 0);
 		for (var i = 0; i < Missiles.length; i++) {
 			Missiles[i].draw();
