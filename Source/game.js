@@ -298,6 +298,14 @@ function Game(processing) {
 		}
 	}
 	
+	function SpawnMonster() {
+		var x = processing.random(SpawnXMin, SpawnXMax);
+		var monsterXStep = processing.random(MonsterXStepMin, MonsterXStepMax);
+		var monster = new Tank(x, 0, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
+		MoveTank(monster, 0);	// make sure it's on the ground
+		Tanks.push(monster);
+	}
+	
 	// Explosion class
 	function Explosion(x, y, radius) {
 		this.x = x;
@@ -552,78 +560,6 @@ function Game(processing) {
 		Missiles.push(missile);
 	}
 	
-	// Init game
-  	processing.setup = function () {
-		console.log("setup called");
-		
-		processing.size(ScreenWidth, ScreenHeight);
-		
-		// Create PImages from pre-loaded images
-		Background_2_Image = processing.loadImage("Assets/Images/Background_2.png");
-		Sunscape_Image = processing.loadImage("Assets/Images/Sunscape.png");
-				
-		// Init Layers
-		BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		BackgroundLayer.beginDraw();
-		BackgroundLayer.background(0, 0, 0, 255);
-		BackgroundLayer.noStroke();
-		for (var i = 0; i < NumStars; i++) {
-			var x = processing.random(0, ScreenWidth);
-			var y = processing.random(0, ScreenHeight);
-			var intensity = processing.random(MinStarIntensity, MaxStarIntensity);
-			var color = processing.color(intensity, intensity, intensity);
-			//console.log("x="+x+"; y="+y+"; intensity="+intensity + "; ni=" + processing.random(0.0, 1.0));
-			BackgroundLayer.fill(color);
-			BackgroundLayer.rect(x, y, 1, 1);
-		}
-		BackgroundLayer.endDraw();
-		
-		DawnOverlayLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		DawnOverlayLayer.beginDraw();
-		DawnOverlayLayer.fill
-		DawnOverlayLayer.endDraw();
-		
-		TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		TerrainLayer.beginDraw();
-		TerrainLayer.background(0, 0, 0, 0);			// fill with blank pixels
-		TerrainLayer.image(Background_2_Image, 0, 0);	// draw the image on top of it
-		TerrainLayer.endDraw();
-
-		// processing.imageMode(processing.CORNER);
-		// for (var y = 0; y < ScreenHeight; y++)
-		// {
-		// 	console.log("alpha,"+y+" = " + processing.red(TerrainLayer.get(20,y)));
-		// }
-		
-		ShotLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		ShotLayer.beginDraw();
-		ShotLayer.background(0, 0, 0, 0);
-		ShotLayer.endDraw();
-		
-		// Init Tanks
-		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
-		CurrentTank = Tanks[0];
-
-		NextSpawnAt = processing.millis();
-		//SpawnMonster();
-		
-		// Init Sunrise
-		Sunscape_YPos = Sunscape_YPos_Night;
-		
-		// Update angle + power views
-		UpdateViewFromModel();
-		
-		console.log("setup done!");
-	}
-	
-	function SpawnMonster() {
-		var x = processing.random(SpawnXMin, SpawnXMax);
-		var monsterXStep = processing.random(MonsterXStepMin, MonsterXStepMax);
-		var monster = new Tank(x, 0, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
-		MoveTank(monster, 0);	// make sure it's on the ground
-		Tanks.push(monster);
-	}
-	
 	processing.keyPressed = function () {
 		if (processing.keyCode == processing.LEFT) {
 			console.log("left");
@@ -705,7 +641,71 @@ function Game(processing) {
 			ProcessInputsAfterAppTimeMS = processing.millis() + InputIntervalInMS;
 		}		
 	}
+	
+	// Init game
+  	processing.setup = function () {
+		console.log("setup called");
+		
+		processing.size(ScreenWidth, ScreenHeight);
+		
+		// Create PImages from pre-loaded images
+		Background_2_Image = processing.loadImage("Assets/Images/Background_2.png");
+		Sunscape_Image = processing.loadImage("Assets/Images/Sunscape.png");
+				
+		// Init Layers
+		BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		BackgroundLayer.beginDraw();
+		BackgroundLayer.background(0, 0, 0, 255);
+		BackgroundLayer.noStroke();
+		for (var i = 0; i < NumStars; i++) {
+			var x = processing.random(0, ScreenWidth);
+			var y = processing.random(0, ScreenHeight);
+			var intensity = processing.random(MinStarIntensity, MaxStarIntensity);
+			var color = processing.color(intensity, intensity, intensity);
+			//console.log("x="+x+"; y="+y+"; intensity="+intensity + "; ni=" + processing.random(0.0, 1.0));
+			BackgroundLayer.fill(color);
+			BackgroundLayer.rect(x, y, 1, 1);
+		}
+		BackgroundLayer.endDraw();
+		
+		DawnOverlayLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		DawnOverlayLayer.beginDraw();
+		DawnOverlayLayer.fill
+		DawnOverlayLayer.endDraw();
+		
+		TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		TerrainLayer.beginDraw();
+		TerrainLayer.background(0, 0, 0, 0);			// fill with blank pixels
+		TerrainLayer.image(Background_2_Image, 0, 0);	// draw the image on top of it
+		TerrainLayer.endDraw();
 
+		// processing.imageMode(processing.CORNER);
+		// for (var y = 0; y < ScreenHeight; y++)
+		// {
+		// 	console.log("alpha,"+y+" = " + processing.red(TerrainLayer.get(20,y)));
+		// }
+		
+		ShotLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		ShotLayer.beginDraw();
+		ShotLayer.background(0, 0, 0, 0);
+		ShotLayer.endDraw();
+		
+		// Init Tanks
+		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
+		CurrentTank = Tanks[0];
+
+		NextSpawnAt = processing.millis();
+		//SpawnMonster();
+		
+		// Init Sunrise
+		Sunscape_YPos = Sunscape_YPos_Night;
+		
+		// Update angle + power views
+		UpdateViewFromModel();
+		
+		console.log("setup done!");
+	}
+	
 	function Update() {
 		//console.log("s: " + (processing.millis() / 1000));
 		CurrentTimeMS = processing.millis();
