@@ -728,85 +728,50 @@ function sketchProc(processing) {
 	};
 }
 
-// RemoteImage.prototype.onload = function () {
-//     console.log("RemoteImage loaded");
-// }
 
-const NumImagesToLoad = 2;
-var NumImagesLoaded = 0;
-
-
-
-var sketch = new Processing.Sketch(sketchProc);
-var canvas1 = document.getElementById('canvas1');
-
-
-// function ProcessingApp(canvasName, sketchFunction) {
-//     this.theCanvas = document.getElementById(canvasName);
-//     this.sketch = new Processing.Sketch(sketchFunction);
-//     this.remoteImageNames = new Array();
-//     this.imageObjects = null;
-//     this.loadedImageCount = 0;
-// }
-// 
-// ProcessingApp.prototype.AddRemoteImage = function (src) {
-//     if (src.imageObjects != null) {
-//         console.error("Cannot add another image after the app has been launched!");
-//         return;
-//     }
-// 
-//     this.remoteImageNames.push(src);
-// }
-// 
-// ProcessingApp.prototype.LoadImagesAndRun = function () {
-//     var app = this;
-//     this.imageObjects = new Array();
-//     for (var i = 0; i < this.remoteImageNames.length; i++) {
-//         var imageObject = new Image();
-//         imageObject.onload = function () {
-//             app.sketch.imageCache.add(app.remoteImageNames[i], imageObject);
-//             app.OnRemoteImageLoaded();
-//         }
-//         imageObject.src = this.remoteImageNames[i];
-//     }
-// }
-// 
-// ProcessingApp.prototype.OnRemoteImageLoaded = function () {
-//     this.loadedImageCount++;
-//     if (this.loadedImageCount == this.remoteImageNames.length) {
-//         this.OnAllImagesLoaded();
-//     }
-// }
-// var processing = null;
-// ProcessingApp.prototype.OnAllImagesLoaded = function () {
-//     processing = new Processing(this.theCanvas, this.sketch);
-// }
-// 
-// 
-// var app = new ProcessingApp("canvas1", sketchProc);
-// app.AddRemoteImage("Assets/Images/Background_2.png");
-// app.AddRemoteImage("Assets/Images/Sunscape.png");
-// app.LoadImagesAndRun();
-
-
-
-function RemoteImage(src, processingSketch) {
-    this.innerImage = new Image();
-    this.innerImage.onload = function () {
-        console.log("RemoteImage loaded, src=" + src);
-        processingSketch.imageCache.add(src, this.innerImage);
-        OnImageLoaded();
-    }
-    this.innerImage.src = src;
+/*
+ * Launches a Processing.js context after loading all resources.
+ *
+ * Example:
+ *   var launcher = new ProcessingLauncher(document.getElementById('TheCanvas'), TheSketchFunction);
+ *   launcher.AddRemoteImage("Image1.png");
+ *   launcher.AddRemoteImage("Image2.png");
+ *   launcher.LoadRemoteImagesAndRun();
+ */
+function ProcessingLauncher(canvas, sketchProc) {
+	this.NumImagesToLoad = 0;
+	this.NumImagesLoaded = 0;
+	this.ImagesToLoad = new Array();
+	this.sketch = new Processing.Sketch(sketchProc);
+	this.canvas = canvas;
+	this.processingContext = null;
 }
 
-function OnImageLoaded() {
-    NumImagesLoaded++;
-    if (NumImagesLoaded == NumImagesToLoad) {
-     // Once all of the images are loaded, start the Processing sketch.
-		processing = new Processing(canvas1, sketch);
+ProcessingLauncher.prototype.AddRemoteImage = function (src) {
+	var launcher = this;
+	var innerImage = new Image();
+	innerImage.onload = function () {
+        launcher.sketch.imageCache.add(src, innerImage);
+        launcher._OnImageLoaded();
+    }
+	this.ImagesToLoad[src] = innerImage;
+	this.NumImagesToLoad++;
+}
+
+ProcessingLauncher.prototype._OnImageLoaded = function () {
+    this.NumImagesLoaded++;
+    if (this.NumImagesLoaded == this.NumImagesToLoad) {
+		this.processingContext = new Processing(this.canvas, this.sketch);
     }
 }
 
-var Background_2 = new RemoteImage("Assets/Images/Background_2.png", sketch);
-var Sunscape = new RemoteImage("Assets/Images/Sunscape.png", sketch);
+ProcessingLauncher.prototype.LoadRemoteImagesAndRun = function () {
+	for (var src in this.ImagesToLoad) {
+	    this.ImagesToLoad[src].src = src;
+	}
+}
+
+var launcher = new ProcessingLauncher(document.getElementById('canvas1'), sketchProc);
+launcher.AddRemoteImage("Assets/Images/Background_2.png");
+launcher.AddRemoteImage("Assets/Images/Sunscape.png");
+launcher.LoadRemoteImagesAndRun();
