@@ -57,8 +57,8 @@ function Game(processing) {
 	const MonsterWidth = 6;
 	const SpawnXMin = 400;
 	const SpawnXMax = 500;
-	const NextMonsterDelayMinMS = 2000;
-	const NextMonsterDelayMaxMS = 7000;
+	const NextMonsterDelayMinMS = 20000;
+	const NextMonsterDelayMaxMS = 20000;
 	const MonsterXStepMin = 70;
 	const MonsterXStepMax = 250;
 
