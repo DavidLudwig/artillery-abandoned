@@ -1,7 +1,4 @@
-
-// Simple way to attach js code to the canvas is by using a function
-function sketchProc(processing) {
-
+function Game(processing) {
 	// Constants
 	const ScreenWidth = 512;
 	const ScreenHeight = 384;
@@ -727,9 +724,3 @@ function sketchProc(processing) {
 		CollectGarbage(Tanks, DeadTanks);
 	};
 }
-
-
-var launcher = new ProcessingLauncher(document.getElementById('canvas1'), sketchProc);
-launcher.AddRemoteImage("Assets/Images/Background_2.png");
-launcher.AddRemoteImage("Assets/Images/Sunscape.png");
-launcher.LoadRemoteImagesAndRun();
