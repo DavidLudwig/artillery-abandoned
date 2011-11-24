@@ -1,0 +1,79 @@
+
+.the_thing {
+	position: relative;
+}
+
+/*
+.click_me {
+	position: absolute;
+	top: 50px;
+	left: 100px;
+}
+*/
+
+.label {
+	position: absolute;
+	font-family: fixed;
+}
+
+.spacer {
+	position: absolute;
+}
+
+.text_input {
+	position: absolute;
+}
+
+.button {
+   position: absolute;
+   border-top: 1px solid #7d7d7d;
+   background: #828282;
+   background: -webkit-gradient(linear, left top, left bottom, from(#000000), to(#828282));
+   background: -webkit-linear-gradient(top, #000000, #828282);
+   background: -moz-linear-gradient(top, #000000, #828282);
+   background: -ms-linear-gradient(top, #000000, #828282);
+   background: -o-linear-gradient(top, #000000, #828282);
+   padding: 5px 10px;
+   -webkit-border-radius: 8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: white;
+   font-size: 14px;
+   font-family: Georgia, serif;
+   text-decoration: none;
+   vertical-align: middle;
+   }
+.button:hover {
+   border-top-color: #807e7e;
+   background: #807e7e;
+   color: #ccc;
+   }
+.button:active {
+   border-top-color: #f70000;
+   background: #f70000;
+   }
+
+.title {
+	font-size: 36px;
+	color: #ff0000;
+}
+
+.game {
+	border-style: solid;
+	border-color: #ff0000;
+	border-width: 1px;
+}
+
+.small_text {
+	font-size: 12px;
+	color: #ff0000;
+}
+
+.about {
+	font-size: 12px;
+	color: #dddddd;
+}
