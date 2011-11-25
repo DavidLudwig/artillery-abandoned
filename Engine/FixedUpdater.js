@@ -13,7 +13,7 @@ FixedUpdater.prototype.AddCallback = function (interval, callback) {
 	this._callbacks.push(callbackInfo);
 }
 
-FixedUpdater.prototype.AdvanceTime = function (offset) {
+FixedUpdater.prototype.AdvanceTimeByOffset = function (offset) {
 	this._currentTime += offset;
 	
 	for (var i = 0; i < this._callbacks.length; i++) {
@@ -23,6 +23,15 @@ FixedUpdater.prototype.AdvanceTime = function (offset) {
 			callbackInfo.nextTime += callbackInfo.interval;
 		}
 	}
+}
+
+FixedUpdater.prototype.AdvanceToTime = function (newTime) {
+	if (newTime <= this._currentTime) {
+		return;		// TODO: test this
+	}
+	
+	var offset = newTime - this._currentTime;
+	this.AdvanceTimeByOffset(offset);
 }
 
 FixedUpdater.prototype.Time = function () {
