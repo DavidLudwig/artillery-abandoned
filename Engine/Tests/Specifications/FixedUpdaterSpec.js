@@ -33,7 +33,7 @@ describe("FixedUpdater", function () {
 				callCount++;
 			});
 		});
-
+		
 		describe("that's advanceable by offset", function () {
 			it("isn't called by default", function () {
 				expect(callCount).toEqual(0);
@@ -101,6 +101,47 @@ describe("FixedUpdater", function () {
 				updater.AdvanceToTime(30);
 				expect(callCount).toEqual(3);
 			});		
+		});
+	});
+	
+	describe("signals time observers at specific times", function () {
+		var callbackTimes = null;
+		
+		beforeEach(function () {
+			callbackTimes = new Array();
+		});
+
+		function AddTestCallback(interval) {
+			var indexIntoTestResults = callbackTimes.length;
+			callbackTimes.push(new Array());
+			updater.AddCallback(interval, function () {
+				callbackTimes[indexIntoTestResults].push(updater.Time());
+			});
+		}
+		
+		it("with a single callback", function () {
+			AddTestCallback(10);
+			updater.AdvanceToTime(10);
+			expect(callbackTimes[0][0]).toEqual(10);
+		});
+		
+		it("with multiple callbacks", function () {
+			AddTestCallback(2);
+			AddTestCallback(5);
+			updater.AdvanceToTime(14);
+
+			expect(callbackTimes[0].length).toEqual(5):
+			expect(callbackTimes[0][0]).toEqual(2);
+			expect(callbackTimes[0][1]).toEqual(4);
+			expect(callbackTimes[0][2]).toEqual(6);
+			expect(callbackTimes[0][3]).toEqual(8);
+			expect(callbackTimes[0][4]).toEqual(10);
+			expect(callbackTimes[0][5]).toEqual(12);
+			expect(callbackTimes[0][6]).toEqual(14);
+
+			expect(callbackTimes[1].length).toEqual(2);
+			expect(callbackTimes[1][0]).toEqual(5);
+			expect(callbackTimes[1][1]).toEqual(10);
 		});
 	});
 });
