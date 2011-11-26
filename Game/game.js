@@ -74,6 +74,7 @@ function Game(processing) {
 	var UpdateDurationS = 0.05;		// time to elapse when updating game state, sort-of approximately in seconds
 	var CurrentTimeMS = 0;
 	var TimeMgr = null;
+	var FixedUpdateIntervalMS = 50;
 	
 	// Layers
 	var BackgroundLayer;
@@ -710,18 +711,22 @@ function Game(processing) {
 		console.log("setup done!");
 	}
 	
+	var FixedUpdateCount = 0;
+	var ActualCount = 0;
 	function FixedUpdate() {
-		console.log("FixedUpdate: managed="+TimeMgr.Time()+"; actual="+processing.millis());
+		FixedUpdateCount++;
+		console.log("FixedUpdate("+ActualCount+","+FixedUpdateCount+"): managed="+TimeMgr.Time()+"; begin="+CurrentTimeMS+"; real="+processing.millis());
 	}
 	
 	function Update() {
 		//console.log("s: " + (processing.millis() / 1000));
+		ActualCount++;
 		CurrentTimeMS = processing.millis();
 		
 		if (TimeMgr == null) {
 			TimeMgr = new FixedUpdater();
 			TimeMgr._currentTime = processing.millis();
-			TimeMgr.AddCallback(20, function () {
+			TimeMgr.AddCallback(FixedUpdateIntervalMS, function () {
 				FixedUpdate();
 			});
 			FixedUpdate();
