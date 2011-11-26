@@ -27,6 +27,16 @@ describe("FixedUpdater", function () {
 	});
 
 	describe("can have callbacks", function () {
+		it("that can be added after some amount of time has elapsed.", function () {
+			var callCount = 0;
+			updater.AdvanceToTime(100);
+			updater.AddCallback(10, function () {
+				callCount++;
+			});
+			updater.AdvanceToTime(120);
+			expect(callCount).toEqual(2);
+		});
+		
 		describe("that will be invoked a certain number of times as time is advanced", function () {
 			var callCount = 0;
 

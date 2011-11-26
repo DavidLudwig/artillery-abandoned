@@ -8,7 +8,7 @@ FixedUpdater.prototype.AddCallback = function (interval, callback) {
 	var callbackInfo = {
 		interval: interval,
 		callback: callback,
-		nextTime: interval	// TODO: set to something reflecting the current time
+		nextTime: this._currentTime + interval	// TODO: set to something reflecting the current time
 	};
 	this._callbacks.push(callbackInfo);
 }
