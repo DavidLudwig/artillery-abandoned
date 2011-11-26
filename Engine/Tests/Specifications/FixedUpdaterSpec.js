@@ -105,7 +105,7 @@ describe("FixedUpdater", function () {
 			});
 		});
 		
-		describe("that can query for the current time, which won't be in the future.", function () {
+		describe("that can query for the current time, the value of which won't be listed as being in the future.", function () {
 			var callbackTimes = null;
 
 			beforeEach(function () {
