@@ -6,22 +6,24 @@ describe("FixedUpdater", function () {
 		updater = new FixedUpdater();
 	});
 	
-	it("has a default time of 0", function () {
-		expect(updater.Time()).toEqual(0);
-	});
+	describe("can be externally queried about its current time", function () {
+		it("the value of which is zero by default.", function () {
+			expect(updater.Time()).toEqual(0);
+		});
 	
-	it("can have its time advanced forward by an offset", function () {
-		updater.AdvanceTimeByOffset(10);
-		expect(updater.Time()).toEqual(10);
+		it("the value of which updates as time is updated.", function () {
+			updater.AdvanceToTime(10);
+			expect(updater.Time()).toEqual(10);
 		
-		updater.AdvanceTimeByOffset(10);
-		expect(updater.Time()).toEqual(20);
+			updater.AdvanceToTime(20);
+			expect(updater.Time()).toEqual(20);
 		
-		updater.AdvanceTimeByOffset(20);
-		expect(updater.Time()).toEqual(40);
+			updater.AdvanceTimeByOffset(20);
+			expect(updater.Time()).toEqual(40);
 		
-		updater.AdvanceTimeByOffset(50);
-		expect(updater.Time()).toEqual(90);
+			updater.AdvanceTimeByOffset(50);
+			expect(updater.Time()).toEqual(90);
+		});
 	});
 
 	describe("can have callbacks", function () {
@@ -87,7 +89,7 @@ describe("FixedUpdater", function () {
 				});
 			});
 	
-			describe("to a specific tim.e", function () {
+			describe("to a specific time.", function () {
 				it("They will be called once, if time is advanced to the interval.", function () {
 					updater.AdvanceToTime(10);
 					expect(callCount).toEqual(1);
