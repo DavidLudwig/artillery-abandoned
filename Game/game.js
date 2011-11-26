@@ -73,6 +73,7 @@ function Game(processing) {
 	// Timing
 	var UpdateDurationS = 0.05;		// time to elapse when updating game state, sort-of approximately in seconds
 	var CurrentTimeMS = 0;
+	var TimeMgr = null;
 	
 	// Layers
 	var BackgroundLayer;
@@ -703,12 +704,30 @@ function Game(processing) {
 		// Update angle + power views
 		UpdateViewFromModel();
 		
+		// Reset time manager
+		TimeMgr = null;
+		
 		console.log("setup done!");
+	}
+	
+	function FixedUpdate() {
+		console.log("FixedUpdate: managed="+TimeMgr.Time()+"; actual="+processing.millis());
 	}
 	
 	function Update() {
 		//console.log("s: " + (processing.millis() / 1000));
 		CurrentTimeMS = processing.millis();
+		
+		if (TimeMgr == null) {
+			TimeMgr = new FixedUpdater();
+			TimeMgr._currentTime = processing.millis();
+			TimeMgr.AddCallback(20, function () {
+				FixedUpdate();
+			});
+			FixedUpdate();
+		} else {
+			TimeMgr.AdvanceToTime(processing.millis());
+		}
 		
 		//if (GameState == GameStates.PLAYING) {
 			for (var i = 0; i < Tanks.length; i++) {
