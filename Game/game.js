@@ -86,6 +86,9 @@ function Game(processing) {
 	var Background_2_Image;
 	var Sunscape_Image;
 	
+	// Missile Drawing
+	var MissileLineSegmentsToDraw;
+	
 	// Game Objects
 	var Tanks = new Array();
 	var DeadTanks = new Array();
@@ -418,6 +421,8 @@ function Game(processing) {
 		this.lasty = this.y;
 		this.x += (this.vx * FixedUpdateIntervalS);
 		this.y += (this.vy * FixedUpdateIntervalS);
+		MissileLineSegmentsToDraw.push([this.lastx, this.lasty, this.x, this.y]);
+		
 		this.vy += (GravityY * FixedUpdateIntervalS);
 		
 		// make sure the missile does not continue offscreen to either the left or right
@@ -438,6 +443,7 @@ function Game(processing) {
 		}
 	}
 	
+	/*
 	Missile.prototype.draw = function () {
 		ShotLayer.beginDraw();
 		ShotLayer.stroke(Colors.Yellow);
@@ -452,6 +458,7 @@ function Game(processing) {
 		// 			   4,	// width
 		// 			   4);	// height
 	}
+	*/
 	
 	// Angle + Power management
 		
@@ -692,6 +699,9 @@ function Game(processing) {
 		ShotLayer.background(0, 0, 0, 0);
 		ShotLayer.endDraw();
 		
+		// Init Missiles
+		MissileLineSegmentsToDraw = new Array();
+		
 		// Init Tanks
 		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
 		CurrentTank = Tanks[0];
@@ -769,9 +779,16 @@ function Game(processing) {
 		processing.image(BackgroundLayer, 0, 0);
 		processing.image(Sunscape_Image, 0, Sunscape_YPos);
 		processing.image(TerrainLayer, 0, 0);
-		for (var i = 0; i < Missiles.length; i++) {
-			Missiles[i].draw();
+
+		for (var i = 0; i < MissileLineSegmentsToDraw.length; i++) {
+			var m = MissileLineSegmentsToDraw[i];
+			ShotLayer.beginDraw();
+			ShotLayer.stroke(Colors.Yellow);
+			ShotLayer.line(m[0], m[1], m[2], m[3]);
+			ShotLayer.endDraw();
 		}
+		MissileLineSegmentsToDraw.splice(0, MissileLineSegmentsToDraw.length);	// clear the array
+		
 		processing.image(ShotLayer, 0, 0);
 		for (var i = 0; i < Tanks.length; i++) {
 			Tanks[i].draw();
