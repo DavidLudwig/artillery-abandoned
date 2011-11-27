@@ -72,9 +72,9 @@ function Game(processing) {
 	
 	// Timing
 	var UpdateDurationS = 0.05;		// time to elapse when updating game state, sort-of approximately in seconds
-	var CurrentTimeMS = 0;
 	var TimeMgr = null;
-	var FixedUpdateIntervalMS = 50;
+	const FixedUpdateIntervalMS = 50;
+	const FixedUpdateIntervalS = FixedUpdateIntervalMS / 1000;
 	
 	// Layers
 	var BackgroundLayer;
@@ -213,9 +213,9 @@ function Game(processing) {
 	Tank.prototype.update = function () {
 		if (this.nextUpdateMS == null) {
 			// set nextUpdateMS on the first tick
-			this.nextUpdateMS = CurrentTimeMS;
+			this.nextUpdateMS = TimeMgr.Time();
 		}
-		while (this.nextUpdateMS <= CurrentTimeMS) {
+		while (this.nextUpdateMS <= TimeMgr.Time()) {
 			// var intersectRectRect(var left, var top, var right, var bottom,
 			//                       var otherLeft, var otherTop, var otherRight, var otherBottom)
 			
@@ -370,7 +370,7 @@ function Game(processing) {
 			this.wasColliderRun = true;
 		}
 		
-		this.timeRemaining -= UpdateDurationS;
+		this.timeRemaining -= FixedUpdateIntervalS;
 		if (this.timeRemaining <= 0) {
 			Destroy(this, DeadExplosions);
 		}
@@ -416,9 +416,9 @@ function Game(processing) {
 		
 		this.lastx = this.x;
 		this.lasty = this.y;
-		this.x += (this.vx * UpdateDurationS);
-		this.y += (this.vy * UpdateDurationS);
-		this.vy += (GravityY * UpdateDurationS);
+		this.x += (this.vx * FixedUpdateIntervalS);
+		this.y += (this.vy * FixedUpdateIntervalS);
+		this.vy += (GravityY * FixedUpdateIntervalS);
 		
 		// make sure the missile does not continue offscreen to either the left or right
 		if (this.x < 0 || this.x >= ScreenWidth) {
@@ -715,14 +715,44 @@ function Game(processing) {
 	var ActualCount = 0;
 	function FixedUpdate() {
 		FixedUpdateCount++;
-		console.log("FixedUpdate("+ActualCount+","+FixedUpdateCount+"): managed="+TimeMgr.Time()+"; begin="+CurrentTimeMS+"; real="+processing.millis());
+		//console.log("FixedUpdate("+ActualCount+","+FixedUpdateCount+"): managed="+TimeMgr.Time()+"; real="+processing.millis());
+		
+		for (var i = 0; i < Tanks.length; i++) {
+			Tanks[i].update();
+		}
+		
+		for (var i = 0; i < Missiles.length; i++) {
+			Missiles[i].update();
+		}
+		
+		for (var i = 0; i < Explosions.length; i++) {
+			Explosions[i].update();
+		}
+		
+		if (NextSpawnAt <= TimeMgr.Time()) {
+			SpawnMonster();
+			var nextDelay = processing.random(NextMonsterDelayMinMS, NextMonsterDelayMaxMS);
+			NextSpawnAt = TimeMgr.Time() + nextDelay;
+		}
+		
+		// Update sunscape position
+
+		// if (NextRiseAt <= TimeMgr.Time()) {
+		// 	Sunscape_YPos--;
+		// 	if (Sunscape_YPos < Sunscape_YPos_Sunrise) {
+		// 		Sunscape_YPos = Sunscape_YPos_Sunrise;
+		// 	}
+		// 	NextRiseAt = TimeMgr.Time() + 
+		// }
 	}
 	
-	function Update() {
+	processing.draw = function() {
 		//console.log("s: " + (processing.millis() / 1000));
-		ActualCount++;
-		CurrentTimeMS = processing.millis();
 		
+		// Process Input
+		ProcessInput();
+		
+		// Update
 		if (TimeMgr == null) {
 			TimeMgr = new FixedUpdater();
 			TimeMgr._currentTime = processing.millis();
@@ -733,44 +763,6 @@ function Game(processing) {
 		} else {
 			TimeMgr.AdvanceToTime(processing.millis());
 		}
-		
-		//if (GameState == GameStates.PLAYING) {
-			for (var i = 0; i < Tanks.length; i++) {
-				Tanks[i].update();
-			}
-		//}
-		for (var i = 0; i < Missiles.length; i++) {
-			Missiles[i].update();
-		}
-		for (var i = 0; i < Explosions.length; i++) {
-			Explosions[i].update();
-		}
-		
-		// Update sunscape position
-
-		// if (NextRiseAt <= CurrentTimeMS) {
-		// 	Sunscape_YPos--;
-		// 	if (Sunscape_YPos < Sunscape_YPos_Sunrise) {
-		// 		Sunscape_YPos = Sunscape_YPos_Sunrise;
-		// 	}
-		// 	NextRiseAt = CurrentTimeMS + 
-		// }
-				
-		if (NextSpawnAt <= CurrentTimeMS) {
-			SpawnMonster();
-			var nextDelay = processing.random(NextMonsterDelayMinMS, NextMonsterDelayMaxMS);
-			NextSpawnAt = CurrentTimeMS + nextDelay;
-		}
-	}
-	
-	processing.draw = function() {
-		//console.log("s: " + (processing.millis() / 1000));
-		
-		// Process Input
-		ProcessInput();
-		
-		// Update
-		Update();
 		
 		// Draw
 		processing.background(204);
