@@ -696,39 +696,24 @@ function Game(processing) {
 		processing.size(ScreenWidth, ScreenHeight);
 		
 		// Create PImages from pre-loaded images
-		// Background_2_Image = processing.loadImage("Assets/Images/Background_2.png");
 		Background_2_Image = launcher.GetImage("Assets/Images/Background_2.png");
-		//Sunscape_Image = processing.loadImage("Assets/Images/Sunscape.png");
 		Sunscape_Image = launcher.GetImage("Assets/Images/Sunscape.png");
 		
 		// Init Layers
-		//BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		BackgroundLayer = document.createElement("canvas");
 		BackgroundLayer.width = ScreenWidth;
 		BackgroundLayer.height = ScreenHeight;
-		//BackgroundLayer.beginDraw();
 		var tmpContext = BackgroundLayer.getContext("2d");
-		//BackgroundLayer.background(0, 0, 0, 255);
 		tmpContext.fillStyle = "black"
 		tmpContext.fillRect(0, 0, BackgroundLayer.width, BackgroundLayer.height);
-		//BackgroundLayer.noStroke();
 		for (var i = 0; i < NumStars; i++) {
-			//var x = processing.random(0, ScreenWidth);
 			var x = RandInt(0, ScreenWidth);
-			//var y = processing.random(0, ScreenHeight);
 			var y = RandInt(0, ScreenHeight);
-			//var intensity = processing.random(MinStarIntensity, MaxStarIntensity);
 			var intensity = RandInt(MinStarIntensity, MaxStarIntensity);
-			//var color = processing.color(intensity, intensity, intensity);
 			var color = "rgb(" + intensity + "," + intensity + "," + intensity + ");";
-			//var color = "rgb(200, 200, 200);";
-			//console.log("x="+x+"; y="+y+"; intensity="+intensity + "; ni=" + processing.random(0.0, 1.0));
-			//BackgroundLayer.fill(color);
 			tmpContext.fillStyle = color;
-			//BackgroundLayer.rect(x, y, 1, 1);
 			tmpContext.fillRect(x, y, 1, 1);
 		}
-		//BackgroundLayer.endDraw();
 		tmpContext = null;
 		
 		// DawnOverlayLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
@@ -740,22 +725,12 @@ function Game(processing) {
 		TerrainLayer = document.createElement("canvas");
 		TerrainLayer.width = ScreenWidth;
 		TerrainLayer.height = ScreenHeight;
-		//TerrainLayer.beginDraw();
 		tmpContext = TerrainLayer.getContext("2d");
-		//TerrainLayer.background(0, 0, 0, 0);			// fill with blank pixels
 		tmpContext.fillStyle = "transparent black";
 		tmpContext.fillRect(0, 0, TerrainLayer.width, TerrainLayer.height);
-		//TerrainLayer.image(Background_2_Image, 0, 0);	// draw the image on top of it
 		tmpContext.drawImage(Background_2_Image, 0, 0);
 		TerrainLayerData = tmpContext.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
-		//TerrainLayer.endDraw();
 		tmpContext = null;
-
-		// processing.imageMode(processing.CORNER);
-		// for (var y = 0; y < ScreenHeight; y++)
-		// {
-		// 	console.log("alpha,"+y+" = " + processing.red(TerrainLayer.get(20,y)));
-		// }
 		
 		ShotLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		ShotLayer.beginDraw();
