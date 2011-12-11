@@ -581,9 +581,10 @@ function Game(processing) {
 			return;
 		}
 		
-		ShotLayer.beginDraw();
-		ShotLayer.background(0,0,0,0);
-		ShotLayer.endDraw();
+		var tmpContext = ShotLayer.getContext("2d");
+		tmpContext.fillStyle = "transparent black";
+		tmpContext.fillRect(ShotLayer.width, ShotLayer.height);
+		tmpContext = null;
 		
 		var angleDeg = CurrentTank.angle;
 		var angleRad = processing.radians(angleDeg);
@@ -732,10 +733,17 @@ function Game(processing) {
 		TerrainLayerData = tmpContext.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
 		tmpContext = null;
 		
-		ShotLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		ShotLayer.beginDraw();
-		ShotLayer.background(0, 0, 0, 0);
-		ShotLayer.endDraw();
+		ShotLayer = document.createElement("canvas");
+		ShotLayer.width = ScreenWidth;
+		ShotLayer.height = ScreenHeight;
+		tmpContext = ShotLayer.getContext("2d");
+		tmpContext.fillStyle = "rgba(0,0,0,0);";
+		tmpContext.fillRect(0, 0, ShotLayer.width, ShotLayer.height);
+		tmpContext = null;
+		// ShotLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		// ShotLayer.beginDraw();
+		// ShotLayer.background(0, 0, 0, 0);
+		// ShotLayer.endDraw();
 		
 		// Init Missiles
 		MissileLineSegmentsToDraw = new Array();
@@ -802,6 +810,7 @@ function Game(processing) {
 		}
 		
 		var ctx = canvas.getContext("2d");
+		var tmpContext = null;
 		
 		/*
 		ctx.fillStyle = "rgb(200,0,0)";  
@@ -866,17 +875,19 @@ function Game(processing) {
 		//processing.image(TerrainLayer, 0, 0);
 		ctx.drawImage(TerrainLayer, 0, 0);
 		
-		/*
-
-		for (var i = 0; i < MissileLineSegmentsToDraw.length; i++) {
-			var m = MissileLineSegmentsToDraw[i];
-			ShotLayer.beginDraw();
-			ShotLayer.stroke(Colors.Yellow);
-			ShotLayer.line(m[0], m[1], m[2], m[3]);
-			ShotLayer.endDraw();
+		if (MissileLineSegmentsToDraw.length > 0) {
+			tmpContext = ShotLayer.getContext("2d");
+			tmpContext.strokeStyle = "yellow";
+			for (var i = 0; i < MissileLineSegmentsToDraw.length; i++) {
+				var m = MissileLineSegmentsToDraw[i];
+				tmpContext.beginPath();
+				tmpContext.moveTo(m[0], m[1]);
+				tmpContext.lineTo(m[2], m[3]);
+				tmpContext.stroke();
+			}
+			MissileLineSegmentsToDraw.splice(0, MissileLineSegmentsToDraw.length);	// clear the array
 		}
-		MissileLineSegmentsToDraw.splice(0, MissileLineSegmentsToDraw.length);	// clear the array
-		*/
+		ctx.drawImage(ShotLayer, 0, 0);
 		
 		// processing.image(ShotLayer, 0, 0);
 		for (var i = 0; i < Tanks.length; i++) {
