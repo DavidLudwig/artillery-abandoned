@@ -283,46 +283,39 @@ function Game(processing) {
 		//console.log("draw tank at " + this.x + ", " + this.y);
 		
 		// Draw tank body
-		ctx.save();
-		// processing.rectMode(processing.CENTER);
-		// processing.fill(this.color);
-		// processing.noStroke();
-		// processing.rect(this.cx,
-		// 				this.cy,
-		// 				this.width,
-		// 				this.height);
 		var x = this.cx - (this.width/2);
 		var y = this.cy - (this.height/2);
-		// ctx.translate(this.cx - (this.width/2), this.cy - (this.height/2));
-		ctx.fillStyle = "purple";
-		// ctx.fillRect(0, 0, this.width, this.height);
+		ctx.fillStyle = this.color;
 		ctx.fillRect(x, y, this.width, this.height);
-		ctx.restore();
 
-		// // Draw turret
-		// if (this.isPlayer) {
-		// 	processing.stroke(this.color);
-		// 	processing.strokeWeight(TurretWeight);
-		// 	var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
-		// 	RotateVectorByDeg(turretVector, this.angle);
-		// 	processing.line(this.cx, this.cy, this.cx + turretVector.x, this.cy + turretVector.y);
-		// }
-		// 
-		// // Draw crosshair
-		// if (this.isPlayer) {
-		// 	processing.stroke(Colors.White);
-		// 	processing.strokeWeight(CrosshairWeight);
-		// 	var crosshairVector = new processing.PVector(CrosshairLengthFromTankCenter + ((this.power / 1000.0) * 120));
-		// 	RotateVectorByDeg(crosshairVector, this.angle);
-		// 	processing.line(this.cx + crosshairVector.x - (CrosshairSize / 2),
-		// 					this.cy + crosshairVector.y,
-		// 					this.cx + crosshairVector.x + (CrosshairSize / 2) - 1,
-		// 					this.cy + crosshairVector.y);
-		// 	processing.line(this.cx + crosshairVector.x,
-		// 					this.cy + crosshairVector.y - (CrosshairSize / 2),
-		// 					this.cx + crosshairVector.x,
-		// 					this.cy + crosshairVector.y + (CrosshairSize / 2) - 1);		
-		// }
+		// Draw turret
+		if (this.isPlayer) {
+			var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
+			RotateVectorByDeg(turretVector, this.angle);
+			ctx.beginPath();
+			ctx.moveTo(this.cx, this.cy);
+			ctx.lineTo(this.cx + turretVector.x, this.cy + turretVector.y);
+			ctx.strokeStyle = this.color;
+			ctx.lineWidth = TurretWeight;
+			ctx.lineCap = "square";
+			ctx.stroke();
+		}
+		
+		// Draw crosshair
+		if (this.isPlayer) {
+			var crosshairVector = new processing.PVector(CrosshairLengthFromTankCenter + ((this.power / 1000.0) * 120));
+			RotateVectorByDeg(crosshairVector, this.angle);
+			ctx.lineWidth = CrosshairWeight;
+			ctx.strokeStyle = "white";
+			ctx.beginPath();
+			ctx.moveTo(this.cx + crosshairVector.x - (CrosshairSize / 2), this.cy + crosshairVector.y);
+			ctx.lineTo(this.cx + crosshairVector.x + (CrosshairSize / 2), this.cy + crosshairVector.y);
+			ctx.stroke();
+			ctx.moveTo(this.cx + crosshairVector.x, this.cy + crosshairVector.y - (CrosshairSize / 2));
+			ctx.lineTo(this.cx + crosshairVector.x, this.cy + crosshairVector.y + (CrosshairSize / 2));
+			ctx.stroke();
+		}
+		
 		ctx.restore();
 	}
 	
@@ -330,7 +323,7 @@ function Game(processing) {
 		return;
 		var x = processing.random(SpawnXMin, SpawnXMax);
 		var monsterXStep = processing.random(MonsterXStepMin, MonsterXStepMax);
-		var monster = new Tank(x, 0, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
+		var monster = new Tank(x, 0, "red", DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
 		MoveTank(monster, 0);	// make sure it's on the ground
 		Tanks.push(monster);
 	}
@@ -773,7 +766,7 @@ function Game(processing) {
 		MissileLineSegmentsToDraw = new Array();
 		
 		// Init Tanks
-		Tanks.push(new Tank(60, 267, Colors.Blue, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
+		Tanks.push(new Tank(60, 267, "blue", DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
 		CurrentTank = Tanks[0];
 
 		NextSpawnAt = processing.millis();
