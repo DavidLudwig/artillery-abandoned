@@ -80,6 +80,7 @@ function Game(processing) {
 	var BackgroundLayer;
 	//var DawnOverlayLayer;
 	var TerrainLayer;
+	var TerrainLayerData;
 	var ShotLayer;
 	
 	// Images
@@ -157,12 +158,13 @@ function Game(processing) {
 		var yadjustment = (tank.height / 2);
 		var y = tank.cy + yadjustment;
 		while (true) {
-			var alpha = HackedGetAlpha(TerrainLayer, x, y);
-			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
 			if (y >= ScreenHeight) {
 				console.log("AdjustTankDownward hit bottom")
 				return false;
-			} else if (alpha == 0) {
+			}
+			var alpha = HackedGetAlpha(TerrainLayerData, x, y);
+			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
+			if (alpha == 0) {
 				y++;
 			} else {
 				//console.log("AdjustTankDownward got it!")
@@ -177,12 +179,13 @@ function Game(processing) {
 		var yadjustment = (tank.height / 2);
 		var y = tank.cy + yadjustment;
 		while (true) {
-			var alpha = HackedGetAlpha(TerrainLayer, x, y - 1);
-			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
-			if (y < 0) {
+			if (y <= 0) {
 				console.log("AdjustTankUpward hit top")
 				return false;
-			} else if (alpha != 0) {
+			}
+			var alpha = HackedGetAlpha(TerrainLayerData, x, y - 1);
+			//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
+			if (alpha != 0) {
 				y--;
 			} else {
 				//console.log("AdjustTankUpward got it!")
@@ -250,10 +253,12 @@ function Game(processing) {
 				}
 			}
 			
+			/*
 			if ( ! MoveTank(this, this.xstep) ) {
 				Destroy(this, DeadTanks);
 				return;
 			}
+			*/
 
 			this.nextUpdateMS += this.xstepInterval;
 		}
@@ -273,45 +278,56 @@ function Game(processing) {
 		RotateVectorByRad(v, rad);
 	}
 	
-	Tank.prototype.draw = function () {
+	Tank.prototype.draw = function (ctx, a, b, c, d) {
+		ctx.save();
 		//console.log("draw tank at " + this.x + ", " + this.y);
 		
 		// Draw tank body
-		processing.rectMode(processing.CENTER);
-		processing.fill(this.color);
-		processing.noStroke();
-		processing.rect(this.cx,
-						this.cy,
-						this.width,
-						this.height);
-						
-		// Draw turret
-		if (this.isPlayer) {
-			processing.stroke(this.color);
-			processing.strokeWeight(TurretWeight);
-			var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
-			RotateVectorByDeg(turretVector, this.angle);
-			processing.line(this.cx, this.cy, this.cx + turretVector.x, this.cy + turretVector.y);
-		}
-		
-		// Draw crosshair
-		if (this.isPlayer) {
-			processing.stroke(Colors.White);
-			processing.strokeWeight(CrosshairWeight);
-			var crosshairVector = new processing.PVector(CrosshairLengthFromTankCenter + ((this.power / 1000.0) * 120));
-			RotateVectorByDeg(crosshairVector, this.angle);
-			processing.line(this.cx + crosshairVector.x - (CrosshairSize / 2),
-							this.cy + crosshairVector.y,
-							this.cx + crosshairVector.x + (CrosshairSize / 2) - 1,
-							this.cy + crosshairVector.y);
-			processing.line(this.cx + crosshairVector.x,
-							this.cy + crosshairVector.y - (CrosshairSize / 2),
-							this.cx + crosshairVector.x,
-							this.cy + crosshairVector.y + (CrosshairSize / 2) - 1);		
-		}
+		ctx.save();
+		// processing.rectMode(processing.CENTER);
+		// processing.fill(this.color);
+		// processing.noStroke();
+		// processing.rect(this.cx,
+		// 				this.cy,
+		// 				this.width,
+		// 				this.height);
+		var x = this.cx - (this.width/2);
+		var y = this.cy - (this.height/2);
+		// ctx.translate(this.cx - (this.width/2), this.cy - (this.height/2));
+		ctx.fillStyle = "purple";
+		// ctx.fillRect(0, 0, this.width, this.height);
+		ctx.fillRect(x, y, this.width, this.height);
+		ctx.restore();
+
+		// // Draw turret
+		// if (this.isPlayer) {
+		// 	processing.stroke(this.color);
+		// 	processing.strokeWeight(TurretWeight);
+		// 	var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
+		// 	RotateVectorByDeg(turretVector, this.angle);
+		// 	processing.line(this.cx, this.cy, this.cx + turretVector.x, this.cy + turretVector.y);
+		// }
+		// 
+		// // Draw crosshair
+		// if (this.isPlayer) {
+		// 	processing.stroke(Colors.White);
+		// 	processing.strokeWeight(CrosshairWeight);
+		// 	var crosshairVector = new processing.PVector(CrosshairLengthFromTankCenter + ((this.power / 1000.0) * 120));
+		// 	RotateVectorByDeg(crosshairVector, this.angle);
+		// 	processing.line(this.cx + crosshairVector.x - (CrosshairSize / 2),
+		// 					this.cy + crosshairVector.y,
+		// 					this.cx + crosshairVector.x + (CrosshairSize / 2) - 1,
+		// 					this.cy + crosshairVector.y);
+		// 	processing.line(this.cx + crosshairVector.x,
+		// 					this.cy + crosshairVector.y - (CrosshairSize / 2),
+		// 					this.cx + crosshairVector.x,
+		// 					this.cy + crosshairVector.y + (CrosshairSize / 2) - 1);		
+		// }
+		ctx.restore();
 	}
 	
 	function SpawnMonster() {
+		return;
 		var x = processing.random(SpawnXMin, SpawnXMax);
 		var monsterXStep = processing.random(MonsterXStepMin, MonsterXStepMax);
 		var monster = new Tank(x, 0, Colors.Red, DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
@@ -417,9 +433,20 @@ function Game(processing) {
 	}
 	
 	function HackedGetAlpha(layer, x, y) {
-		var detectedColor = TerrainLayer.get(x, (ScreenHeight - y));
-		var detectedAlpha = processing.alpha(detectedColor);
-		return detectedAlpha;
+		//var detectedColor = TerrainLayer.get(x, (ScreenHeight - y));
+		//var detectedAlpha = processing.alpha(detectedColor);
+		//return detectedAlpha;
+		x = Math.round(x);
+		y = Math.round(y);
+		
+		var index = (((layer.width * y) + x) * 4) + 3;
+		var value = layer.data[index];
+		if (value == null) {
+			console.log("undefined value");
+		}
+		//console.log("value at "+x+","+y+": "+value);
+		return value;
+		//return 0;
 	}
 	
 	Missile.prototype.update = function () {
@@ -441,7 +468,7 @@ function Game(processing) {
 		
 		// do collision detection against the ground
 		// NOTE: Processing.js reverses the y-axis wrt. its get() function
-		var detectedAlpha = HackedGetAlpha(TerrainLayer, this.x, this.y);
+		var detectedAlpha = HackedGetAlpha(TerrainLayerData, this.x, this.y);
 		// var detectedColor = TerrainLayer.get(this.x, (ScreenHeight-this.y));
 		// var detectedAlpha = processing.alpha(detectedColor);
 		if (detectedAlpha > 0) {
@@ -661,15 +688,25 @@ function Game(processing) {
 	
 	// Init game
   	processing.setup = function () {
-		console.log("setup called");
+		console.log("setup calledX");
+		
+		// var testCanvas = document.createElement("canvas");
+		// testCanvas.width = 16;
+		// testCanvas.height = 16;
+		// var testContext = testCanvas.getContext("2d");
+		// testContext.fillStyle = "red";
+		// testContext.fillRect(0, 0, 16, 16);
+		// var testData = testContext.getImageData(0, 0, 16, 16);
+		// var value = testData.data[0];
+		// console.log("value: " + value);
 		
 		processing.size(ScreenWidth, ScreenHeight);
 		
 		// Create PImages from pre-loaded images
-		Background_2_Image = processing.loadImage("Assets/Images/Background_2.png");
+		// Background_2_Image = processing.loadImage("Assets/Images/Background_2.png");
+		Background_2_Image = launcher.GetImage("Assets/Images/Background_2.png");
 		//Sunscape_Image = processing.loadImage("Assets/Images/Sunscape.png");
 		Sunscape_Image = launcher.GetImage("Assets/Images/Sunscape.png");
-		console.log("sunscape: " + Sunscape_Image);
 		
 		// Init Layers
 		//BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
@@ -706,11 +743,20 @@ function Game(processing) {
 		// DawnOverlayLayer.fill
 		// DawnOverlayLayer.endDraw();
 		
-		TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		TerrainLayer.beginDraw();
-		TerrainLayer.background(0, 0, 0, 0);			// fill with blank pixels
-		TerrainLayer.image(Background_2_Image, 0, 0);	// draw the image on top of it
-		TerrainLayer.endDraw();
+		//TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		TerrainLayer = document.createElement("canvas");
+		TerrainLayer.width = ScreenWidth;
+		TerrainLayer.height = ScreenHeight;
+		//TerrainLayer.beginDraw();
+		tmpContext = TerrainLayer.getContext("2d");
+		//TerrainLayer.background(0, 0, 0, 0);			// fill with blank pixels
+		tmpContext.fillStyle = "transparent black";
+		tmpContext.fillRect(0, 0, TerrainLayer.width, TerrainLayer.height);
+		//TerrainLayer.image(Background_2_Image, 0, 0);	// draw the image on top of it
+		tmpContext.drawImage(Background_2_Image, 0, 0);
+		TerrainLayerData = tmpContext.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
+		//TerrainLayer.endDraw();
+		tmpContext = null;
 
 		// processing.imageMode(processing.CORNER);
 		// for (var y = 0; y < ScreenHeight; y++)
@@ -828,8 +874,31 @@ function Game(processing) {
 
 		//processing.image(Sunscape_Image, 0, Sunscape_YPos);
 		ctx.drawImage(Sunscape_Image, 0, Sunscape_YPos);
-/*
-		processing.image(TerrainLayer, 0, 0);
+		
+		// var data = ctx.createImageData(16, 16);
+		// var to = 16 * 16 * 4;
+		// for (var i = 0; i < to; i+=4) {
+		// 	data.data[i+0] = 255;
+		// 	data.data[i+1] = 0;
+		// 	data.data[i+2] = 0;
+		// 	data.data[i+3] = 255;
+		// }
+		// ctx.putImageData(data, 0, 0);
+		// 
+		// //console.log("data.data[0]: " + data.data[0]);
+		// 
+		// for (var i = 0; i < to; i+=4) {
+		// 	data.data[i+0] = 0;
+		// 	data.data[i+1] = 255;
+		// 	data.data[i+2] = 0;
+		// 	data.data[i+3] = 255;
+		// }
+		// ctx.putImageData(data, 16, 0);
+		
+		//processing.image(TerrainLayer, 0, 0);
+		ctx.drawImage(TerrainLayer, 0, 0);
+		
+		/*
 
 		for (var i = 0; i < MissileLineSegmentsToDraw.length; i++) {
 			var m = MissileLineSegmentsToDraw[i];
@@ -839,20 +908,20 @@ function Game(processing) {
 			ShotLayer.endDraw();
 		}
 		MissileLineSegmentsToDraw.splice(0, MissileLineSegmentsToDraw.length);	// clear the array
+		*/
 		
-		processing.image(ShotLayer, 0, 0);
+		// processing.image(ShotLayer, 0, 0);
 		for (var i = 0; i < Tanks.length; i++) {
-			Tanks[i].draw();
+			Tanks[i].draw(ctx);
 		}
-		for (var i = 0; i < Explosions.length; i++) {
-			Explosions[i].draw();
-		}
+		// for (var i = 0; i < Explosions.length; i++) {
+		// 	Explosions[i].draw();
+		// }
 		
 		// Clean up garbage
 		CollectGarbage(Missiles, DeadMissiles);
 		CollectGarbage(Explosions, DeadExplosions);
 		CollectGarbage(Tanks, DeadTanks);
-		*/
 		ctx.restore();
 	};
 }
