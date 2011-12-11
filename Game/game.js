@@ -396,7 +396,7 @@ function Game(processing) {
 		}
 	}
 	
-	Explosion.prototype.draw = function () {
+	Explosion.prototype.draw = function (ctx) {
 		// if ( ! this.wasDrawn ) {
 		// 	ShotLayer.beginDraw();
 		// 	ShotLayer.ellipseMode(processing.CENTER);
@@ -406,10 +406,18 @@ function Game(processing) {
 		// 	this.wasDrawn = true;
 		// }
 
-		processing.ellipseMode(processing.CENTER);
-		processing.fill(Colors.Yellow);
-		processing.noStroke();
-		processing.ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
+		ctx.save();
+		ctx.beginPath();
+		ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+		ctx.fillStyle = "yellow";
+		ctx.fill();
+		ctx.restore();
+		
+
+		// processing.ellipseMode(processing.CENTER);
+		// processing.fill(Colors.Yellow);
+		// processing.noStroke();
+		// processing.ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
 
 	}
 	
@@ -893,9 +901,9 @@ function Game(processing) {
 		for (var i = 0; i < Tanks.length; i++) {
 			Tanks[i].draw(ctx);
 		}
-		// for (var i = 0; i < Explosions.length; i++) {
-		// 	Explosions[i].draw();
-		// }
+		for (var i = 0; i < Explosions.length; i++) {
+			Explosions[i].draw(ctx);
+		}
 		
 		// Clean up garbage
 		CollectGarbage(Missiles, DeadMissiles);
