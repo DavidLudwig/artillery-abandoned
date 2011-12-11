@@ -28,6 +28,10 @@ ProcessingLauncher.prototype.AddRemoteImage = function (src) {
 	this.NumImagesToLoad++;
 }
 
+ProcessingLauncher.prototype.GetImage = function (imageName) {
+	return this.ImagesToLoad[imageName];
+}
+
 ProcessingLauncher.prototype._OnImageLoaded = function () {
     this.NumImagesLoaded++;
     if (this.NumImagesLoaded == this.NumImagesToLoad) {

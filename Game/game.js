@@ -78,7 +78,7 @@ function Game(processing) {
 	
 	// Layers
 	var BackgroundLayer;
-	var DawnOverlayLayer;
+	//var DawnOverlayLayer;
 	var TerrainLayer;
 	var ShotLayer;
 	
@@ -114,6 +114,11 @@ function Game(processing) {
 	const Sunscape_YPos_Sunrise = -45;
 	const Sunscape_YPos_Night = 384;
 	
+	// Utility Functions
+	function RandInt(from, to) {
+		return Math.floor(Math.random() * (to - from + 1) + from);
+	}
+	
 	// Game States
 	var GameStates = {
 		"PLAYING" : 1,
@@ -122,6 +127,9 @@ function Game(processing) {
 	
 	var GameState = GameStates.PLAYING;
 	function SetGameState(theState) {
+		if (GameState == theState) {
+			return;
+		}
 		console.log("set game state: " + theState);
 		GameState = theState;
 	}
@@ -659,28 +667,44 @@ function Game(processing) {
 		
 		// Create PImages from pre-loaded images
 		Background_2_Image = processing.loadImage("Assets/Images/Background_2.png");
-		Sunscape_Image = processing.loadImage("Assets/Images/Sunscape.png");
-				
-		// Init Layers
-		BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		BackgroundLayer.beginDraw();
-		BackgroundLayer.background(0, 0, 0, 255);
-		BackgroundLayer.noStroke();
-		for (var i = 0; i < NumStars; i++) {
-			var x = processing.random(0, ScreenWidth);
-			var y = processing.random(0, ScreenHeight);
-			var intensity = processing.random(MinStarIntensity, MaxStarIntensity);
-			var color = processing.color(intensity, intensity, intensity);
-			//console.log("x="+x+"; y="+y+"; intensity="+intensity + "; ni=" + processing.random(0.0, 1.0));
-			BackgroundLayer.fill(color);
-			BackgroundLayer.rect(x, y, 1, 1);
-		}
-		BackgroundLayer.endDraw();
+		//Sunscape_Image = processing.loadImage("Assets/Images/Sunscape.png");
+		Sunscape_Image = launcher.GetImage("Assets/Images/Sunscape.png");
+		console.log("sunscape: " + Sunscape_Image);
 		
-		DawnOverlayLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		DawnOverlayLayer.beginDraw();
-		DawnOverlayLayer.fill
-		DawnOverlayLayer.endDraw();
+		// Init Layers
+		//BackgroundLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		BackgroundLayer = document.createElement("canvas");
+		BackgroundLayer.width = ScreenWidth;
+		BackgroundLayer.height = ScreenHeight;
+		//BackgroundLayer.beginDraw();
+		var tmpContext = BackgroundLayer.getContext("2d");
+		//BackgroundLayer.background(0, 0, 0, 255);
+		tmpContext.fillStyle = "black"
+		tmpContext.fillRect(0, 0, BackgroundLayer.width, BackgroundLayer.height);
+		//BackgroundLayer.noStroke();
+		for (var i = 0; i < NumStars; i++) {
+			//var x = processing.random(0, ScreenWidth);
+			var x = RandInt(0, ScreenWidth);
+			//var y = processing.random(0, ScreenHeight);
+			var y = RandInt(0, ScreenHeight);
+			//var intensity = processing.random(MinStarIntensity, MaxStarIntensity);
+			var intensity = RandInt(MinStarIntensity, MaxStarIntensity);
+			//var color = processing.color(intensity, intensity, intensity);
+			var color = "rgb(" + intensity + "," + intensity + "," + intensity + ");";
+			//var color = "rgb(200, 200, 200);";
+			//console.log("x="+x+"; y="+y+"; intensity="+intensity + "; ni=" + processing.random(0.0, 1.0));
+			//BackgroundLayer.fill(color);
+			tmpContext.fillStyle = color;
+			//BackgroundLayer.rect(x, y, 1, 1);
+			tmpContext.fillRect(x, y, 1, 1);
+		}
+		//BackgroundLayer.endDraw();
+		tmpContext = null;
+		
+		// DawnOverlayLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
+		// DawnOverlayLayer.beginDraw();
+		// DawnOverlayLayer.fill
+		// DawnOverlayLayer.endDraw();
 		
 		TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		TerrainLayer.beginDraw();
@@ -710,7 +734,7 @@ function Game(processing) {
 		//SpawnMonster();
 		
 		// Init Sunrise
-		Sunscape_YPos = Sunscape_YPos_Night;
+		Sunscape_YPos = 0; //Sunscape_YPos_Night;	// FIXME: don't use 0 as an initial value, as that's just for testing raw canvas usage
 		
 		// Update angle + power views
 		UpdateViewFromModel();
@@ -718,6 +742,7 @@ function Game(processing) {
 		// Reset time manager
 		TimeMgr = null;
 		
+		console.log("launcher: " + launcher);
 		console.log("setup done!");
 	}
 	
@@ -757,6 +782,21 @@ function Game(processing) {
 	}
 	
 	processing.draw = function() {
+		var canvas = document.getElementById("GameCanvas");
+		if ( ! canvas.getContext ) {
+			return;
+		}
+		
+		var ctx = canvas.getContext("2d");
+		
+		/*
+		ctx.fillStyle = "rgb(200,0,0)";  
+        ctx.fillRect (10, 10, 55, 50);  
+
+        ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
+        ctx.fillRect (30, 30, 55, 50);
+		*/
+		
 		//console.log("s: " + (processing.millis() / 1000));
 		
 		// Process Input
@@ -773,11 +813,22 @@ function Game(processing) {
 		} else {
 			TimeMgr.AdvanceToTime(processing.millis());
 		}
-		
+
 		// Draw
-		processing.background(204);
-		processing.image(BackgroundLayer, 0, 0);
-		processing.image(Sunscape_Image, 0, Sunscape_YPos);
+		ctx.save();
+		
+		// Draw Background
+		//processing.background(204);
+		ctx.fillStyle = "black";
+		ctx.fillRect(0, 0, ScreenWidth, ScreenHeight);
+		
+		//processing.image(BackgroundLayer, 0, 0);
+		//console.log(BackgroundLayer);
+		ctx.drawImage(BackgroundLayer, 0, 0);
+
+		//processing.image(Sunscape_Image, 0, Sunscape_YPos);
+		ctx.drawImage(Sunscape_Image, 0, Sunscape_YPos);
+/*
 		processing.image(TerrainLayer, 0, 0);
 
 		for (var i = 0; i < MissileLineSegmentsToDraw.length; i++) {
@@ -801,5 +852,7 @@ function Game(processing) {
 		CollectGarbage(Missiles, DeadMissiles);
 		CollectGarbage(Explosions, DeadExplosions);
 		CollectGarbage(Tanks, DeadTanks);
+		*/
+		ctx.restore();
 	};
 }
