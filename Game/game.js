@@ -283,7 +283,7 @@ function Game(processing) {
 		var x = this.cx;
 		var y = this.cy;
 		
-		var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
+		var turretVector = new Vector(TurretLengthFromTankCenter, 0);
 		RotateVectorByDeg(turretVector, this.angle);
 		x += turretVector.x;
 		y += turretVector.y;
@@ -307,7 +307,7 @@ function Game(processing) {
 
 		// Draw turret
 		if (this.isPlayer) {
-			var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
+			var turretVector = new Vector(TurretLengthFromTankCenter, 0);
 			RotateVectorByDeg(turretVector, this.angle);
 			ctx.beginPath();
 			ctx.moveTo(this.cx, this.cy);
@@ -320,7 +320,7 @@ function Game(processing) {
 		
 		// Draw crosshair
 		if (this.isPlayer) {
-			var crosshairVector = new processing.PVector(CrosshairLengthFromTankCenter + ((this.power / 1000.0) * 120));
+			var crosshairVector = new Vector(CrosshairLengthFromTankCenter + ((this.power / 1000.0) * 120), 0);
 			RotateVectorByDeg(crosshairVector, this.angle);
 			ctx.lineWidth = CrosshairWeight;
 			ctx.strokeStyle = "white";
@@ -337,6 +337,7 @@ function Game(processing) {
 	}
 	
 	function SpawnMonster() {
+		return;
 		var x = processing.random(SpawnXMin, SpawnXMax);
 		var monsterXStep = processing.random(MonsterXStepMin, MonsterXStepMax);
 		var monster = new Tank(x, 0, "red", DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
