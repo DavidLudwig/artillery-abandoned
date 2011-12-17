@@ -1,8 +1,10 @@
 
 var launcher;
+const LoopIntervalMS = 1000.0 / 60.0;
 
 function Main(processing) {
-	Game(processing);
+	InitGame();
+	setInterval(DrawGame, LoopIntervalMS);
 }
 
 launcher = new ProcessingLauncher(document.getElementById('GameCanvas'), Main);

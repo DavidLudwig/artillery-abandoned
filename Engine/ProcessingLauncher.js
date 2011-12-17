@@ -8,11 +8,12 @@
  *   launcher.AddRemoteImage("Image2.png");
  *   launcher.LoadRemoteImagesAndRun();
  */
-function ProcessingLauncher(canvas, sketchProc) {
+function ProcessingLauncher(canvas, mainFunction) {
 	this.NumImagesToLoad = 0;
 	this.NumImagesLoaded = 0;
 	this.ImagesToLoad = new Array();
-	this.sketch = new Processing.Sketch(sketchProc);
+	//this.sketch = new Processing.Sketch(sketchProc);
+	this.mainFunction = mainFunction;
 	this.canvas = canvas;
 	this.processingContext = null;
 }
@@ -21,7 +22,7 @@ ProcessingLauncher.prototype.AddRemoteImage = function (src) {
 	var launcher = this;
 	var innerImage = new Image();
 	innerImage.onload = function () {
-        launcher.sketch.imageCache.add(src, innerImage);
+        //launcher.sketch.imageCache.add(src, innerImage);
         launcher._OnImageLoaded();
     }
 	this.ImagesToLoad[src] = innerImage;
@@ -35,7 +36,7 @@ ProcessingLauncher.prototype.GetImage = function (imageName) {
 ProcessingLauncher.prototype._OnImageLoaded = function () {
     this.NumImagesLoaded++;
     if (this.NumImagesLoaded == this.NumImagesToLoad) {
-		this.processingContext = new Processing(this.canvas, this.sketch);
+		this.mainFunction();
     }
 }
 
