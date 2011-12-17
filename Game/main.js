@@ -4,7 +4,7 @@ const LoopIntervalMS = 1000.0 / 60.0;
 
 function Main() {
 	InitGame();
-	setInterval(DrawGame, LoopIntervalMS);
+	setInterval(UpdateAndDraw, LoopIntervalMS);
 }
 
 launcher = new AppLauncher(Main);

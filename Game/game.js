@@ -774,18 +774,7 @@ function FixedUpdate() {
 	// }
 }
 
-function DrawGame() {
-	var canvas = document.getElementById("GameCanvas");
-	if ( ! canvas.getContext ) {
-		return;
-	}
-	
-	var ctx = canvas.getContext("2d");
-	var tmpContext = null;
-	
-	// Process Input
-	ProcessInput();
-	
+function Update() {
 	// Update
 	if (TimeMgr == null) {
 		TimeMgr = new FixedUpdater();
@@ -797,8 +786,16 @@ function DrawGame() {
 	} else {
 		TimeMgr.AdvanceToTime(Millis());
 	}
+}
 
-	// Draw
+function Draw() {
+	var canvas = document.getElementById("GameCanvas");
+	if ( ! canvas.getContext ) {
+		return;
+	}
+	
+	var ctx = canvas.getContext("2d");
+	var tmpContext = null;	
 	ctx.save();
 	
 	// Draw Background
@@ -836,6 +833,18 @@ function DrawGame() {
 	CollectGarbage(Tanks, DeadTanks);
 	ctx.restore();
 };
+
+function UpdateAndDraw() {
+	// Process Input
+	ProcessInput();
+
+	// Advance Time
+	Update();
+	
+	// Draw
+	Draw();
+}
+
 
 window.addEventListener('keydown', HandleKeyDown, true);
 
