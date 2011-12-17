@@ -218,10 +218,8 @@ function ProcessInput() {
 }
 
 // Init game
-function InitGame() {
-	console.log("setup called");
-	
-	// Create PImages from pre-loaded images
+function InitGame() {	
+	// Retrieve images
 	Background_2_Image = launcher.GetImage("Assets/Images/Background_2.png");
 	Sunscape_Image = launcher.GetImage("Assets/Images/Sunscape.png");
 	
@@ -278,9 +276,6 @@ function InitGame() {
 	
 	// Reset time manager
 	TimeMgr = null;
-	
-	console.log("launcher: " + launcher);
-	console.log("setup done!");
 }
 
 function FixedUpdate() {	

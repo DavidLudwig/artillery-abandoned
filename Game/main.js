@@ -57,9 +57,15 @@ function Millis() {
 }
 
 function Main() {
+	console.log("All Images Loaded")
+
 	window.addEventListener('keydown', HandleKeyDown, true);
 	StartTimeMS = Date.now();
+
+	console.log("Initializing Game")
 	InitGame();
+	
+	console.log("Starting Main Loop")
 	setInterval(UpdateAndDraw, LoopIntervalMS);
 }
 
