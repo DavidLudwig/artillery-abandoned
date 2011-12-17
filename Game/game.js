@@ -457,15 +457,7 @@ function Game(processing) {
 		//var detectedAlpha = processing.alpha(detectedColor);
 		//return detectedAlpha;
 		x = Math.round(x);
-		y = Math.round(y);
-		console.log("{"+x+","+y+"}")
-		
-		console.log("---");
-		console.log(layer.data[0]);
-		console.log(layer.data[1]);
-		console.log(layer.data[2]);
-		console.log(layer.data[3]);
-		
+		y = Math.round(y);		
 		var index = (((layer.width * y) + x) * 4) + 3;
 		var value = layer.data[index];
 		if (value == null) {
@@ -495,12 +487,6 @@ function Game(processing) {
 		
 		// do collision detection against the ground
 		// NOTE: Processing.js reverses the y-axis wrt. its get() function
-		
-		// var layer = TerrainLayerData;
-		// 		console.log(layer.data[0]);
-		// 		console.log(layer.data[1]);
-		// 		console.log(layer.data[2]);
-		// 		console.log(layer.data[]);
 		/*
 		for (var y = 0; y < ScreenHeight; y++) {
 			var line = "";
@@ -519,7 +505,7 @@ function Game(processing) {
 		var detectedAlpha = HackedGetAlpha(TerrainLayerData, this.x, this.y);
 		// var detectedColor = TerrainLayer.get(this.x, (ScreenHeight-this.y));
 		// var detectedAlpha = processing.alpha(detectedColor);
-		console.log("alpha at {"+this.x+","+this.y+"} = "+detectedAlpha);
+		//console.log("alpha at {"+this.x+","+this.y+"} = "+detectedAlpha);
 		if (detectedAlpha > 0) {
 			var explosion = new Explosion(this.x, this.y);
 			Explosions.push(explosion);
@@ -733,7 +719,7 @@ function Game(processing) {
 	
 	// Init game
   	processing.setup = function () {
-		console.log("setup calledX");
+		console.log("setup called");
 		
 		// var testCanvas = document.createElement("canvas");
 		// testCanvas.width = 16;
@@ -782,12 +768,6 @@ function Game(processing) {
 		tmpContext.fillRect(0, 0, TerrainLayer.width, TerrainLayer.height);
 		tmpContext.drawImage(Background_2_Image, 0, 0);
 		TerrainLayerData = tmpContext.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
-		
-		console.log("---");
-		console.log(TerrainLayerData.data[0]);
-		console.log(TerrainLayerData.data[1]);
-		console.log(TerrainLayerData.data[2]);
-		console.log(TerrainLayerData.data[3]);
 		tmpContext = null;
 		
 		ShotLayer = document.createElement("canvas");
@@ -938,7 +918,6 @@ function Game(processing) {
 			for (var i = 0; i < MissileLineSegmentsToDraw.length; i++) {
 				var m = MissileLineSegmentsToDraw[i];
 				tmpContext.beginPath();
-				tmpContext.lineWidth = 10;
 				tmpContext.moveTo(m[0], m[1]);
 				tmpContext.lineTo(m[2], m[3]);
 				tmpContext.stroke();
