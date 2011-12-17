@@ -278,6 +278,25 @@ function Game(processing) {
 		RotateVectorByRad(v, rad);
 	}
 	
+	Tank.prototype.fire = function () {
+		var angleDeg = this.angle;
+		var angleRad = processing.radians(angleDeg);
+		var power = this.power;
+		var x = this.cx;
+		var y = this.cy;
+		
+		var turretVector = new processing.PVector(TurretLengthFromTankCenter, 0);
+		RotateVectorByDeg(turretVector, this.angle);
+		x += turretVector.x;
+		y += turretVector.y;
+		
+		var vx = power * Math.cos(angleRad);
+		var vy = power * Math.sin(angleRad);
+		console.log("fire!: angle="+angleDeg+"; power="+power+"; x="+x+"; y="+y+"; vx="+vx+"; vy="+vy);
+		var missile = new Missile(x, y, vx, vy);
+		Missiles.push(missile);
+	}
+	
 	Tank.prototype.draw = function (ctx, a, b, c, d) {
 		ctx.save();
 		//console.log("draw tank at " + this.x + ", " + this.y);
@@ -439,6 +458,13 @@ function Game(processing) {
 		//return detectedAlpha;
 		x = Math.round(x);
 		y = Math.round(y);
+		console.log("{"+x+","+y+"}")
+		
+		console.log("---");
+		console.log(layer.data[0]);
+		console.log(layer.data[1]);
+		console.log(layer.data[2]);
+		console.log(layer.data[3]);
 		
 		var index = (((layer.width * y) + x) * 4) + 3;
 		var value = layer.data[index];
@@ -469,12 +495,38 @@ function Game(processing) {
 		
 		// do collision detection against the ground
 		// NOTE: Processing.js reverses the y-axis wrt. its get() function
+		
+		// var layer = TerrainLayerData;
+		// 		console.log(layer.data[0]);
+		// 		console.log(layer.data[1]);
+		// 		console.log(layer.data[2]);
+		// 		console.log(layer.data[]);
+		/*
+		for (var y = 0; y < ScreenHeight; y++) {
+			var line = "";
+			var x_initial = 0;
+			for (var x = x_initial; x <= (x_initial + 10); x++) {
+				//var alpha = HackedGetAlpha(TerrainLayerData, x, y);
+				//var index = (((layer.width * y) + x) * 4) + 3;
+				var index = (la)
+				var value = layer.data[index];
+				line = line + alpha + ",";
+			}
+			console.log(line);
+		}
+		*/
+		
 		var detectedAlpha = HackedGetAlpha(TerrainLayerData, this.x, this.y);
 		// var detectedColor = TerrainLayer.get(this.x, (ScreenHeight-this.y));
 		// var detectedAlpha = processing.alpha(detectedColor);
+		console.log("alpha at {"+this.x+","+this.y+"} = "+detectedAlpha);
 		if (detectedAlpha > 0) {
 			var explosion = new Explosion(this.x, this.y);
 			Explosions.push(explosion);
+			Destroy(this, DeadMissiles);
+		}
+		
+		if (this.x < 0 || this.x >= ScreenWidth || this.y < 0 || this.y >= ScreenHeight) {
 			Destroy(this, DeadMissiles);
 		}
 	}
@@ -594,16 +646,7 @@ function Game(processing) {
 		tmpContext.fillRect(ShotLayer.width, ShotLayer.height);
 		tmpContext = null;
 		
-		var angleDeg = CurrentTank.angle;
-		var angleRad = processing.radians(angleDeg);
-		var power = CurrentTank.power;
-		var x = CurrentTank.cx;
-		var y = CurrentTank.cy;
-		var vx = power * Math.cos(angleRad);
-		var vy = power * Math.sin(angleRad);
-		console.log("fire!: angle="+angleDeg+"; power="+power+"; x="+x+"; y="+y+"; vx="+vx+"; vy="+vy);
-		var missile = new Missile(x, y, vx, vy);
-		Missiles.push(missile);
+		CurrentTank.fire();
 	}
 	
 	processing.keyPressed = function () {
@@ -735,10 +778,16 @@ function Game(processing) {
 		TerrainLayer.width = ScreenWidth;
 		TerrainLayer.height = ScreenHeight;
 		tmpContext = TerrainLayer.getContext("2d");
-		tmpContext.fillStyle = "transparent black";
+		tmpContext.fillStyle = "rgba(0,0,0,0);";
 		tmpContext.fillRect(0, 0, TerrainLayer.width, TerrainLayer.height);
 		tmpContext.drawImage(Background_2_Image, 0, 0);
 		TerrainLayerData = tmpContext.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
+		
+		console.log("---");
+		console.log(TerrainLayerData.data[0]);
+		console.log(TerrainLayerData.data[1]);
+		console.log(TerrainLayerData.data[2]);
+		console.log(TerrainLayerData.data[3]);
 		tmpContext = null;
 		
 		ShotLayer = document.createElement("canvas");
@@ -889,6 +938,7 @@ function Game(processing) {
 			for (var i = 0; i < MissileLineSegmentsToDraw.length; i++) {
 				var m = MissileLineSegmentsToDraw[i];
 				tmpContext.beginPath();
+				tmpContext.lineWidth = 10;
 				tmpContext.moveTo(m[0], m[1]);
 				tmpContext.lineTo(m[2], m[3]);
 				tmpContext.stroke();
