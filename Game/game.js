@@ -253,12 +253,10 @@ function Game(processing) {
 				}
 			}
 			
-			/*
 			if ( ! MoveTank(this, this.xstep) ) {
 				Destroy(this, DeadTanks);
 				return;
 			}
-			*/
 
 			this.nextUpdateMS += this.xstepInterval;
 		}
@@ -339,7 +337,6 @@ function Game(processing) {
 	}
 	
 	function SpawnMonster() {
-		return;
 		var x = processing.random(SpawnXMin, SpawnXMax);
 		var monsterXStep = processing.random(MonsterXStepMin, MonsterXStepMax);
 		var monster = new Tank(x, 0, "red", DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
@@ -790,7 +787,7 @@ function Game(processing) {
 		CurrentTank = Tanks[0];
 
 		NextSpawnAt = processing.millis();
-		//SpawnMonster();
+		SpawnMonster();
 		
 		// Init Sunrise
 		Sunscape_YPos = 0; //Sunscape_YPos_Night;	// FIXME: don't use 0 as an initial value, as that's just for testing raw canvas usage
