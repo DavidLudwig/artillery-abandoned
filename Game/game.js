@@ -1,7 +1,7 @@
 
 var ImagesToLoad = [
-	"Assets/Images/Background_2.png",
-	"Assets/Images/Sunscape.png"
+	"Game/Assets/Images/Background_2.png",
+	"Game/Assets/Images/Sunscape.png"
 ];
 
 
@@ -220,8 +220,8 @@ function ProcessInput() {
 // Init game
 function InitGame() {	
 	// Retrieve images
-	Background_2_Image = launcher.GetImage("Assets/Images/Background_2.png");
-	Sunscape_Image = launcher.GetImage("Assets/Images/Sunscape.png");
+	Background_2_Image = launcher.GetImage("Game/Assets/Images/Background_2.png");
+	Sunscape_Image = launcher.GetImage("Game/Assets/Images/Sunscape.png");
 	
 	// Init Layers
 	BackgroundLayer = document.createElement("canvas");
