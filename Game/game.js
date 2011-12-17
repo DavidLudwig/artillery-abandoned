@@ -61,6 +61,7 @@ function Game(processing) {
 
 	
 	// Timing
+	var StartTimeMS = null;
 	var UpdateDurationS = 0.05;		// time to elapse when updating game state, sort-of approximately in seconds
 	var TimeMgr = null;
 	const FixedUpdateIntervalMS = 50;
@@ -112,6 +113,10 @@ function Game(processing) {
 	
 	function RandInt(from, to) {
 		return Math.floor(Math.random() * (to - from + 1) + from);
+	}
+	
+	function Millis() {
+		return Date.now() - StartTimeMS;
 	}
 	
 	// Game States
@@ -436,7 +441,7 @@ function Game(processing) {
 	}
 	
 	Missile.prototype.update = function () {
-		//console.log("missile active at ms: " + processing.millis());
+		//console.log("missile active at ms: " + Millis());
 		
 		this.lastx = this.x;
 		this.lasty = this.y;
@@ -582,8 +587,8 @@ function Game(processing) {
 	};
 
 	function ProcessInput() {
-		if (processing.millis() < ProcessInputsAfterAppTimeMS) {
-			//console.log("ignoring inputs: cur=" + processing.millis() + "; next=" + ProcessInputsAfterAppTimeMS);
+		if (Millis() < ProcessInputsAfterAppTimeMS) {
+			//console.log("ignoring inputs: cur=" + Millis() + "; next=" + ProcessInputsAfterAppTimeMS);
 			return;
 		}
 
@@ -646,13 +651,15 @@ function Game(processing) {
 		if (doViewUpdate) {
 			//console.log(CurrentTank.angle);
 			UpdateViewFromModel();
-			ProcessInputsAfterAppTimeMS = processing.millis() + InputIntervalInMS;
+			ProcessInputsAfterAppTimeMS = Millis() + InputIntervalInMS;
 		}		
 	}
 	
 	// Init game
   	processing.setup = function () {
 		console.log("setup called");
+		
+		StartTimeMS = Date.now();
 		
 		processing.size(ScreenWidth, ScreenHeight);
 		
@@ -702,7 +709,7 @@ function Game(processing) {
 		Tanks.push(new Tank(60, 267, "blue", DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
 		CurrentTank = Tanks[0];
 
-		NextSpawnAt = processing.millis();
+		NextSpawnAt = Millis();
 		SpawnMonster();
 		
 		// Init Sunrise
@@ -722,7 +729,7 @@ function Game(processing) {
 	var ActualCount = 0;
 	function FixedUpdate() {
 		FixedUpdateCount++;
-		//console.log("FixedUpdate("+ActualCount+","+FixedUpdateCount+"): managed="+TimeMgr.Time()+"; real="+processing.millis());
+		//console.log("FixedUpdate("+ActualCount+","+FixedUpdateCount+"): managed="+TimeMgr.Time()+"; real="+Millis());
 		
 		for (var i = 0; i < Tanks.length; i++) {
 			Tanks[i].update();
@@ -768,13 +775,13 @@ function Game(processing) {
 		// Update
 		if (TimeMgr == null) {
 			TimeMgr = new FixedUpdater();
-			TimeMgr._currentTime = processing.millis();
+			TimeMgr._currentTime = Millis();
 			TimeMgr.AddCallback(FixedUpdateIntervalMS, function () {
 				FixedUpdate();
 			});
 			FixedUpdate();
 		} else {
-			TimeMgr.AdvanceToTime(processing.millis());
+			TimeMgr.AdvanceToTime(Millis());
 		}
 
 		// Draw
