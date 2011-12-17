@@ -1,16 +1,6 @@
 function Game(processing) {
 
 	//
-	// Colors
-	//
-	const Colors = {
-		"Blue": processing.color(0, 0, 255),
-		"Red": processing.color(255, 0, 0),
-		"White": processing.color(255, 255, 255),
-		"Yellow": processing.color(255, 255, 0)
-	};
-
-	//
 	// Screen Dimensions
 	//
 	const ScreenWidth = 512;
@@ -116,6 +106,10 @@ function Game(processing) {
 	const Sunscape_YPos_Night = 384;
 	
 	// Utility Functions
+	function RandNum(from, to) {
+		return Math.random() * (to - from + 1) + from;
+	}
+	
 	function RandInt(from, to) {
 		return Math.floor(Math.random() * (to - from + 1) + from);
 	}
@@ -217,10 +211,6 @@ function Game(processing) {
 		this.xstep = xstep;
 		this.xstepInterval = xstepInterval;
 		this.nextUpdateMS = null;
-		
-		if (color == null) {
-			color = processing.color(255, 0, 0);
-		}
 		this.color = color;
 	}
 	
@@ -272,13 +262,13 @@ function Game(processing) {
 	}
 	
 	function RotateVectorByDeg(v, deg) {
-		var rad = processing.radians(deg);
+		var rad = DegToRad(deg);
 		RotateVectorByRad(v, rad);
 	}
 	
 	Tank.prototype.fire = function () {
 		var angleDeg = this.angle;
-		var angleRad = processing.radians(angleDeg);
+		var angleRad = DegToRad(angleDeg);
 		var power = this.power;
 		var x = this.cx;
 		var y = this.cy;
@@ -337,9 +327,8 @@ function Game(processing) {
 	}
 	
 	function SpawnMonster() {
-		return;
-		var x = processing.random(SpawnXMin, SpawnXMax);
-		var monsterXStep = processing.random(MonsterXStepMin, MonsterXStepMax);
+		var x = RandNum(SpawnXMin, SpawnXMax);
+		var monsterXStep = RandNum(MonsterXStepMin, MonsterXStepMax);
 		var monster = new Tank(x, 0, "red", DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
 		MoveTank(monster, 0);	// make sure it's on the ground
 		Tanks.push(monster);
@@ -356,7 +345,6 @@ function Game(processing) {
 		this.radius = radius;
 		
 		this.timeRemaining = DefaultExplosionDuration;
-		this.wasDrawn = false;
 		this.wasColliderRun = false;
 	}
 	
@@ -414,28 +402,12 @@ function Game(processing) {
 	}
 	
 	Explosion.prototype.draw = function (ctx) {
-		// if ( ! this.wasDrawn ) {
-		// 	ShotLayer.beginDraw();
-		// 	ShotLayer.ellipseMode(processing.CENTER);
-		// 	ShotLayer.fill(Colors.Yellow);
-		// 	ShotLayer.ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
-		// 	ShotLayer.endDraw();
-		// 	this.wasDrawn = true;
-		// }
-
 		ctx.save();
 		ctx.beginPath();
 		ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
 		ctx.fillStyle = "yellow";
 		ctx.fill();
 		ctx.restore();
-		
-
-		// processing.ellipseMode(processing.CENTER);
-		// processing.fill(Colors.Yellow);
-		// processing.noStroke();
-		// processing.ellipse(this.x, this.y, this.radius * 2, this.radius * 2);
-
 	}
 	
 	
@@ -451,9 +423,6 @@ function Game(processing) {
 	}
 	
 	function HackedGetAlpha(layer, x, y) {
-		//var detectedColor = TerrainLayer.get(x, (ScreenHeight - y));
-		//var detectedAlpha = processing.alpha(detectedColor);
-		//return detectedAlpha;
 		x = Math.round(x);
 		y = Math.round(y);		
 		var index = (((layer.width * y) + x) * 4) + 3;
@@ -484,25 +453,7 @@ function Game(processing) {
 		}
 		
 		// do collision detection against the ground
-		// NOTE: Processing.js reverses the y-axis wrt. its get() function
-		/*
-		for (var y = 0; y < ScreenHeight; y++) {
-			var line = "";
-			var x_initial = 0;
-			for (var x = x_initial; x <= (x_initial + 10); x++) {
-				//var alpha = HackedGetAlpha(TerrainLayerData, x, y);
-				//var index = (((layer.width * y) + x) * 4) + 3;
-				var index = (la)
-				var value = layer.data[index];
-				line = line + alpha + ",";
-			}
-			console.log(line);
-		}
-		*/
-		
 		var detectedAlpha = HackedGetAlpha(TerrainLayerData, this.x, this.y);
-		// var detectedColor = TerrainLayer.get(this.x, (ScreenHeight-this.y));
-		// var detectedAlpha = processing.alpha(detectedColor);
 		//console.log("alpha at {"+this.x+","+this.y+"} = "+detectedAlpha);
 		if (detectedAlpha > 0) {
 			var explosion = new Explosion(this.x, this.y);
@@ -514,23 +465,7 @@ function Game(processing) {
 			Destroy(this, DeadMissiles);
 		}
 	}
-	
-	/*
-	Missile.prototype.draw = function () {
-		ShotLayer.beginDraw();
-		ShotLayer.stroke(Colors.Yellow);
-		ShotLayer.line(this.lastx, this.lasty, this.x, this.y);
-		ShotLayer.endDraw();
-		
-		// ShotLayer.rectMode(processing.CENTER);
-		// ShotLayer.fill(Colors.Yellow);
-		// ShotLayer.noStroke();
-		// ShotLayer.rect(this.x,
-		// 			   this.y,
-		// 			   4,	// width
-		// 			   4);	// height
-	}
-	*/
+
 	
 	// Angle + Power management
 		
@@ -719,16 +654,6 @@ function Game(processing) {
   	processing.setup = function () {
 		console.log("setup called");
 		
-		// var testCanvas = document.createElement("canvas");
-		// testCanvas.width = 16;
-		// testCanvas.height = 16;
-		// var testContext = testCanvas.getContext("2d");
-		// testContext.fillStyle = "red";
-		// testContext.fillRect(0, 0, 16, 16);
-		// var testData = testContext.getImageData(0, 0, 16, 16);
-		// var value = testData.data[0];
-		// console.log("value: " + value);
-		
 		processing.size(ScreenWidth, ScreenHeight);
 		
 		// Create PImages from pre-loaded images
@@ -752,12 +677,6 @@ function Game(processing) {
 		}
 		tmpContext = null;
 		
-		// DawnOverlayLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		// DawnOverlayLayer.beginDraw();
-		// DawnOverlayLayer.fill
-		// DawnOverlayLayer.endDraw();
-		
-		//TerrainLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
 		TerrainLayer = document.createElement("canvas");
 		TerrainLayer.width = ScreenWidth;
 		TerrainLayer.height = ScreenHeight;
@@ -775,10 +694,6 @@ function Game(processing) {
 		tmpContext.fillStyle = "rgba(0,0,0,0);";
 		tmpContext.fillRect(0, 0, ShotLayer.width, ShotLayer.height);
 		tmpContext = null;
-		// ShotLayer = processing.createGraphics(ScreenWidth, ScreenHeight, processing.P3D);
-		// ShotLayer.beginDraw();
-		// ShotLayer.background(0, 0, 0, 0);
-		// ShotLayer.endDraw();
 		
 		// Init Missiles
 		MissileLineSegmentsToDraw = new Array();
@@ -823,7 +738,7 @@ function Game(processing) {
 		
 		if (NextSpawnAt <= TimeMgr.Time()) {
 			SpawnMonster();
-			var nextDelay = processing.random(NextMonsterDelayMinMS, NextMonsterDelayMaxMS);
+			var nextDelay = RandInt(NextMonsterDelayMinMS, NextMonsterDelayMaxMS);
 			NextSpawnAt = TimeMgr.Time() + nextDelay;
 		}
 		
@@ -847,16 +762,6 @@ function Game(processing) {
 		var ctx = canvas.getContext("2d");
 		var tmpContext = null;
 		
-		/*
-		ctx.fillStyle = "rgb(200,0,0)";  
-        ctx.fillRect (10, 10, 55, 50);  
-
-        ctx.fillStyle = "rgba(0, 0, 200, 0.5)";  
-        ctx.fillRect (30, 30, 55, 50);
-		*/
-		
-		//console.log("s: " + (processing.millis() / 1000));
-		
 		// Process Input
 		ProcessInput();
 		
@@ -876,38 +781,11 @@ function Game(processing) {
 		ctx.save();
 		
 		// Draw Background
-		//processing.background(204);
 		ctx.fillStyle = "black";
 		ctx.fillRect(0, 0, ScreenWidth, ScreenHeight);
 		
-		//processing.image(BackgroundLayer, 0, 0);
-		//console.log(BackgroundLayer);
 		ctx.drawImage(BackgroundLayer, 0, 0);
-
-		//processing.image(Sunscape_Image, 0, Sunscape_YPos);
-		ctx.drawImage(Sunscape_Image, 0, Sunscape_YPos);
-		
-		// var data = ctx.createImageData(16, 16);
-		// var to = 16 * 16 * 4;
-		// for (var i = 0; i < to; i+=4) {
-		// 	data.data[i+0] = 255;
-		// 	data.data[i+1] = 0;
-		// 	data.data[i+2] = 0;
-		// 	data.data[i+3] = 255;
-		// }
-		// ctx.putImageData(data, 0, 0);
-		// 
-		// //console.log("data.data[0]: " + data.data[0]);
-		// 
-		// for (var i = 0; i < to; i+=4) {
-		// 	data.data[i+0] = 0;
-		// 	data.data[i+1] = 255;
-		// 	data.data[i+2] = 0;
-		// 	data.data[i+3] = 255;
-		// }
-		// ctx.putImageData(data, 16, 0);
-		
-		//processing.image(TerrainLayer, 0, 0);
+		ctx.drawImage(Sunscape_Image, 0, Sunscape_YPos);		
 		ctx.drawImage(TerrainLayer, 0, 0);
 		
 		if (MissileLineSegmentsToDraw.length > 0) {
@@ -924,7 +802,6 @@ function Game(processing) {
 		}
 		ctx.drawImage(ShotLayer, 0, 0);
 		
-		// processing.image(ShotLayer, 0, 0);
 		for (var i = 0; i < Tanks.length; i++) {
 			Tanks[i].draw(ctx);
 		}
