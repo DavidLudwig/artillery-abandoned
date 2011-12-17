@@ -1,7 +1,9 @@
 
-function Millis() {
-	return Date.now() - StartTimeMS;
-}
+var ImagesToLoad = [
+	"Assets/Images/Background_2.png",
+	"Assets/Images/Sunscape.png"
+];
+
 
 // Game States
 var GameStates = {
@@ -18,25 +20,6 @@ function SetGameState(theState) {
 	GameState = theState;
 }
 
-// Delayed Deletion
-function Destroy(object, deadObjects) {
-	deadObjects.push(object);
-}
-
-function CollectGarbage(liveObjects, deadObjects) {
-	for (var i = 0; i < deadObjects.length; i++) {
-		for (var j = 0; j < liveObjects.length; j++) {
-			if (deadObjects[i] == liveObjects[j]) {
-				liveObjects.splice(j, 1);
-			}
-		}
-	}
-	deadObjects.splice(0, deadObjects.length);
-}
-
-
-
-
 function SpawnMonster() {
 	var x = RandNum(SpawnXMin, SpawnXMax);
 	var monsterXStep = RandNum(MonsterXStepMin, MonsterXStepMax);
@@ -45,11 +28,7 @@ function SpawnMonster() {
 	Tanks.push(monster);
 }
 
-
-
-
 // Angle + Power management
-	
 function getAngleFromView() {
 	var angle = parseInt(document.getElementById("AngleValue").innerHTML);
 	if (isNaN(angle)) {
@@ -242,8 +221,6 @@ function ProcessInput() {
 function InitGame() {
 	console.log("setup called");
 	
-	StartTimeMS = Date.now();
-	
 	// Create PImages from pre-loaded images
 	Background_2_Image = launcher.GetImage("Assets/Images/Background_2.png");
 	Sunscape_Image = launcher.GetImage("Assets/Images/Sunscape.png");
@@ -306,12 +283,7 @@ function InitGame() {
 	console.log("setup done!");
 }
 
-var FixedUpdateCount = 0;
-var ActualCount = 0;
-function FixedUpdate() {
-	FixedUpdateCount++;
-	//console.log("FixedUpdate("+ActualCount+","+FixedUpdateCount+"): managed="+TimeMgr.Time()+"; real="+Millis());
-	
+function FixedUpdate() {	
 	for (var i = 0; i < Tanks.length; i++) {
 		Tanks[i].update();
 	}
@@ -341,29 +313,7 @@ function FixedUpdate() {
 	// }
 }
 
-function Update() {
-	// Update
-	if (TimeMgr == null) {
-		TimeMgr = new FixedUpdater();
-		TimeMgr._currentTime = Millis();
-		TimeMgr.AddCallback(FixedUpdateIntervalMS, function () {
-			FixedUpdate();
-		});
-		FixedUpdate();
-	} else {
-		TimeMgr.AdvanceToTime(Millis());
-	}
-}
-
-function Draw() {
-	var canvas = document.getElementById("GameCanvas");
-	if ( ! canvas.getContext ) {
-		return;
-	}
-	
-	var ctx = canvas.getContext("2d");
-	var tmpContext = null;	
-
+function Draw(ctx) {
 	ctx.save();	
 	DrawBackground(ctx);
 	DrawTerrain(ctx);
@@ -385,6 +335,7 @@ function DrawTerrain(ctx) {
 }
 
 function DrawMissiles(ctx) {
+	var tmpContext = null;
 	if (MissileLineSegmentsToDraw.length > 0) {
 		tmpContext = ShotLayer.getContext("2d");
 		tmpContext.strokeStyle = "yellow";
@@ -418,23 +369,6 @@ function CleanupFromUpdate() {
 	CollectGarbage(Explosions, DeadExplosions);
 	CollectGarbage(Tanks, DeadTanks);
 }
-
-function UpdateAndDraw() {
-	// Process Input
-	ProcessInput();
-
-	// Advance Time
-	Update();
-	
-	// Draw
-	Draw();
-	
-	// Cleanup
-	CleanupFromUpdate();
-}
-
-
-window.addEventListener('keydown', HandleKeyDown, true);
 
 
 
