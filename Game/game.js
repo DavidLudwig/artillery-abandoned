@@ -796,16 +796,28 @@ function Draw() {
 	
 	var ctx = canvas.getContext("2d");
 	var tmpContext = null;	
-	ctx.save();
-	
-	// Draw Background
+
+	ctx.save();	
+	DrawBackground(ctx);
+	DrawTerrain(ctx);
+	DrawMissiles(ctx);
+	DrawTanks(ctx);
+	DrawExplosions(ctx);
+	ctx.restore();
+}
+
+function DrawBackground(ctx) {
 	ctx.fillStyle = "black";
-	ctx.fillRect(0, 0, ScreenWidth, ScreenHeight);
-	
+	ctx.fillRect(0, 0, ScreenWidth, ScreenHeight);	
 	ctx.drawImage(BackgroundLayer, 0, 0);
 	ctx.drawImage(Sunscape_Image, 0, Sunscape_YPos);		
+}
+
+function DrawTerrain(ctx) {
 	ctx.drawImage(TerrainLayer, 0, 0);
-	
+}
+
+function DrawMissiles(ctx) {
 	if (MissileLineSegmentsToDraw.length > 0) {
 		tmpContext = ShotLayer.getContext("2d");
 		tmpContext.strokeStyle = "yellow";
@@ -819,20 +831,26 @@ function Draw() {
 		MissileLineSegmentsToDraw.splice(0, MissileLineSegmentsToDraw.length);	// clear the array
 	}
 	ctx.drawImage(ShotLayer, 0, 0);
-	
+}
+
+function DrawTanks(ctx) {
 	for (var i = 0; i < Tanks.length; i++) {
 		Tanks[i].draw(ctx);
 	}
+}
+
+function DrawExplosions(ctx) {
 	for (var i = 0; i < Explosions.length; i++) {
 		Explosions[i].draw(ctx);
 	}
-	
+}
+
+function CleanupFromUpdate() {
 	// Clean up garbage
 	CollectGarbage(Missiles, DeadMissiles);
 	CollectGarbage(Explosions, DeadExplosions);
 	CollectGarbage(Tanks, DeadTanks);
-	ctx.restore();
-};
+}
 
 function UpdateAndDraw() {
 	// Process Input
@@ -843,6 +861,9 @@ function UpdateAndDraw() {
 	
 	// Draw
 	Draw();
+	
+	// Cleanup
+	CleanupFromUpdate();
 }
 
 
