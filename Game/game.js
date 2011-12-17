@@ -7,16 +7,17 @@ var ImagesToLoad = [
 
 // Game States
 var GameStates = {
-	"PLAYING" : 1,
-	"GAME_OVER" : 2
+	"INITIALIZING" : "INITIALIZING",
+	"PLAYING" : "PLAYING",
+	"GAME_OVER" : "GAME_OVER"
 };
 
-var GameState = GameStates.PLAYING;
+var GameState = null;
 function SetGameState(theState) {
 	if (GameState == theState) {
 		return;
 	}
-	console.log("set game state: " + theState);
+	//console.log("New game state: " + theState);
 	GameState = theState;
 }
 
@@ -218,7 +219,9 @@ function ProcessInput() {
 }
 
 // Init game
-function InitGame() {	
+function InitGame() {
+	SetGameState(GameStates.INITIALIZING);
+	
 	// Retrieve images
 	Background_2_Image = launcher.GetImage("Game/Assets/Images/Background_2.png");
 	Sunscape_Image = launcher.GetImage("Game/Assets/Images/Sunscape.png");
@@ -276,6 +279,9 @@ function InitGame() {
 	
 	// Reset time manager
 	TimeMgr = null;
+	
+	// Mark as initialized
+	SetGameState(GameStates.PLAYING);
 }
 
 function FixedUpdate() {	
