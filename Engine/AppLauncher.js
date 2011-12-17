@@ -3,17 +3,16 @@
  * Launches a game after loading all resources.
  *
  * Example:
- *   var launcher = new AppLauncher(document.getElementById('TheCanvas'), TheMainFunction);
+ *   var launcher = new AppLauncher(TheMainFunction);
  *   launcher.AddRemoteImage("Image1.png");
  *   launcher.AddRemoteImage("Image2.png");
  *   launcher.LoadRemoteImagesAndRun();
  */
-function AppLauncher(canvas, mainFunction) {
+function AppLauncher(mainFunction) {
 	this.NumImagesToLoad = 0;
 	this.NumImagesLoaded = 0;
 	this.ImagesToLoad = new Array();
 	this.mainFunction = mainFunction;
-	this.canvas = canvas;
 }
 
 AppLauncher.prototype.AddRemoteImage = function (src) {
