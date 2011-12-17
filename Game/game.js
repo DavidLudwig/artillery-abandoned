@@ -32,6 +32,16 @@ function Game(processing) {
 	const MaxGamePower = 400;
 	
 	//
+	// Keyboard input key codes
+	//
+	const KeyCodes = {
+		"Left": 37,
+		"Up": 38,
+		"Right": 39,
+		"Down": 40
+	};
+	
+	//
 	// Player Tank
 	//
 	const TurretLengthFromTankCenter = 15;
@@ -573,18 +583,25 @@ function Game(processing) {
 		CurrentTank.fire();
 	}
 	
-	processing.keyPressed = function () {
-		if (processing.keyCode == processing.LEFT) {
-			console.log("left");
-			MoveTank(Tanks[1], -1);
-		} else if (processing.keyCode == processing.RIGHT) {
-			console.log("right");
-			MoveTank(Tanks[1], 1);
-		} else if (processing.keyCode == processing.DOWN) {
-			AdjustTankDownward(Tanks[1]);
+	function HandleKeyDown(evt) {
+		console.log("keydown: " + evt + ", keyCode=" + evt.keyCode + "; charCode=" + evt.charCode);
+		switch (evt.keyCode) {
+			case KeyCodes.Left:
+				//console.log("left");
+				MoveTank(Tanks[1], -1);
+				break;
+			
+			case KeyCodes.Right:
+				//console.log("right");
+				MoveTank(Tanks[1], 1);
+				break;
+			
+			case KeyCodes.Down:
+				//console.log("down");
+				AdjustTankDownward(Tanks[1]);
+				break;
 		}
-		//console.log("key pressed: " + processing.key);
-	};
+	}
 
 	function ProcessInput() {
 		if (Millis() < ProcessInputsAfterAppTimeMS) {
@@ -822,4 +839,10 @@ function Game(processing) {
 		CollectGarbage(Tanks, DeadTanks);
 		ctx.restore();
 	};
+
+	window.addEventListener('keydown', HandleKeyDown, true);
 }
+
+
+
+
