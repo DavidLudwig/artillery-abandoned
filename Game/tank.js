@@ -120,7 +120,7 @@ Tank.prototype.fire = function () {
 	
 	var vx = power * Math.cos(angleRad);
 	var vy = power * Math.sin(angleRad);
-	console.log("fire!: angle="+angleDeg+"; power="+power+"; x="+x+"; y="+y+"; vx="+vx+"; vy="+vy);
+	//console.log("fire!: angle="+angleDeg+"; power="+power+"; x="+x+"; y="+y+"; vx="+vx+"; vy="+vy);
 	var missile = new Missile(x, y, vx, vy);
 	Missiles.push(missile);
 }

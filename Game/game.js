@@ -129,7 +129,7 @@ document.getElementById('FireButton').onclick = function() {
 }
 
 function HandleKeyDown(evt) {
-	console.log("keydown: " + evt + ", keyCode=" + evt.keyCode + "; charCode=" + evt.charCode);
+	//console.log("keydown: " + evt + ", keyCode=" + evt.keyCode + "; charCode=" + evt.charCode);
 	switch (evt.keyCode) {
 		case KeyCodes.Left:
 			//console.log("left");
