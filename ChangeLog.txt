@@ -1,0 +1,9 @@
+Artillery Game Change Log
+by David Ludwig, <dludwig -at- pobox.com>
+
+1.1, Dec 17, 2011:
+	- Replaced processing.js calls with raw, HTML5 ones
+	- Performance enhancements (tested on Chrome 15 on Mac)
+
+1.0, Nov 20, 2011:
+	- Initial HTML5 Game Jam version
