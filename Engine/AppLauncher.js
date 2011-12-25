@@ -9,7 +9,7 @@
  *   launcher.AddRemoteFile("GameData.xml");
  *   launcher.LoadRemoteDataAndRun();
  */
-function AppLauncher(mainFunction) {
+function AppLauncher() {
 	this.NumImages = 0;
 	this.NumImagesLoaded = 0;
 	this.Images = new Array();
@@ -18,7 +18,7 @@ function AppLauncher(mainFunction) {
 	this.NumFilesLoaded = 0;
 	this.Files = new Array();
 	
-	this.mainFunction = mainFunction;
+	this.allLoadedCallback = null;
 }
 
 /*
@@ -48,7 +48,7 @@ AppLauncher.prototype.GetImage = function (imageName) {
 
 AppLauncher.prototype._OnImageLoaded = function () {
     this.NumImagesLoaded++;
-	this._RunMainFunctionIfEverythingIsLoaded();
+	this._RunAllLoadedCallbackIfEverythingIsLoaded();
 }
 
 /*
@@ -66,7 +66,6 @@ AppLauncher.prototype.AddRemoteFile = function (src) {
 			launcher._OnFileLoaded(httpRequest);
 		} else if (httpRequest.readyState >= 2 ) {
 			console.log("File ready state change: " + src + " (readyState=" + httpRequest.readyState + ", status code='" + httpRequest.status + ": " + httpRequest.statusText + "')"); 
-			// console.log("File not loaded, readyState=" + httpRequest.readyState + ", status code=" + httpRequest.status + ": " + src); 
 		} else {
 			console.log("File ready state change: " + src + " (readyState=" + httpRequest.readyState + ")"); 
 		}
@@ -88,28 +87,31 @@ AppLauncher.prototype.GetFile = function (src) {
 
 AppLauncher.prototype._OnFileLoaded = function (httpRequest) {
 	this.NumFilesLoaded++;
-	this._RunMainFunctionIfEverythingIsLoaded();
+	this._RunAllLoadedCallbackIfEverythingIsLoaded();
 }
 
 /*
  * Other Stuff
  */
 
-AppLauncher.prototype.LoadRemoteDataAndRun = function () {
+AppLauncher.prototype.LoadRemoteDataAndRun = function (callback) {
 	for (var src in this.Images) {
 	    this.Images[src].src = src;
 	}
 	for (var src in this.Files) {
 	    this.Files[src].send();
 	}
+	this.allLoadedCallback = callback;
 }
 
-AppLauncher.prototype._RunMainFunctionIfEverythingIsLoaded = function () {
+AppLauncher.prototype._RunAllLoadedCallbackIfEverythingIsLoaded = function () {
 	if (this.NumImagesLoaded < this.NumImages) {
 		return;
 	}
 	if (this.NumFilesLoaded < this.NumFiles) {
 		return;
 	}
-	this.mainFunction();
+	if (this.allLoadedCallback) {
+		this.allLoadedCallback();
+	}
 }

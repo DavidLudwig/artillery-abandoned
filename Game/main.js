@@ -69,7 +69,7 @@ function Main() {
 	setInterval(UpdateAndDraw, LoopIntervalMS);
 }
 
-launcher = new AppLauncher(Main);
+launcher = new AppLauncher();
 
 if (typeof(ImagesToLoad) == "object") {
 	for (idx in ImagesToLoad) {
@@ -85,4 +85,4 @@ if (typeof(FilesToLoad) == "object") {
 		launcher.AddRemoteFile(remoteFilePath);
 	}
 }
-launcher.LoadRemoteDataAndRun();
+launcher.LoadRemoteDataAndRun(Main);
