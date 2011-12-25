@@ -57,8 +57,8 @@ function Millis() {
 }
 
 function Main() {
-	console.log("All Images Loaded")
-
+	console.log("All Assets Loaded");
+	
 	window.addEventListener('keydown', HandleKeyDown, true);
 	StartTimeMS = Date.now();
 
@@ -70,9 +70,19 @@ function Main() {
 }
 
 launcher = new AppLauncher(Main);
-for (idx in ImagesToLoad) {
-	var remoteImagePath = ImagesToLoad[idx];
-	console.log("Loading Image: " + remoteImagePath)
-	launcher.AddRemoteImage(remoteImagePath);
+
+if (typeof(ImagesToLoad) == "object") {
+	for (idx in ImagesToLoad) {
+		var remoteImagePath = ImagesToLoad[idx];
+		console.log("Loading Image: " + remoteImagePath)
+		launcher.AddRemoteImage(remoteImagePath);
+	}
 }
-launcher.LoadRemoteImagesAndRun();
+if (typeof(FilesToLoad) == "object") {
+	for (idx in FilesToLoad) {
+		var remoteFilePath = FilesToLoad[idx];
+		console.log("Loading File: " + remoteFilePath)
+		launcher.AddRemoteFile(remoteFilePath);
+	}
+}
+launcher.LoadRemoteDataAndRun();
