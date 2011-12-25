@@ -227,6 +227,11 @@ function InitGame() {
 	// Load Game Parameters
 	if (typeof(GameParametersFile) == "string") {
 		console.log("Loading Game Parameters From File: " + GameParametersFile);
+		var rawData = launcher.GetFile(GameParametersFile);
+		var parser = new DOMParser();
+		var xmlData = parser.parseFromString(rawData, "text/xml");
+		console.log("Game Parameters:");
+		console.log(xmlData);
 	}
 	
 	// Retrieve images
