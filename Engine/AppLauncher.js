@@ -9,9 +9,9 @@
  *   launcher.LoadRemoteImagesAndRun();
  */
 function AppLauncher(mainFunction) {
-	this.NumImagesToLoad = 0;
+	this.NumImages = 0;
 	this.NumImagesLoaded = 0;
-	this.ImagesToLoad = new Array();
+	this.Images = new Array();
 	this.mainFunction = mainFunction;
 }
 
@@ -21,23 +21,23 @@ AppLauncher.prototype.AddRemoteImage = function (src) {
 	innerImage.onload = function () {
         launcher._OnImageLoaded();
     }
-	this.ImagesToLoad[src] = innerImage;
-	this.NumImagesToLoad++;
+	this.Images[src] = innerImage;
+	this.NumImages++;
 }
 
 AppLauncher.prototype.GetImage = function (imageName) {
-	return this.ImagesToLoad[imageName];
+	return this.Images[imageName];
 }
 
 AppLauncher.prototype._OnImageLoaded = function () {
     this.NumImagesLoaded++;
-    if (this.NumImagesLoaded == this.NumImagesToLoad) {
+    if (this.NumImagesLoaded == this.NumImages) {
 		this.mainFunction();
     }
 }
 
 AppLauncher.prototype.LoadRemoteImagesAndRun = function () {
-	for (var src in this.ImagesToLoad) {
-	    this.ImagesToLoad[src].src = src;
+	for (var src in this.Images) {
+	    this.Images[src].src = src;
 	}
 }
