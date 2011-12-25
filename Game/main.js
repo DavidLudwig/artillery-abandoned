@@ -85,4 +85,9 @@ if (typeof(FilesToLoad) == "object") {
 		launcher.AddRemoteFile(remoteFilePath);
 	}
 }
+if (typeof(GameParametersFile) == "string") {
+	console.log("Loading File: " + GameParametersFile);
+	launcher.AddRemoteFile(GameParametersFile);
+}
+
 launcher.LoadRemoteDataAndRun(Main);

@@ -4,6 +4,8 @@ var ImagesToLoad = [
 	"Game/Assets/Images/Sunscape.png"
 ];
 
+var FilesToLoad = [
+];
 
 // Game States
 var GameStates = {
@@ -222,10 +224,15 @@ function ProcessInput() {
 function InitGame() {
 	SetGameState(GameStates.INITIALIZING);
 	
+	// Load Game Parameters
+	if (typeof(GameParametersFile) == "string") {
+		console.log("Loading Game Parameters From File: " + GameParametersFile);
+	}
+	
 	// Retrieve images
 	Background_2_Image = launcher.GetImage("Game/Assets/Images/Background_2.png");
 	Sunscape_Image = launcher.GetImage("Game/Assets/Images/Sunscape.png");
-	
+		
 	// Init Layers
 	BackgroundLayer = document.createElement("canvas");
 	BackgroundLayer.width = ScreenWidth;
