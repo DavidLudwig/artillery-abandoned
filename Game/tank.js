@@ -6,7 +6,7 @@ function AdjustTankDownward(tank) {
 	var y = tank.cy + yadjustment;
 	while (true) {
 		if (y >= ScreenHeight) {
-			console.log("AdjustTankDownward hit bottom")
+			//console.log("AdjustTankDownward hit bottom")
 			return false;
 		}
 		var alpha = HackedGetAlpha(TerrainLayerData, x, y);
@@ -27,7 +27,7 @@ function AdjustTankUpward(tank) {
 	var y = tank.cy + yadjustment;
 	while (true) {
 		if (y <= 0) {
-			console.log("AdjustTankUpward hit top")
+			//console.log("AdjustTankUpward hit top")
 			return false;
 		}
 		var alpha = HackedGetAlpha(TerrainLayerData, x, y - 1);
