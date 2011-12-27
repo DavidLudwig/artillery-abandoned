@@ -19,21 +19,16 @@ function CollectGarbage(liveObjects, deadObjects) {
 
 var FixedUpdateCount = 0;
 function AdvanceTime() {
-	// Update
+	var currentTime = Millis();
+	
 	if (FixedUpdateCount == 0) {
-		TimeMgr = new FixedUpdater();
-		TimeMgr.Pause();
-		TimeMgr.AdvanceToTime(Millis());
-		TimeMgr.AddCallback(FixedUpdateIntervalMS, function () {
-			FixedUpdateCount++;
-			FixedUpdate();
-		});
+		//TimeMgr.AdvanceToTime(currentTime - FixedUpdateIntervalMS);
+		TimeMgr._currentTime = currentTime - FixedUpdateIntervalMS;	// HACK: set time to a potentially negative value (if so, it will be made positive shortly)
 		TimeMgr.Resume();
-		FixedUpdateCount++;
-		FixedUpdate();
-	} else {
-		TimeMgr.AdvanceToTime(Millis());
 	}
+	
+	console.log("AdvanceTime: " + currentTime);
+	TimeMgr.AdvanceToTime(currentTime);
 }
 
 function UpdateAndDraw() {
@@ -65,7 +60,13 @@ function Main() {
 	StartTimeMS = Date.now();
 	
 	// Reset time manager
-	TimeMgr = null;
+	//TimeMgr = null;
+	TimeMgr = new FixedUpdater();
+	TimeMgr.Pause();
+	TimeMgr.AddCallback(FixedUpdateIntervalMS, function () {
+		FixedUpdateCount++;
+		FixedUpdate();
+	});
 
 	console.log("Initializing Game")
 	InitGame();
