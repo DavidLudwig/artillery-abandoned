@@ -265,16 +265,13 @@ describe("FixedUpdater", function () {
 	});
 
 	describe("pause and resume with callbacks", function () {
-		var callCount = 0;
-		
-		beforeEach(function () {
-			callCount = 0;
+		it("won't invoke callbacks, if the updater is paused before any updates occur", function () {
+			// Set up a call-counting callback
+			var callCount = 0;
 			updater.AddCallback(10, function () {
 				callCount++;
 			});
-		});
 
-		it("won't invoke callbacks, if the updater is paused before any updates occur", function () {
 			// Pause the updater.
 			updater.Pause();
 			
@@ -290,6 +287,23 @@ describe("FixedUpdater", function () {
 			// Paused time is not considered when determining how many times to invoke callbacks.
 			updater.AdvanceToTime(150);
 			expect(callCount).toEqual(5);
+		});
+		
+		it("can have callbacks added while the updater is paused, which will be invoked once the updater resumes and time is advanced", function () {
+			updater.Pause();
+			updater.AdvanceToTime(100);
+			var callCount = 0;
+			updater.AddCallback(10, function () {
+				callCount++;
+			});
+			updater.AdvanceToTime(110);
+			expect(callCount).toEqual(0);
+
+			updater.Resume();
+			expect(callCount).toEqual(0);
+
+			updater.AdvanceToTime(120);
+			expect(callCount).toEqual(1);
 		});
 	});
 });
