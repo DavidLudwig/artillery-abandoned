@@ -4,7 +4,7 @@ function FixedUpdater() {
 	this._currentTime = 0;
 	this._simulatedTime = 0;
 	this._isPaused = false;
-	this._timeOfLastResume = 0;
+	//this._timeOfLastResume = 0;
 }
 
 FixedUpdater.prototype.AddCallback = function (interval, callback) {
@@ -78,7 +78,7 @@ FixedUpdater.prototype.Pause = function () {
 
 FixedUpdater.prototype.Resume = function () {
 	this._isPaused = false;
-	this._timeOfLastResume = this._currentTime;
+	//this._timeOfLastResume = this._currentTime;
 }
 
 FixedUpdater.prototype.SimulatedTime = function () {
