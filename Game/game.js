@@ -23,6 +23,112 @@ function SetGameState(theState) {
 	GameState = theState;
 }
 
+// Init game
+function InitGame() {
+	SetGameState(GameStates.INITIALIZING);
+	
+	// Load Game Parameters
+	if (typeof(GameParametersFile) == "string") {
+		console.log("Loading Game Parameters From File: " + GameParametersFile);
+		var rawData = launcher.GetFile(GameParametersFile);
+		var parser = new DOMParser();
+		var xmlData = parser.parseFromString(rawData, "text/xml");
+		console.log("Game Parameters:");
+		console.log(xmlData);
+	}
+	 
+	// Retrieve images
+	Background_2_Image = launcher.GetImage("Game/Assets/Images/Background_2.png");
+	Sunscape_Image = launcher.GetImage("Game/Assets/Images/Sunscape.png");
+		
+	// Init Layers
+	BackgroundLayer = document.createElement("canvas");
+	BackgroundLayer.width = ScreenWidth;
+	BackgroundLayer.height = ScreenHeight;
+	var tmpContext = BackgroundLayer.getContext("2d");
+	tmpContext.fillStyle = "black"
+	tmpContext.fillRect(0, 0, BackgroundLayer.width, BackgroundLayer.height);
+	for (var i = 0; i < NumStars; i++) {
+		var x = RandInt(0, ScreenWidth);
+		var y = RandInt(0, ScreenHeight);
+		var intensity = RandInt(MinStarIntensity, MaxStarIntensity);
+		var color = "rgb(" + intensity + "," + intensity + "," + intensity + ");";
+		tmpContext.fillStyle = color;
+		tmpContext.fillRect(x, y, 1, 1);
+	}
+	tmpContext = null;
+	
+	TerrainLayer = document.createElement("canvas");
+	TerrainLayer.width = ScreenWidth;
+	TerrainLayer.height = ScreenHeight;
+	tmpContext = TerrainLayer.getContext("2d");
+	tmpContext.fillStyle = "rgba(0,0,0,0);";
+	tmpContext.fillRect(0, 0, TerrainLayer.width, TerrainLayer.height);
+	tmpContext.drawImage(Background_2_Image, 0, 0);
+	TerrainLayerData = tmpContext.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
+	tmpContext = null;
+	
+	ShotLayer = document.createElement("canvas");
+	ShotLayer.width = ScreenWidth;
+	ShotLayer.height = ScreenHeight;
+	tmpContext = ShotLayer.getContext("2d");
+	tmpContext.fillStyle = "rgba(0,0,0,0);";
+	tmpContext.fillRect(0, 0, ShotLayer.width, ShotLayer.height);
+	tmpContext = null;
+	
+	// Init Missiles
+	MissileLineSegmentsToDraw = new Array();
+	
+	// Init Tanks
+	Tanks.push(new Tank(60, 267, "blue", DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
+	CurrentTank = Tanks[0];
+
+	NextSpawnAt = Millis();
+	SpawnMonster();
+	
+	// Init Sunrise
+	Sunscape_YPos = 0; //Sunscape_YPos_Night;	// FIXME: don't use 0 as an initial value, as that's just for testing raw canvas usage
+	
+	// Update angle + power views
+	UpdateViewFromModel();
+	
+	// Reset time manager
+	TimeMgr = null;
+	
+	// Mark as initialized
+	SetGameState(GameStates.PLAYING);
+}
+
+function FixedUpdate() {	
+	for (var i = 0; i < Tanks.length; i++) {
+		Tanks[i].update();
+	}
+	
+	for (var i = 0; i < Missiles.length; i++) {
+		Missiles[i].update();
+	}
+	
+	for (var i = 0; i < Explosions.length; i++) {
+		Explosions[i].update();
+	}
+	
+	if (NextSpawnAt <= TimeMgr.Time()) {
+		SpawnMonster();
+		var nextDelay = RandInt(NextMonsterDelayMinMS, NextMonsterDelayMaxMS);
+		NextSpawnAt = TimeMgr.Time() + nextDelay;
+	}
+	
+	// Update sunscape position
+
+	// if (NextRiseAt <= TimeMgr.Time()) {
+	// 	Sunscape_YPos--;
+	// 	if (Sunscape_YPos < Sunscape_YPos_Sunrise) {
+	// 		Sunscape_YPos = Sunscape_YPos_Sunrise;
+	// 	}
+	// 	NextRiseAt = TimeMgr.Time() + 
+	// }
+}
+
 function SpawnMonster() {
 	var x = RandNum(SpawnXMin, SpawnXMax);
 	var monsterXStep = RandNum(MonsterXStepMin, MonsterXStepMax);
@@ -218,112 +324,6 @@ function ProcessInput() {
 		UpdateViewFromModel();
 		ProcessInputsAfterAppTimeMS = Millis() + InputIntervalInMS;
 	}		
-}
-
-// Init game
-function InitGame() {
-	SetGameState(GameStates.INITIALIZING);
-	
-	// Load Game Parameters
-	if (typeof(GameParametersFile) == "string") {
-		console.log("Loading Game Parameters From File: " + GameParametersFile);
-		var rawData = launcher.GetFile(GameParametersFile);
-		var parser = new DOMParser();
-		var xmlData = parser.parseFromString(rawData, "text/xml");
-		console.log("Game Parameters:");
-		console.log(xmlData);
-	}
-	
-	// Retrieve images
-	Background_2_Image = launcher.GetImage("Game/Assets/Images/Background_2.png");
-	Sunscape_Image = launcher.GetImage("Game/Assets/Images/Sunscape.png");
-		
-	// Init Layers
-	BackgroundLayer = document.createElement("canvas");
-	BackgroundLayer.width = ScreenWidth;
-	BackgroundLayer.height = ScreenHeight;
-	var tmpContext = BackgroundLayer.getContext("2d");
-	tmpContext.fillStyle = "black"
-	tmpContext.fillRect(0, 0, BackgroundLayer.width, BackgroundLayer.height);
-	for (var i = 0; i < NumStars; i++) {
-		var x = RandInt(0, ScreenWidth);
-		var y = RandInt(0, ScreenHeight);
-		var intensity = RandInt(MinStarIntensity, MaxStarIntensity);
-		var color = "rgb(" + intensity + "," + intensity + "," + intensity + ");";
-		tmpContext.fillStyle = color;
-		tmpContext.fillRect(x, y, 1, 1);
-	}
-	tmpContext = null;
-	
-	TerrainLayer = document.createElement("canvas");
-	TerrainLayer.width = ScreenWidth;
-	TerrainLayer.height = ScreenHeight;
-	tmpContext = TerrainLayer.getContext("2d");
-	tmpContext.fillStyle = "rgba(0,0,0,0);";
-	tmpContext.fillRect(0, 0, TerrainLayer.width, TerrainLayer.height);
-	tmpContext.drawImage(Background_2_Image, 0, 0);
-	TerrainLayerData = tmpContext.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
-	tmpContext = null;
-	
-	ShotLayer = document.createElement("canvas");
-	ShotLayer.width = ScreenWidth;
-	ShotLayer.height = ScreenHeight;
-	tmpContext = ShotLayer.getContext("2d");
-	tmpContext.fillStyle = "rgba(0,0,0,0);";
-	tmpContext.fillRect(0, 0, ShotLayer.width, ShotLayer.height);
-	tmpContext = null;
-	
-	// Init Missiles
-	MissileLineSegmentsToDraw = new Array();
-	
-	// Init Tanks
-	Tanks.push(new Tank(60, 267, "blue", DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
-	CurrentTank = Tanks[0];
-
-	NextSpawnAt = Millis();
-	SpawnMonster();
-	
-	// Init Sunrise
-	Sunscape_YPos = 0; //Sunscape_YPos_Night;	// FIXME: don't use 0 as an initial value, as that's just for testing raw canvas usage
-	
-	// Update angle + power views
-	UpdateViewFromModel();
-	
-	// Reset time manager
-	TimeMgr = null;
-	
-	// Mark as initialized
-	SetGameState(GameStates.PLAYING);
-}
-
-function FixedUpdate() {	
-	for (var i = 0; i < Tanks.length; i++) {
-		Tanks[i].update();
-	}
-	
-	for (var i = 0; i < Missiles.length; i++) {
-		Missiles[i].update();
-	}
-	
-	for (var i = 0; i < Explosions.length; i++) {
-		Explosions[i].update();
-	}
-	
-	if (NextSpawnAt <= TimeMgr.Time()) {
-		SpawnMonster();
-		var nextDelay = RandInt(NextMonsterDelayMinMS, NextMonsterDelayMaxMS);
-		NextSpawnAt = TimeMgr.Time() + nextDelay;
-	}
-	
-	// Update sunscape position
-
-	// if (NextRiseAt <= TimeMgr.Time()) {
-	// 	Sunscape_YPos--;
-	// 	if (Sunscape_YPos < Sunscape_YPos_Sunrise) {
-	// 		Sunscape_YPos = Sunscape_YPos_Sunrise;
-	// 	}
-	// 	NextRiseAt = TimeMgr.Time() + 
-	// }
 }
 
 function Draw(ctx) {
