@@ -128,7 +128,7 @@ function FixedUpdate() {
 }
 
 function SpawnMonster() {
-	console.log("SpawnMonster: fixedcount="+FixedUpdateCount);
+	//console.log("SpawnMonster: fixedcount="+FixedUpdateCount);
 	var x = RandNum(SpawnXMin, SpawnXMax);
 	var monsterXStep = RandNum(MonsterXStepMin, MonsterXStepMax);
 	var monster = new Tank(x, 0, "red", DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
