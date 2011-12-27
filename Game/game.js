@@ -36,7 +36,7 @@ function InitGame() {
 		console.log("Game Parameters:");
 		console.log(xmlData);
 	}
-	 
+	
 	// Retrieve images
 	Background_2_Image = launcher.GetImage("Game/Assets/Images/Background_2.png");
 	Sunscape_Image = launcher.GetImage("Game/Assets/Images/Sunscape.png");
