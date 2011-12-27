@@ -73,7 +73,7 @@ const PlayerExplodedRadius = 50;
 var StartTimeMS = null;
 var UpdateDurationS = 0.05;		// time to elapse when updating game state, sort-of approximately in seconds
 var TimeMgr = null;
-const FixedUpdateIntervalMS = 50;
+const FixedUpdateIntervalMS = 25;
 const FixedUpdateIntervalS = FixedUpdateIntervalMS / 1000;
 
 // Layers
