@@ -84,7 +84,6 @@ function InitGame() {
 	CurrentTank = Tanks[0];
 
 	NextSpawnAt = Millis();
-	SpawnMonster();
 	
 	// Init Sunrise
 	Sunscape_YPos = 0; //Sunscape_YPos_Night;	// FIXME: don't use 0 as an initial value, as that's just for testing raw canvas usage
@@ -129,6 +128,7 @@ function FixedUpdate() {
 }
 
 function SpawnMonster() {
+	console.log("SpawnMonster: fixedcount="+FixedUpdateCount);
 	var x = RandNum(SpawnXMin, SpawnXMax);
 	var monsterXStep = RandNum(MonsterXStepMin, MonsterXStepMax);
 	var monster = new Tank(x, 0, "red", DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
