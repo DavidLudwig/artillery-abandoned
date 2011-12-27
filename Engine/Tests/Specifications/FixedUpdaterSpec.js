@@ -181,17 +181,90 @@ describe("FixedUpdater", function () {
 		
 			it("will resume once the updater is resumed, without factoring in paused time", function () {
 				updater.Pause();
+				expect(updater.SimulatedTime()).toEqual(0);
+
 				updater.AdvanceToTime(10);
+				expect(updater.SimulatedTime()).toEqual(0);
+				
 				updater.Resume();
+				expect(updater.SimulatedTime()).toEqual(0);
+
 				updater.AdvanceToTime(30);
 				expect(updater.SimulatedTime()).toEqual(20);
+
 				updater.AdvanceToTime(70);
 				expect(updater.SimulatedTime()).toEqual(60);
+
+				updater.Pause();
+				updater.AdvanceToTime(100);
+				expect(updater.SimulatedTime()).toEqual(60);
+
+				updater.Resume();
+				expect(updater.SimulatedTime()).toEqual(60);
+				
+				updater.AdvanceToTime(110);
+				expect(updater.SimulatedTime()).toEqual(70);
+				
+				updater.Pause();
+				expect(updater.SimulatedTime()).toEqual(70);
+				
+				updater.AdvanceToTime(115);
+				expect(updater.SimulatedTime()).toEqual(70);
+				
+				updater.Resume();
+				expect(updater.SimulatedTime()).toEqual(70);
+				
+				updater.AdvanceToTime(120);
+				expect(updater.SimulatedTime()).toEqual(75);
 			});
+		});
+		
+		it("allows callbacks to retrieve simulated time, and interpolates time for callbacks that occur in the middle of large advancements", function () {
+			var SimulatedTimesOnAFiveSecondCallback = new Array();
+			updater.AddCallback(5, function () {
+				SimulatedTimesOnAFiveSecondCallback.push(updater.SimulatedTime());
+			});
+
+			var SimulatedTimesOnATenSecondCallback = new Array();
+			updater.AddCallback(10, function () {
+				SimulatedTimesOnATenSecondCallback.push(updater.SimulatedTime());
+			});
+			
+			updater.AdvanceToTime(12);
+			expect(SimulatedTimesOnAFiveSecondCallback.length).toEqual(2);
+			expect(SimulatedTimesOnAFiveSecondCallback[0]).toEqual(5);
+			expect(SimulatedTimesOnAFiveSecondCallback[1]).toEqual(10);
+			expect(SimulatedTimesOnATenSecondCallback.length).toEqual(1);
+			expect(SimulatedTimesOnATenSecondCallback[0]).toEqual(10);
+			
+			updater.AdvanceToTime(25);
+			expect(SimulatedTimesOnAFiveSecondCallback.length).toEqual(5);
+			expect(SimulatedTimesOnAFiveSecondCallback[0]).toEqual(5);
+			expect(SimulatedTimesOnAFiveSecondCallback[1]).toEqual(10);
+			expect(SimulatedTimesOnAFiveSecondCallback[2]).toEqual(15);
+			expect(SimulatedTimesOnAFiveSecondCallback[3]).toEqual(20);
+			expect(SimulatedTimesOnAFiveSecondCallback[4]).toEqual(25);
+			expect(SimulatedTimesOnATenSecondCallback.length).toEqual(2);
+			expect(SimulatedTimesOnATenSecondCallback[0]).toEqual(10);
+			expect(SimulatedTimesOnATenSecondCallback[1]).toEqual(20);
+		});
+
+		it("won't erronously compute callback intervals based off of real-time", function () {
+			var SimulatedTimesFromCallback = new Array();
+			updater.AddCallback(10, function () {
+				SimulatedTimesFromCallback.push(updater.SimulatedTime());
+			});
+			
+			updater.Pause();
+			updater.AdvanceToTime(54);
+			updater.Resume();
+			updater.AdvanceToTime(70);
+			expect(SimulatedTimesFromCallback.length).toEqual(1);
+			expect(SimulatedTimesFromCallback[0]).toEqual(10);
 		});
 	});
 
-	describe("can be paused", function () {
+	describe("pause and resume with callbacks", function () {
 		var callCount = 0;
 		
 		beforeEach(function () {
@@ -201,7 +274,7 @@ describe("FixedUpdater", function () {
 			});
 		});
 
-		it("from the beginning of the updater's lifetime, with callbacks not being invoked.", function () {
+		it("won't invoke callbacks, if the updater is paused before any updates occur", function () {
 			// Pause the updater.
 			updater.Pause();
 			
