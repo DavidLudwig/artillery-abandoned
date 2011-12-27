@@ -2,6 +2,7 @@
 function FixedUpdater() {
 	this._callbacks = [];
 	this._currentTime = 0;
+	this._isPaused = false;
 }
 
 FixedUpdater.prototype.AddCallback = function (interval, callback) {
@@ -47,7 +48,9 @@ FixedUpdater.prototype.AdvanceToTime = function (newTime) {
 		for (var i = 0; i < this._callbacks.length; i++) {
 			var callbackInfo = this._callbacks[i];
 			while (callbackInfo.nextTime <= this._currentTime) {
-				callbackInfo.callback();
+				if (this._isPaused == false) {
+					callbackInfo.callback();
+				}
 				callbackInfo.nextTime += callbackInfo.interval;
 			}
 		}
@@ -57,6 +60,14 @@ FixedUpdater.prototype.AdvanceToTime = function (newTime) {
 			return;
 		}
 	}
+}
+
+FixedUpdater.prototype.Pause = function () {
+	this._isPaused = true;
+}
+
+FixedUpdater.prototype.Resume = function () {
+	this._isPaused = false;
 }
 
 FixedUpdater.prototype.Time = function () {

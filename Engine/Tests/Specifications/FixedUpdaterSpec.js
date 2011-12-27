@@ -158,4 +158,33 @@ describe("FixedUpdater", function () {
 			});
 		});
 	});
+
+	describe("can be paused", function () {
+		var callCount = 0;
+		
+		beforeEach(function () {
+			callCount = 0;
+			updater.AddCallback(10, function () {
+				callCount++;
+			});
+		});
+
+		it("from the beginning of the updater's lifetime, with callbacks not being invoked.", function () {
+			// Pause the updater.
+			updater.Pause();
+			
+			// Advance time by a bit, observing that no callbacks have been invoked.
+			updater.AdvanceToTime(100);
+			expect(callCount).toEqual(0);
+			
+			// Resume the updater, observing that callbacks still have not been invoked.
+			updater.Resume();
+			expect(callCount).toEqual(0);
+			
+			// Advance time a bit mroe, observing that callbacks are invoked, but only from the resumed time.
+			// Paused time is not considered when determining how many times to invoke callbacks.
+			updater.AdvanceToTime(150);
+			expect(callCount).toEqual(5);
+		});
+	});
 });
