@@ -44,9 +44,6 @@ function UpdateAndDraw() {
 		var ctx = canvas.getContext("2d");	
 		Draw(ctx);
 	}
-	
-	// Cleanup
-	CleanupFromUpdate();
 }
 
 function Millis() {

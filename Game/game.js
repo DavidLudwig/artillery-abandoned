@@ -125,6 +125,9 @@ function FixedUpdate() {
 	// 	}
 	// 	NextRiseAt = TimeMgr.SimulatedTime() + 
 	// }
+	
+	// Cleanup
+	CleanupFromUpdate();
 }
 
 function SpawnMonster() {
