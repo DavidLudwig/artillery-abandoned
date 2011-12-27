@@ -2,7 +2,9 @@
 function FixedUpdater() {
 	this._callbacks = [];
 	this._currentTime = 0;
+	this._simulatedTime = 0;
 	this._isPaused = false;
+	this._timeOfLastResume = 0;
 }
 
 FixedUpdater.prototype.AddCallback = function (interval, callback) {
@@ -43,12 +45,16 @@ FixedUpdater.prototype.AdvanceToTime = function (newTime) {
 		
 		// Update time by a bit.
 		this._currentTime = nextTime;
+		if ( ! this._isPaused) {
+			var elapsedTimeSinceLastResume = (nextTime - this._timeOfLastResume);
+			this._simulatedTime = elapsedTimeSinceLastResume;
+		}
 		
 		// Signal callbacks.
 		for (var i = 0; i < this._callbacks.length; i++) {
 			var callbackInfo = this._callbacks[i];
 			while (callbackInfo.nextTime <= this._currentTime) {
-				if (this._isPaused == false) {
+				if ( ! this._isPaused) {
 					callbackInfo.callback();
 				}
 				callbackInfo.nextTime += callbackInfo.interval;
@@ -68,6 +74,11 @@ FixedUpdater.prototype.Pause = function () {
 
 FixedUpdater.prototype.Resume = function () {
 	this._isPaused = false;
+	this._timeOfLastResume = this._currentTime;
+}
+
+FixedUpdater.prototype.SimulatedTime = function () {
+	return this._simulatedTime;
 }
 
 FixedUpdater.prototype.Time = function () {

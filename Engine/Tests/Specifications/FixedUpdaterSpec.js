@@ -158,6 +158,38 @@ describe("FixedUpdater", function () {
 			});
 		});
 	});
+	
+	describe("the concept of simulated time, which is separate from real time", function () {
+		it("starts at zero", function () {
+			expect(updater.SimulatedTime()).toEqual(0);
+		});
+		
+		it("increments as real-time is incremented", function () {
+			updater.AdvanceToTime(20);
+			expect(updater.SimulatedTime()).toEqual(20);
+
+			updater.AdvanceToTime(100);
+			expect(updater.SimulatedTime()).toEqual(100);
+		});
+		
+		describe("simulated time with paused states", function () {
+			it("doesn't increment if the updater is paused", function () {
+				updater.Pause();
+				updater.AdvanceToTime(20);
+				expect(updater.SimulatedTime()).toEqual(0);
+			});
+		
+			it("will resume once the updater is resumed, without factoring in paused time", function () {
+				updater.Pause();
+				updater.AdvanceToTime(10);
+				updater.Resume();
+				updater.AdvanceToTime(30);
+				expect(updater.SimulatedTime()).toEqual(20);
+				updater.AdvanceToTime(70);
+				expect(updater.SimulatedTime()).toEqual(60);
+			});
+		});
+	});
 
 	describe("can be paused", function () {
 		var callCount = 0;
