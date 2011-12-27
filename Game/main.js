@@ -27,7 +27,7 @@ function AdvanceTime() {
 		TimeMgr.Resume();
 	}
 	
-	console.log("AdvanceTime: " + currentTime);
+	//console.log("AdvanceTime: " + currentTime);
 	TimeMgr.AdvanceToTime(currentTime);
 }
 
@@ -60,7 +60,6 @@ function Main() {
 	StartTimeMS = Date.now();
 	
 	// Reset time manager
-	//TimeMgr = null;
 	TimeMgr = new FixedUpdater();
 	TimeMgr.Pause();
 	TimeMgr.AddCallback(FixedUpdateIntervalMS, function () {
