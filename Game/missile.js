@@ -24,8 +24,6 @@ function HackedGetAlpha(layer, x, y) {
 }
 
 Missile.prototype.update = function () {
-	//console.log("missile active at ms: " + Millis());
-	
 	this.lastx = this.x;
 	this.lasty = this.y;
 	this.x += (this.vx * FixedUpdateIntervalS);

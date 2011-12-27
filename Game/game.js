@@ -83,7 +83,7 @@ function InitGame() {
 	Tanks.push(new Tank(60, 267, "blue", DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
 	CurrentTank = Tanks[0];
 
-	NextSpawnAt = Millis();
+	NextSpawnAt = TimeMgr.SimulatedTime();
 	
 	// Init Sunrise
 	Sunscape_YPos = 0; //Sunscape_YPos_Night;	// FIXME: don't use 0 as an initial value, as that's just for testing raw canvas usage
@@ -110,20 +110,20 @@ function FixedUpdate() {
 		Explosions[i].update();
 	}
 	
-	if (NextSpawnAt <= TimeMgr.Time()) {
+	if (NextSpawnAt <= TimeMgr.SimulatedTime()) {
 		SpawnMonster();
 		var nextDelay = RandInt(NextMonsterDelayMinMS, NextMonsterDelayMaxMS);
-		NextSpawnAt = TimeMgr.Time() + nextDelay;
+		NextSpawnAt = TimeMgr.SimulatedTime() + nextDelay;
 	}
 	
 	// Update sunscape position
 
-	// if (NextRiseAt <= TimeMgr.Time()) {
+	// if (NextRiseAt <= TimeMgr.SimulatedTime()) {
 	// 	Sunscape_YPos--;
 	// 	if (Sunscape_YPos < Sunscape_YPos_Sunrise) {
 	// 		Sunscape_YPos = Sunscape_YPos_Sunrise;
 	// 	}
-	// 	NextRiseAt = TimeMgr.Time() + 
+	// 	NextRiseAt = TimeMgr.SimulatedTime() + 
 	// }
 }
 

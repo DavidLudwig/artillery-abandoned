@@ -70,9 +70,9 @@ function Tank(cx, cy, color, angle, power, isPlayer, width, xstep, xstepInterval
 Tank.prototype.update = function () {
 	if (this.nextUpdateMS == null) {
 		// set nextUpdateMS on the first tick
-		this.nextUpdateMS = TimeMgr.Time();
+		this.nextUpdateMS = TimeMgr.SimulatedTime();
 	}
-	while (this.nextUpdateMS <= TimeMgr.Time()) {
+	while (this.nextUpdateMS <= TimeMgr.SimulatedTime()) {
 		// var intersectRectRect(var left, var top, var right, var bottom,
 		//                       var otherLeft, var otherTop, var otherRight, var otherBottom)
 		
