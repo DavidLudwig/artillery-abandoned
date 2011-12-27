@@ -20,14 +20,16 @@ function CollectGarbage(liveObjects, deadObjects) {
 var FixedUpdateCount = 0;
 function AdvanceTime() {
 	// Update
-	if (TimeMgr == null) {
+	if (FixedUpdateCount == 0) {
 		TimeMgr = new FixedUpdater();
-		TimeMgr._currentTime = Millis();
+		TimeMgr.Pause();
+		TimeMgr.AdvanceToTime(Millis());
 		TimeMgr.AddCallback(FixedUpdateIntervalMS, function () {
 			FixedUpdateCount++;
-			//console.log("FixedUpdate, #" + FixedUpdateCount+": managed="+TimeMgr.Time()+"; real="+Millis());
 			FixedUpdate();
 		});
+		TimeMgr.Resume();
+		FixedUpdateCount++;
 		FixedUpdate();
 	} else {
 		TimeMgr.AdvanceToTime(Millis());
@@ -61,6 +63,9 @@ function Main() {
 	
 	window.addEventListener('keydown', HandleKeyDown, true);
 	StartTimeMS = Date.now();
+	
+	// Reset time manager
+	TimeMgr = null;
 
 	console.log("Initializing Game")
 	InitGame();

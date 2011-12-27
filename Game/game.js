@@ -92,14 +92,13 @@ function InitGame() {
 	// Update angle + power views
 	UpdateViewFromModel();
 	
-	// Reset time manager
-	TimeMgr = null;
-	
 	// Mark as initialized
 	SetGameState(GameStates.PLAYING);
 }
 
-function FixedUpdate() {	
+function FixedUpdate() {
+	//console.log("FixedUpdate, #" + FixedUpdateCount+": managed="+TimeMgr.Time()+"; real="+Millis());
+	
 	for (var i = 0; i < Tanks.length; i++) {
 		Tanks[i].update();
 	}
