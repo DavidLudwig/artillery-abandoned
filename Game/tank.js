@@ -76,6 +76,11 @@ Tank.prototype.update = function () {
 		// var intersectRectRect(var left, var top, var right, var bottom,
 		//                       var otherLeft, var otherTop, var otherRight, var otherBottom)
 		
+		if ( ! MoveTank(this, this.xstep) ) {
+			Destroy(this, DeadTanks);
+			return;
+		}
+
 		if (this.isPlayer) {
 			for (var i = 1; i < Tanks.length; i++) {
 				var otherTank = Tanks[i];
@@ -94,11 +99,6 @@ Tank.prototype.update = function () {
 					return;
 				}
 			}
-		}
-		
-		if ( ! MoveTank(this, this.xstep) ) {
-			Destroy(this, DeadTanks);
-			return;
 		}
 
 		this.nextUpdateMS += this.xstepInterval;
