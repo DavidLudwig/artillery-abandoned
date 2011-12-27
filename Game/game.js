@@ -127,6 +127,9 @@ function FixedUpdate() {
 	// }
 	
 	// Cleanup
+	if (Tanks.indexOf(CurrentTank) == -1) {
+		CurrentTank = null;
+	}
 	CleanupFromUpdate();
 }
 
