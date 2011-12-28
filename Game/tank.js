@@ -165,5 +165,19 @@ Tank.prototype.draw = function (ctx, a, b, c, d) {
 		ctx.stroke();
 	}
 	
+	// Draw highlight, if need be.
+	if (UseTankHighlights && this == CurrentTank) {
+		//console.log("draw current tank");
+		ctx.beginPath();
+		ctx.fillStyle = HighlightColor;
+		ctx.beginPath();
+		ctx.beginPath();
+		ctx.moveTo(this.cx - (HighlightWidth / 2), this.cy - HighlightDistanceYFromTankCenter - HighlightHeight);
+		ctx.lineTo(this.cx + (HighlightWidth / 2), this.cy - HighlightDistanceYFromTankCenter - HighlightHeight);
+		ctx.lineTo(this.cx, this.cy - HighlightDistanceYFromTankCenter);
+		ctx.closePath();
+		ctx.fill();
+	}
+	
 	ctx.restore();
 }

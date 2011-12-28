@@ -56,6 +56,11 @@ const CrosshairWeight = 2;
 const CrosshairSize = 6;
 const CrosshairLengthFromTankCenter = 20;
 const PlayerWidth = 16;
+var UseTankHighlights = false;
+const HighlightWidth = 10;
+const HighlightHeight = 5;
+const HighlightDistanceYFromTankCenter = 20;
+const HighlightColor = "orange";
 
 //
 // Monsters

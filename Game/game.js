@@ -72,6 +72,8 @@ function InitGame() {
 			}
 		}
 	}
+	
+	// Log gameplay-affecting variables.
 	console.log("Use Monsters?: " + UseMonsters);
 	
 	// Retrieve images
@@ -126,6 +128,9 @@ function InitGame() {
 		}
 	}
 	CurrentTank = Tanks[0];
+	if ( ! UseMonsters ) {
+		UseTankHighlights = true;
+	}
 
 	// Init Monsters
 	NextSpawnAt = TimeMgr.SimulatedTime();
