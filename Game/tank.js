@@ -82,21 +82,23 @@ Tank.prototype.update = function () {
 		}
 
 		if (this.isPlayer) {
-			for (var i = 1; i < Tanks.length; i++) {
+			for (var i = 0; i < Tanks.length; i++) {
 				var otherTank = Tanks[i];
-				if (intersectRectRect(this.cx - (this.width / 2),
-									  this.cy - (this.height / 2),
-									  this.cx + (this.width / 2),
-									  this.cy + (this.height / 2),
-									  otherTank.cx - (otherTank.width / 2),
-									  otherTank.cy - (otherTank.height / 2),
-									  otherTank.cx + (otherTank.width / 2),
-									  otherTank.cy + (otherTank.height / 2))) {
-					// console.log("tank collision");
-					var explosion = new Explosion(this.cx, this.cy, PlayerExplodedRadius);
-					Explosions.push(explosion);
-					SetGameState(GameStates.GAME_OVER);
-					return;
+				if ( ! otherTank.isPlayer ) {
+					if (intersectRectRect(this.cx - (this.width / 2),
+										  this.cy - (this.height / 2),
+										  this.cx + (this.width / 2),
+										  this.cy + (this.height / 2),
+										  otherTank.cx - (otherTank.width / 2),
+										  otherTank.cy - (otherTank.height / 2),
+										  otherTank.cx + (otherTank.width / 2),
+										  otherTank.cy + (otherTank.height / 2))) {
+						// console.log("tank collision");
+						var explosion = new Explosion(this.cx, this.cy, PlayerExplodedRadius);
+						Explosions.push(explosion);
+						SetGameState(GameStates.GAME_OVER);
+						return;
+					}
 				}
 			}
 		}
