@@ -23,6 +23,17 @@ function SetGameState(theState) {
 	GameState = theState;
 }
 
+function ToBool(input, defaultOutput) {
+	var value = parseInt(input);
+	if (isNaN(value)) {
+		return defaultOutput;
+	} else if (value == 0) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
 // Init game
 function InitGame() {
 	SetGameState(GameStates.INITIALIZING);
@@ -32,10 +43,22 @@ function InitGame() {
 		console.log("Loading Game Parameters From File: " + GameParametersFile);
 		var rawData = launcher.GetFile(GameParametersFile);
 		var parser = new DOMParser();
-		var xmlData = parser.parseFromString(rawData, "text/xml");
-		console.log("Game Parameters:");
-		console.log(xmlData);
+		var gameParamsDoc = parser.parseFromString(rawData, "text/xml");
+		var parserErrors = gameParamsDoc.getElementsByTagName("parsererror");
+		if (parserErrors.length > 0) {
+			console.log("Error parsing game parameters:");
+			console.log(parserErrors[0]);
+		} else {
+			console.log("Game Parameters:");
+			console.log(gameParamsDoc);
+		}
+		
+		var gameData = gameParamsDoc.getElementsByTagName("game")[0];
+		if (gameData) {
+			UseMonsters = ToBool(gameData.getAttribute("monsters"), UseMonsters);
+		}
 	}
+	console.log("Use Monsters?: " + UseMonsters);
 	
 	// Retrieve images
 	Background_2_Image = launcher.GetImage("Game/Assets/Images/Background_2.png");
@@ -134,6 +157,10 @@ function FixedUpdate() {
 }
 
 function SpawnMonster() {
+	if ( ! UseMonsters ) {
+		return;
+	}
+	
 	//console.log("SpawnMonster: fixedcount="+FixedUpdateCount);
 	var x = RandNum(SpawnXMin, SpawnXMax);
 	var monsterXStep = RandNum(MonsterXStepMin, MonsterXStepMax);

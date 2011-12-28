@@ -53,6 +53,7 @@ const PlayerWidth = 16;
 //
 // Monsters
 //
+var UseMonsters = true;
 const MonsterWidth = 6;
 const SpawnXMin = 400;
 const SpawnXMax = 500;
