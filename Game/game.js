@@ -56,6 +56,20 @@ function InitGame() {
 		var gameData = gameParamsDoc.getElementsByTagName("game")[0];
 		if (gameData) {
 			UseMonsters = ToBool(gameData.getAttribute("monsters"), UseMonsters);
+			
+			var tanks = gameData.getElementsByTagName("tanks")[0].getElementsByTagName("tank");
+			for (var i = 0; i < tanks.length; i++) {
+				var x = parseInt(tanks[i].getAttribute("x"));
+				var y = parseInt(tanks[i].getAttribute("y"));
+				var color = tanks[i].getAttribute("color") || "blue";
+				if ( ! isNaN(x) && ! isNaN(y) ) {
+					TanksToSpawn[i] = {
+						"x": x,
+						"y": y,
+						"color": color
+					};
+				}
+			}
 		}
 	}
 	console.log("Use Monsters?: " + UseMonsters);
