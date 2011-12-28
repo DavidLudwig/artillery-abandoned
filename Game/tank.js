@@ -65,6 +65,13 @@ function Tank(cx, cy, color, angle, power, isPlayer, width, xstep, xstepInterval
 	this.xstepInterval = xstepInterval;
 	this.nextUpdateMS = null;
 	this.color = color;
+	
+	// The tank's body.
+	this.tankCanvas = null;
+	
+	// Tank canvas center point: a point on this.tankCanvas's coordinate space that translates to this.cx and this.cy in the world's coordinate space.
+	this.tankCanvasCX = null;
+	this.tankCanvasCY = null;
 }
 
 Tank.prototype.update = function () {
@@ -107,7 +114,6 @@ Tank.prototype.update = function () {
 	}
 }
 
-
 Tank.prototype.fire = function () {
 	var angleDeg = this.angle;
 	var angleRad = DegToRad(angleDeg);
@@ -127,28 +133,59 @@ Tank.prototype.fire = function () {
 	Missiles.push(missile);
 }
 
-Tank.prototype.draw = function (ctx, a, b, c, d) {
-	ctx.save();
-	//console.log("draw tank at " + this.x + ", " + this.y);
-	
-	// Draw tank body
-	var x = this.cx - (this.width/2);
-	var y = this.cy - (this.height/2);
+Tank.prototype._drawTankBody = function (ctx, cx, cy) {
+	// Draw the tank's body
+	var x = cx - (this.width / 2);
+	var y = cy - (this.height / 2);
 	ctx.fillStyle = this.color;
 	ctx.fillRect(x, y, this.width, this.height);
-
-	// Draw turret
+	
+	// Draw the turret
 	if (this.isPlayer) {
 		var turretVector = new Vector(TurretLengthFromTankCenter, 0);
 		RotateVectorByDeg(turretVector, this.angle);
 		ctx.beginPath();
-		ctx.moveTo(this.cx, this.cy);
-		ctx.lineTo(this.cx + turretVector.x, this.cy + turretVector.y);
+		ctx.moveTo(cx, cy);
+		ctx.lineTo(cx + turretVector.x, cy + turretVector.y);
 		ctx.strokeStyle = this.color;
 		ctx.lineWidth = TurretWeight;
 		ctx.lineCap = "square";
 		ctx.stroke();
 	}
+}
+
+Tank.prototype._updateTankCanvas = function () {
+	// Create a canvas, if such hasn't already been done. 
+	if (this.tankCanvas == null) {
+		this.tankCanvas = document.createElement("canvas");
+	}
+	
+	// Make sure the canvas is the correct size.
+	var canvasWidth = Math.max(this.width, TurretWeight + (2 * TurretLengthFromTankCenter));
+	var canvasHeight = Math.max(this.height, (TurretWeight / 2) + (TurretLengthFromTankCenter + (this.height / 2)));
+	this.tankCanvas.width = canvasWidth;
+	this.tankCanvas.height = canvasHeight;
+	
+	// Figure out where the tank's center will be on the canvas.
+	this.tankCanvasCX = canvasWidth / 2;
+	this.tankCanvasCY = canvasHeight - (this.height / 2);
+
+	// Draw onto the canvas.
+	var ctx = this.tankCanvas.getContext("2d");
+	this._drawTankBody(ctx, this.tankCanvasCX, this.tankCanvasCY);
+}
+
+Tank.prototype.draw = function (ctx, a, b, c, d) {
+	this._updateTankCanvas();
+	
+	ctx.save();
+	//console.log("draw tank at " + this.x + ", " + this.y);
+	
+	// Draw tank body
+	// this._drawTankBody(ctx, this.cx, this.cy);
+	var tankCanvasGlobalLeft = this.cx - this.tankCanvasCX;
+	var tankCanvasGlobalTop = this.cy - this.tankCanvasCY;
+	ctx.drawImage(this.tankCanvas, tankCanvasGlobalLeft, tankCanvasGlobalTop);
 	
 	// Draw crosshair
 	if (this.isPlayer) {
