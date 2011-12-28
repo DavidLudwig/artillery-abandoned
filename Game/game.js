@@ -101,9 +101,29 @@ function InitGame() {
 	TerrainLayer.width = ScreenWidth;
 	TerrainLayer.height = ScreenHeight;
 	tmpContext = TerrainLayer.getContext("2d");
-	tmpContext.fillStyle = "rgba(0,0,0,0);";
-	tmpContext.fillRect(0, 0, TerrainLayer.width, TerrainLayer.height);
-	tmpContext.drawImage(Background_2_Image, 0, 0);
+	if (UseImageBasedTerrain) {
+		tmpContext.fillStyle = "rgba(0,0,0,0);";
+		tmpContext.fillRect(0, 0, TerrainLayer.width, TerrainLayer.height);
+		tmpContext.drawImage(Background_2_Image, 0, 0);
+	} else {
+		var TerrainData = [
+			[0,300],
+			[200,280],
+			[400,220],
+			[512,270]
+		];
+		tmpContext.fillStyle = "#996600";
+		tmpContext.beginPath();
+		tmpContext.moveTo(0, ScreenHeight);
+		for (var pointIndex = 0; pointIndex < TerrainData.length; pointIndex++) {
+			var px = TerrainData[pointIndex][0];
+			var py = TerrainData[pointIndex][1];
+			tmpContext.lineTo(px, py);
+		}
+		tmpContext.lineTo(ScreenWidth, ScreenHeight);
+		tmpContext.closePath();
+		tmpContext.fill();
+	}
 	TerrainLayerData = tmpContext.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
 	tmpContext = null;
 	

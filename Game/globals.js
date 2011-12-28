@@ -81,6 +81,12 @@ const DefaultExplosionRadius = 10;
 const DefaultExplosionDuration = 0.3;
 const PlayerExplodedRadius = 50;
 
+//
+// Terrain
+//
+var UseImageBasedTerrain = true;
+//var UseImageBasedTerrain = false;
+
 // Timing
 var StartTimeMS = null;
 var UpdateDurationS = 0.05;		// time to elapse when updating game state, sort-of approximately in seconds
