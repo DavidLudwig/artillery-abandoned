@@ -144,7 +144,7 @@ function InitGame() {
 		if (tankSpawnInfo.x && tankSpawnInfo.y && tankSpawnInfo.color) {
 			var tank = new Tank(tankSpawnInfo.x, tankSpawnInfo.y, tankSpawnInfo.color, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10);
 			Tanks.push(tank);
-			AdjustTankDownward(tank);
+			tank.AdjustDownward();
 		}
 	}
 	CurrentTank = Tanks[0];
@@ -212,7 +212,7 @@ function SpawnMonster() {
 	var x = RandNum(SpawnXMin, SpawnXMax);
 	var monsterXStep = RandNum(MonsterXStepMin, MonsterXStepMax);
 	var monster = new Tank(x, 0, "red", DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
-	MoveTank(monster, 0);	// make sure it's on the ground
+	monster.MoveByXOffset(0);	// make sure it's on the ground
 	Tanks.push(monster);
 }
 
@@ -321,17 +321,17 @@ function HandleKeyDown(evt) {
 	switch (evt.keyCode) {
 		case KeyCodes.Left:
 			//console.log("left");
-			MoveTank(Tanks[1], -1);
+			Tanks[1].MoveByXOffset(-1);
 			break;
 		
 		case KeyCodes.Right:
 			//console.log("right");
-			MoveTank(Tanks[1], 1);
+			Tanks[1].MoveByXOffset(1);
 			break;
 		
 		case KeyCodes.Down:
 			//console.log("down");
-			AdjustTankDownward(Tanks[1]);
+			Tanks[1].AdjustDownward();
 			break;
 	}
 }

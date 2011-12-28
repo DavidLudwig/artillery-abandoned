@@ -1,57 +1,5 @@
 
 // Tank class
-function AdjustTankDownward(tank) {
-	var x = tank.cx;
-	var yadjustment = (tank.height / 2);
-	var y = tank.cy + yadjustment;
-	while (true) {
-		if (y >= ScreenHeight) {
-			//console.log("AdjustTankDownward hit bottom")
-			return false;
-		}
-		var alpha = HackedGetAlpha(TerrainLayerData, x, y);
-		//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
-		if (alpha == 0) {
-			y++;
-		} else {
-			//console.log("AdjustTankDownward got it!")
-			tank.cy = y - yadjustment;
-			return true;
-		}
-	}
-}
-
-function AdjustTankUpward(tank) {
-	var x = tank.cx;
-	var yadjustment = (tank.height / 2);
-	var y = tank.cy + yadjustment;
-	while (true) {
-		if (y <= 0) {
-			//console.log("AdjustTankUpward hit top")
-			return false;
-		}
-		var alpha = HackedGetAlpha(TerrainLayerData, x, y - 1);
-		//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
-		if (alpha != 0) {
-			y--;
-		} else {
-			//console.log("AdjustTankUpward got it!")
-			tank.cy = y - yadjustment;
-			return true;
-		}
-	}
-}
-
-function MoveTank(tank, xoff) {
-	tank.cx += xoff;
-	if ( ! AdjustTankDownward(tank) ) {
-		return false;
-	}
-	if ( ! AdjustTankUpward(tank) ) {
-		return false;
-	}
-	return true;
-}
 
 function Tank(cx, cy, color, angle, power, isPlayer, width, xstep, xstepInterval) {
 	this.cx = cx;
@@ -83,7 +31,7 @@ Tank.prototype.update = function () {
 		// var intersectRectRect(var left, var top, var right, var bottom,
 		//                       var otherLeft, var otherTop, var otherRight, var otherBottom)
 		
-		if ( ! MoveTank(this, this.xstep) ) {
+		if ( ! this.MoveByXOffset(this.xstep)) {
 			Destroy(this, DeadTanks);
 			return;
 		}
@@ -218,3 +166,57 @@ Tank.prototype.draw = function (ctx, a, b, c, d) {
 	
 	ctx.restore();
 }
+
+Tank.prototype.AdjustDownward = function () {
+	var x = this.cx;
+	var yadjustment = (this.height / 2);
+	var y = this.cy + yadjustment;
+	while (true) {
+		if (y >= ScreenHeight) {
+			//console.log("AdjustDownward hit bottom")
+			return false;
+		}
+		var alpha = HackedGetAlpha(TerrainLayerData, x, y);
+		//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
+		if (alpha == 0) {
+			y++;
+		} else {
+			//console.log("AdjustDownward got it!")
+			this.cy = y - yadjustment;
+			return true;
+		}
+	}
+}
+
+Tank.prototype.AdjustUpward = function () {
+	var x = this.cx;
+	var yadjustment = (this.height / 2);
+	var y = this.cy + yadjustment;
+	while (true) {
+		if (y <= 0) {
+			//console.log("AdjustUpward hit top")
+			return false;
+		}
+		var alpha = HackedGetAlpha(TerrainLayerData, x, y - 1);
+		//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
+		if (alpha != 0) {
+			y--;
+		} else {
+			//console.log("AdjustUpward got it!")
+			this.cy = y - yadjustment;
+			return true;
+		}
+	}
+}
+
+Tank.prototype.MoveByXOffset = function (xoffset) {
+	this.cx += xoffset;
+	if ( ! this.AdjustDownward() ) {
+		return false;
+	}
+	if ( ! this.AdjustUpward() ) {
+		return false;
+	}
+	return true;
+}
+
