@@ -102,6 +102,10 @@ Tank.prototype._drawTankBody = function (ctx, cx, cy) {
 	}
 }
 
+Tank.prototype._invalidateTankCanvas = function () {
+	this.tankCanvas = null;
+}
+
 Tank.prototype._updateTankCanvas = function () {
 	// Create a canvas, if such hasn't already been done. 
 	if (this.tankCanvas == null) {
@@ -124,7 +128,10 @@ Tank.prototype._updateTankCanvas = function () {
 }
 
 Tank.prototype.draw = function (ctx, a, b, c, d) {
-	this._updateTankCanvas();
+	var isTankCanvasValid = (this.tankCanvas != null);
+	if ( ! isTankCanvasValid) {
+		this._updateTankCanvas();
+	}
 	
 	ctx.save();
 	//console.log("draw tank at " + this.x + ", " + this.y);
@@ -169,6 +176,7 @@ Tank.prototype.draw = function (ctx, a, b, c, d) {
 
 Tank.prototype.SetAngle = function (angle) {
 	this.angle = angle;
+	this._invalidateTankCanvas();
 }
 
 Tank.prototype.OffsetAngleWithWrapping = function (offsetAngle) {
@@ -203,6 +211,7 @@ Tank.prototype.AdjustDownward = function () {
 		} else {
 			//console.log("AdjustDownward got it!")
 			this.cy = y - yadjustment;
+			this._invalidateTankCanvas();
 			return true;
 		}
 	}
@@ -224,6 +233,7 @@ Tank.prototype.AdjustUpward = function () {
 		} else {
 			//console.log("AdjustUpward got it!")
 			this.cy = y - yadjustment;
+			this._invalidateTankCanvas();
 			return true;
 		}
 	}
@@ -231,6 +241,8 @@ Tank.prototype.AdjustUpward = function () {
 
 Tank.prototype.MoveByXOffset = function (xoffset) {
 	this.cx += xoffset;
+	this._invalidateTankCanvas();
+	
 	if ( ! this.AdjustDownward() ) {
 		return false;
 	}
