@@ -47,7 +47,7 @@ var TanksToSpawn = [
 	{
 		"color": "blue",
 		"x": 60,
-		"y": 267
+		"y": 1
 	}
 ];
 const TurretLengthFromTankCenter = 15;

@@ -108,6 +108,7 @@ function InitGame() {
 		if (tankSpawnInfo.x && tankSpawnInfo.y && tankSpawnInfo.color) {
 			var tank = new Tank(tankSpawnInfo.x, tankSpawnInfo.y, tankSpawnInfo.color, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10);
 			Tanks.push(tank);
+			AdjustTankDownward(tank);
 		}
 	}
 	CurrentTank = Tanks[0];
