@@ -16,7 +16,7 @@ function HackedGetAlpha(layer, x, y) {
 	var index = (((layer.width * y) + x) * 4) + 3;
 	var value = layer.data[index];
 	if (value == null) {
-		console.log("undefined value");
+		console.log("undefined alpha value at {" + x + "," + y + "}");
 	}
 	//console.log("value at "+x+","+y+": "+value);
 	return value;
