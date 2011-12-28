@@ -171,6 +171,22 @@ Tank.prototype.SetAngle = function (angle) {
 	this.angle = angle;
 }
 
+Tank.prototype.OffsetAngleWithWrapping = function (offsetAngle) {
+	if (offsetAngle > 0) {
+		var newAngle = this.angle + offsetAngle;
+		if (newAngle > 0) {
+			newAngle = -180;
+		}
+		this.SetAngle(newAngle);
+	} else if (offsetAngle < 0) {
+		var newAngle = this.angle - 1;
+		if (newAngle < -180) {
+			newAngle = 0;
+		}
+		this.SetAngle(newAngle);
+	}
+}
+
 Tank.prototype.AdjustDownward = function () {
 	var x = this.cx;
 	var yadjustment = (this.height / 2);

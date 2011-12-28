@@ -372,28 +372,16 @@ function ProcessInput() {
 		}
 	
 		if (AnglePlusPlusDown) {
-			CurrentTank.SetAngle(CurrentTank.angle + AngleIncrementBig);
-			if (CurrentTank.angle > 0) {
-				CurrentTank.SetAngle(-180);
-			}
+			CurrentTank.OffsetAngleWithWrapping(AngleIncrementBig);
 			doViewUpdate = true;
 		} else if (AnglePlusDown) {
-			CurrentTank.SetAngle(CurrentTank.angle + 1);
-			if (CurrentTank.angle > 0) {
-				CurrentTank.SetAngle(-180);
-			}
+			CurrentTank.OffsetAngleWithWrapping(1);
 			doViewUpdate = true;
 		} else if (AngleMinusDown) {
-			CurrentTank.SetAngle(CurrentTank.angle - 1);
-			if (CurrentTank.angle < -180) {
-				CurrentTank.SetAngle(0);
-			}
+			CurrentTank.OffsetAngleWithWrapping(-1);
 			doViewUpdate = true;
 		} else if (AngleMinusMinusDown) {
-			CurrentTank.SetAngle(CurrentTank.angle - AngleIncrementBig);
-			if (CurrentTank.angle < -180) {
-				CurrentTank.SetAngle(0);	// BUG: set to higher than 0 if CurrentTank.angle was considerably less than -180
-			}
+			CurrentTank.OffsetAngleWithWrapping(-1 * AngleIncrementBig)
 			doViewUpdate = true;
 		}
 	}
