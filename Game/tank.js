@@ -167,6 +167,10 @@ Tank.prototype.draw = function (ctx, a, b, c, d) {
 	ctx.restore();
 }
 
+Tank.prototype.SetAngle = function (angle) {
+	this.angle = angle;
+}
+
 Tank.prototype.AdjustDownward = function () {
 	var x = this.cx;
 	var yadjustment = (this.height / 2);
