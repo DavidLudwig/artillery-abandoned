@@ -43,6 +43,13 @@ const KeyCodes = {
 //
 // Player Tank
 //
+var TanksToSpawn = [
+	{
+		"color": "blue",
+		"x": 60,
+		"y": 267
+	}
+];
 const TurretLengthFromTankCenter = 15;
 const TurretWeight = 4;
 const CrosshairWeight = 2;
@@ -68,7 +75,6 @@ const MonsterXStepMax = 250;
 const DefaultExplosionRadius = 10;
 const DefaultExplosionDuration = 0.3;
 const PlayerExplodedRadius = 50;
-
 
 // Timing
 var StartTimeMS = null;

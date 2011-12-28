@@ -103,9 +103,16 @@ function InitGame() {
 	MissileLineSegmentsToDraw = new Array();
 	
 	// Init Tanks
-	Tanks.push(new Tank(60, 267, "blue", DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10));		// player
+	for (var i = 0; i < TanksToSpawn.length; i++) {
+		var tankSpawnInfo = TanksToSpawn[i];
+		if (tankSpawnInfo.x && tankSpawnInfo.y && tankSpawnInfo.color) {
+			var tank = new Tank(tankSpawnInfo.x, tankSpawnInfo.y, tankSpawnInfo.color, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10);
+			Tanks.push(tank);
+		}
+	}
 	CurrentTank = Tanks[0];
 
+	// Init Monsters
 	NextSpawnAt = TimeMgr.SimulatedTime();
 	
 	// Init Sunrise
