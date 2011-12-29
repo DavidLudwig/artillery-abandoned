@@ -400,6 +400,7 @@ function Draw(ctx) {
 	DrawMissiles(ctx);
 	DrawTanks(ctx);
 	DrawExplosions(ctx);
+	DrawCollisionPoint(ctx);
 	ctx.restore();
 }
 
@@ -441,6 +442,19 @@ function DrawExplosions(ctx) {
 	for (var i = 0; i < Explosions.length; i++) {
 		Explosions[i].draw(ctx);
 	}
+}
+
+function DrawCollisionPoint(ctx) {
+	if (ShowCollisionDebugInfo == false || LastCollisionPoint == null || LastCollisionPoint.length != 2) {
+		return;
+	}
+	
+	ctx.save();
+	ctx.fillStyle = CollisionPointDrawColor;
+	var rectLeft = LastCollisionPoint[0] - (CollisionPointSize / 2);
+	var rectTop = LastCollisionPoint[1] - (CollisionPointSize / 2);
+	ctx.fillRect(rectLeft, rectTop, CollisionPointSize, CollisionPointSize);
+	ctx.restore();
 }
 
 function CleanupFromUpdate() {

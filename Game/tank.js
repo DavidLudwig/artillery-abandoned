@@ -16,6 +16,8 @@ function Tank(cx, cy, color, angle, power, isPlayer, width, xstep, xstepInterval
 	
 	// The tank's body.
 	this.tankCanvas = null;
+	this.collisionMaskCanvas = null;
+	this._isTankCanvasValid = false;
 	
 	// Tank canvas center point: a point on this.tankCanvas's coordinate space that translates to this.cx and this.cy in the world's coordinate space.
 	this.tankCanvasCX = null;
@@ -103,10 +105,14 @@ Tank.prototype._drawTankBody = function (ctx, cx, cy) {
 }
 
 Tank.prototype._invalidateTankCanvas = function () {
-	this.tankCanvas = null;
+	this._isTankCanvasValid = false;
 }
 
 Tank.prototype._updateTankCanvas = function () {
+	if (this._isTankCanvasValid) {
+		return;
+	}
+	
 	// Create a canvas, if such hasn't already been done. 
 	if (this.tankCanvas == null) {
 		this.tankCanvas = document.createElement("canvas");
@@ -125,13 +131,22 @@ Tank.prototype._updateTankCanvas = function () {
 	// Draw onto the canvas.
 	var ctx = this.tankCanvas.getContext("2d");
 	this._drawTankBody(ctx, this.tankCanvasCX, this.tankCanvasCY);
+
+	// Create and configure a canvas to do collision detection with.
+	if (this.collisionMaskCanvas == null) {
+		this.collisionMaskCanvas = document.createElement("canvas");
+	}
+	this.collisionMaskCanvas.width = this.tankCanvas.width;
+	this.collisionMaskCanvas.height = this.tankCanvas.height;
+	ctx = this.collisionMaskCanvas.getContext("2d");
+	ctx.clearRect(0, 0, this.collisionMaskCanvas.width, this.collisionMaskCanvas.height);
+	
+	// Mark the tank's canvas as valid.
+	this._isTankCanvasValid = true;
 }
 
 Tank.prototype.draw = function (ctx, a, b, c, d) {
-	var isTankCanvasValid = (this.tankCanvas != null);
-	if ( ! isTankCanvasValid) {
-		this._updateTankCanvas();
-	}
+	this._updateTankCanvas();
 	
 	ctx.save();
 	//console.log("draw tank at " + this.x + ", " + this.y);
@@ -141,6 +156,24 @@ Tank.prototype.draw = function (ctx, a, b, c, d) {
 	var tankCanvasGlobalLeft = this.cx - this.tankCanvasCX;
 	var tankCanvasGlobalTop = this.cy - this.tankCanvasCY;
 	ctx.drawImage(this.tankCanvas, tankCanvasGlobalLeft, tankCanvasGlobalTop);
+	if (ShowCollisionDebugInfo) {
+		ctx.save();
+		ctx.strokeStyle = "white";
+		ctx.lineWeight = "1";
+		ctx.strokeRect(tankCanvasGlobalLeft, tankCanvasGlobalTop, this.tankCanvas.width, this.tankCanvas.height);
+		ctx.restore();
+	}
+	
+	// Draw collision mask, if requested.
+	if (ShowCollisionDebugInfo) {
+		ctx.save();
+		ctx.translate(tankCanvasGlobalLeft, 4);
+		ctx.drawImage(this.collisionMaskCanvas, 0, 0);
+		ctx.strokeStyle = "white";
+		ctx.lineWidth = 1;
+		ctx.strokeRect(0, 0, this.tankCanvas.width, this.tankCanvas.height);
+		ctx.restore();
+	}
 	
 	// Draw crosshair
 	if (this.isPlayer) {
@@ -240,15 +273,99 @@ Tank.prototype.AdjustUpward = function () {
 }
 
 Tank.prototype.MoveByXOffset = function (xoffset) {
-	this.cx += xoffset;
-	this._invalidateTankCanvas();
-	
-	if ( ! this.AdjustDownward() ) {
-		return false;
-	}
-	if ( ! this.AdjustUpward() ) {
-		return false;
+	if (xoffset != 0) {
+		this.cx += xoffset;
+		this._invalidateTankCanvas();	
+		if ( ! this.AdjustDownward() ) {
+			return false;
+		}
+		if ( ! this.AdjustUpward() ) {
+			return false;
+		}
 	}
 	return true;
 }
 
+// var CollisionCallCount = 0;
+Tank.prototype.CollidesWithLineSegment = function (x1, y1, x2, y2, outputToArray) {
+	// CollisionCallCount++;
+	
+	// Figure out if the line segment was near the tank.  If not, report
+	// that no collision occurred.
+	var lineRectLeft = Math.min(x1, x2);
+	var lineRectTop = Math.min(y1, y2);
+	var lineRectRight = Math.max(x1, x2);
+	var lineRectBottom = Math.max(y1, y2);
+	
+	this._updateTankCanvas();
+	var bodyBoxLeft = this.cx - this.tankCanvasCX;
+	var bodyBoxTop = this.cy - this.tankCanvasCY;
+	var bodyBoxRight = bodyBoxLeft + this.tankCanvas.width;
+	var bodyBoxBottom = bodyBoxTop + this.tankCanvas.height;
+	
+	var didLineIntersectWithTankBodyCanvas = intersectRectRect(
+		lineRectLeft, lineRectTop, lineRectRight, lineRectBottom,
+		bodyBoxLeft, bodyBoxTop, bodyBoxRight, bodyBoxBottom);
+	
+	if ( ! didLineIntersectWithTankBodyCanvas ) {
+		return false;
+	}
+	
+	// Determine if the line intersected with any pixel on the tank's body.
+	// This is done by drawing the tank's body onto a separate canvas,
+	// then drawing the line on top of it using a composition mode that
+	// will only show the pixels where line intersects the body.
+	var ctx = this.collisionMaskCanvas.getContext("2d");
+	ctx.save();
+	ctx.clearRect(0, 0, this.collisionMaskCanvas.width, this.collisionMaskCanvas.height);
+	
+	// Draw the tank onto the collision canvas.
+	ctx.globalCompositeOperation = "source-over";
+	ctx.drawImage(this.tankCanvas, 0, 0);
+
+	// Draw the line onto the collision canvas
+	ctx.globalCompositeOperation = "source-in";
+	ctx.strokeStyle = CollisionMaskColor;
+	ctx.fillStyle = CollisionMaskColor;
+	ctx.translate(x1 - bodyBoxLeft, y1 - bodyBoxTop);
+	var lineVectorX = x2 - x1;
+	var lineVectorY = y2 - y1;
+	ctx.rotate(Math.atan2(lineVectorY, lineVectorX));
+	var lineLength = Math.sqrt((lineVectorX * lineVectorX) + (lineVectorY * lineVectorY));
+	ctx.beginPath();
+	ctx.moveTo(0, -1);
+	ctx.lineTo(lineLength, -1);
+	ctx.lineTo(lineLength, 1);
+	ctx.lineTo(0, 1);
+	ctx.closePath();
+	ctx.fill();
+	
+	// All done with drawing to the collision canvas.  Clean up before moving on.
+	ctx.restore();
+	
+	// Check for any collisions.
+	var collidedImageData = ctx.getImageData(0, 0, this.collisionMaskCanvas.width, this.collisionMaskCanvas.height);
+	for (var y = 0; y < this.collisionMaskCanvas.height; y++) {
+		for (var x = 0; x < this.collisionMaskCanvas.width; x++) {
+			var index = (((this.collisionMaskCanvas.width * y) + x) * 4);
+			// var pixelR = collidedImageData.data[index + 0];
+			// var pixelG = collidedImageData.data[index + 1];
+			// var pixelB = collidedImageData.data[index + 2];
+			var pixelAlpha = collidedImageData.data[index + 3];
+			// console.log("****: " + CollisionCallCount + "; {"+x+","+y+"}; index="+index+"; pixel={"+pixelR+","+pixelG+","+pixelB+","+pixelAlpha+"}");
+			if (pixelAlpha > 0) {
+				if (outputToArray != null) {
+					var collisionX = x + bodyBoxLeft;
+					var collisionY = y + bodyBoxTop;
+					outputToArray.splice(0, outputToArray.length);
+					outputToArray.push(collisionX);
+					outputToArray.push(collisionY);
+				}
+				// console.log("!!!!: collision detected")
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
