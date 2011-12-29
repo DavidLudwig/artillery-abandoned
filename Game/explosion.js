@@ -14,12 +14,24 @@ function Explosion(x, y, radius) {
 
 Explosion.prototype.update = function () {
 	if ( ! this.wasColliderRun ) {
+		// Collide explosion with tanks.
 		for (var i = 0; i < Tanks.length; i++) {
 			var tank = Tanks[i];
 			if (tank.CollidesWithCircle(this.x, this.y, this.radius) && ExplosionsDestroyTanks == true) {
 				Destroy(tank, DeadTanks);
 			}
 		}
+		
+		// Collide explosion with landscape.
+		if (ExplosionsDestroyLand) {
+			var ctx = TerrainLayer.getContext("2d");
+			ctx.save();
+			ctx.globalCompositeOperation = "destination-out";
+			this.draw(ctx);
+			ctx.restore();
+			TerrainLayerData = ctx.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
+		}
+		
 		this.wasColliderRun = true;
 	}
 	

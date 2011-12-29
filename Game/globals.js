@@ -81,6 +81,7 @@ const DefaultExplosionRadius = 10;
 const DefaultExplosionDuration = 0.3;
 const PlayerExplodedRadius = 50;
 const ExplosionsDestroyTanks = true;
+const ExplosionsDestroyLand = true;
 
 //
 // Terrain
