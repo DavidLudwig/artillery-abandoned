@@ -71,7 +71,7 @@ Tank.prototype.fire = function () {
 	var x = this.cx;
 	var y = this.cy;
 	
-	var turretVector = new Vector(TurretLengthFromTankCenter, 0);
+	var turretVector = new Vector(TurretLengthFromTankCenter + TurretWeight, 0);
 	RotateVectorByDeg(turretVector, this.angle);
 	x += turretVector.x;
 	y += turretVector.y;

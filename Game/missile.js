@@ -48,10 +48,8 @@ Missile.prototype.update = function () {
 	}
 	
 	// do collision detection against each tank
-	// var firstTankIndex = 0;
-	var firstTankIndex = 1;
 	var collisionPoint = [];
-	for (var tankIndex = firstTankIndex; tankIndex < Tanks.length; tankIndex++) {
+	for (var tankIndex = 0; tankIndex < Tanks.length; tankIndex++) {
 		var tank = Tanks[tankIndex];
 		if (tank.CollidesWithLineSegment(this.lastx, this.lasty, this.x, this.y, collisionPoint)) {
 			// console.log("missile + tank collision detected: {" + collisionPoint[0] + "," + collisionPoint[1] + "}");
