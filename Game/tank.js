@@ -286,7 +286,7 @@ Tank.prototype.MoveByXOffset = function (xoffset) {
 	return true;
 }
 
-Tank.prototype.CollidesWithBoundingBox = function (left, top, right, bottom) {
+Tank.prototype._doesRectCollideWithBoundingBox = function (left, top, right, bottom) {
 	this._updateTankCanvas();
 	var bodyBoxLeft = this.cx - this.tankCanvasCX;
 	var bodyBoxTop = this.cy - this.tankCanvasCY;
@@ -359,14 +359,14 @@ Tank.prototype.CollidesWithLineSegment = function (x1, y1, x2, y2, outputCollisi
 	var lineRectTop = Math.min(y1, y2);
 	var lineRectRight = Math.max(x1, x2);
 	var lineRectBottom = Math.max(y1, y2);
-	if ( ! this.CollidesWithBoundingBox(lineRectLeft, lineRectTop, lineRectRight, lineRectBottom) ) {
+	if ( ! this._doesRectCollideWithBoundingBox(lineRectLeft, lineRectTop, lineRectRight, lineRectBottom) ) {
 		return false;
 	}
 
 	// Determine if the line intersected with any pixel on the tank's body.
 	// This is done by drawing the tank's body onto a separate canvas,
 	// then drawing the line on top of it using a composition mode that
-	// will only show the pixels where line intersects the body.
+	// will only show the pixels where the line intersects the body.
 	var ctx = this.BeginPixelCollisionDetection();
 
 	ctx.translate(x1, y1);
@@ -383,5 +383,32 @@ Tank.prototype.CollidesWithLineSegment = function (x1, y1, x2, y2, outputCollisi
 	ctx.fill();
 
 	var doesPixelCollide = this.EndPixelCollisionDetection(ctx, outputCollisionPoint);
+	return doesPixelCollide;
+}
+
+Tank.prototype.CollidesWithCircle = function (cx, cy, radius) {
+	// Figure out if the circle was near the tank.  If not, report
+	// that no collision occurred.
+	this._updateTankCanvas();
+	var bodyBoxLeft = this.cx - this.tankCanvasCX;
+	var bodyBoxTop = this.cy - this.tankCanvasCY;
+	var bodyBoxRight = bodyBoxLeft + this.tankCanvas.width;
+	var bodyBoxBottom = bodyBoxTop + this.tankCanvas.height;
+	var collisionPoint = intersectCircleAABB(cx, cy, radius, bodyBoxLeft, bodyBoxTop, bodyBoxRight, bodyBoxBottom);
+	if (collisionPoint == null) {
+		return false;
+	}
+	
+	// Determine if the circle intersected with any pixel on the tank's body.
+	// This is done by drawing the tank's body onto a separate canvas,
+	// then drawing the circle on top of it using a composition mode that
+	// will only show the pixels where the circle intersects the body.
+	var ctx = this.BeginPixelCollisionDetection();
+	
+	ctx.beginPath();
+	ctx.arc(cx, cy, radius, 0, Math.PI * 2, true);
+	ctx.fill();
+	
+	var doesPixelCollide = this.EndPixelCollisionDetection(ctx);
 	return doesPixelCollide;
 }
