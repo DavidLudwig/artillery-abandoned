@@ -16,13 +16,7 @@ Explosion.prototype.update = function () {
 	if ( ! this.wasColliderRun ) {
 		for (var i = 0; i < Tanks.length; i++) {
 			var tank = Tanks[i];
-			var collisionPoint = intersectCircleAABB(this.x, this.y, this.radius,
-				(tank.cx - (tank.width / 2)),
-				(tank.cy - (tank.height / 2)),
-				(tank.cx + (tank.width / 2)),
-				(tank.cy + (tank.height / 2)));
-			// console.log("collision pt: " + pt);
-			if (collisionPoint) {
+			if (tank.CollidesWithCircle(this.x, this.y, this.radius) && ExplosionsDestroyTanks == true) {
 				Destroy(tank, DeadTanks);
 			}
 		}

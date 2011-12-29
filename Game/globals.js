@@ -22,12 +22,12 @@ const InputIntervalInMS = 75;
 //
 // Player Input + HUD
 //
-const DefaultAngle = -30; // -56;
-const DefaultPower = 150; // 190;
+const DefaultAngle = -30;
 const PowerIncrementBig = 5;
 const PowerIncrementSmall = 0.5;
 const AngleIncrementBig = 2;
 const GamePowerToViewPowerFactor = 2;
+const DefaultPower = 300 / GamePowerToViewPowerFactor;
 const MaxGamePower = 400;
 
 //
@@ -80,6 +80,7 @@ const MonsterXStepMax = 250;
 const DefaultExplosionRadius = 10;
 const DefaultExplosionDuration = 0.3;
 const PlayerExplodedRadius = 50;
+const ExplosionsDestroyTanks = true;
 
 //
 // Terrain
@@ -114,6 +115,7 @@ var LastCollisionPoint = new Array();
 const CollisionPointDrawColor = "yellow";
 const CollisionPointSize = 6;
 const CollisionMaskColor = "yellow";
+const MissilesCreateExplosions = true;
 
 // Game Objects
 var Tanks = new Array();

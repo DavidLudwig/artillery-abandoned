@@ -42,8 +42,10 @@ Missile.prototype.update = function () {
 	var detectedAlpha = HackedGetAlpha(TerrainLayerData, this.x, this.y);
 	//console.log("alpha at {"+this.x+","+this.y+"} = "+detectedAlpha);
 	if (detectedAlpha > 0) {
-		var explosion = new Explosion(this.x, this.y);
-		Explosions.push(explosion);
+		if (MissilesCreateExplosions == true) {
+			var explosion = new Explosion(this.x, this.y);
+			Explosions.push(explosion);
+		}
 		Destroy(this, DeadMissiles);
 	}
 	
@@ -58,8 +60,10 @@ Missile.prototype.update = function () {
 			LastCollisionPoint[0] = collisionPoint[0];
 			LastCollisionPoint[1] = collisionPoint[1];
 
-			var explosion = new Explosion(collisionPoint[0], collisionPoint[1]);
-			Explosions.push(explosion);
+			if (MissilesCreateExplosions == true) {
+				var explosion = new Explosion(collisionPoint[0], collisionPoint[1]);
+				Explosions.push(explosion);
+			}
 			Destroy(this, DeadMissiles);
 		}
 	}
