@@ -34,6 +34,9 @@ const MaxGamePower = 400;
 // Keyboard input key codes
 //
 const KeyCodes = {
+	"Space": 32,
+	"PageUp": 33,
+	"PageDown": 34,
 	"Left": 37,
 	"Up": 38,
 	"Right": 39,

@@ -99,22 +99,83 @@ document.getElementById('FireButton').onclick = function() {
 	CurrentTank.fire();
 }
 
+function InitInput() {
+	window.addEventListener('keydown', HandleKeyDown, true);
+	window.addEventListener('keyup', HandleKeyUp, true);
+	ResetInput();
+}
+
+const NumKeys = 255;
+var KeysDown = [];
+function ResetInput() {
+	for (var i = 0; i < NumKeys; i++) {
+		KeysDown[i] = false;
+	}
+}
+
 function HandleKeyDown(evt) {
-	//console.log("keydown: " + evt + ", keyCode=" + evt.keyCode + "; charCode=" + evt.charCode);
+	var isKeyRepeating = null;
+	if (evt.keyCode >= 0 && evt.keyCode < NumKeys) {
+		isKeyRepeating = KeysDown[evt.keyCode];
+		KeysDown[evt.keyCode] = true;
+	}
+	
+	//console.log("keydown: " + evt + ", keyCode=" + evt.keyCode + "; charCode=" + evt.charCode + "; isKeyRepeating=" + isKeyRepeating);
+
 	switch (evt.keyCode) {
+		case KeyCodes.Space:
+			if ( ! isKeyRepeating) {
+				if (CurrentTank != null) {
+					CurrentTank.fire();
+				}
+			}
+			break;
+		case KeyCodes.PageUp:
+			PowerPlusPlusDown = true;
+			break;
+		case KeyCodes.PageDown:
+			PowerMinusMinusDown = true;
+			break;
 		case KeyCodes.Left:
-			//console.log("left");
-			Tanks[1].MoveByXOffset(-1);
+			AngleMinusDown = true;
 			break;
-		
 		case KeyCodes.Right:
-			//console.log("right");
-			Tanks[1].MoveByXOffset(1);
+			AnglePlusDown = true;
 			break;
-		
+		case KeyCodes.Up:
+			PowerPlusDown = true;
+			break;
 		case KeyCodes.Down:
-			//console.log("down");
-			Tanks[1].AdjustDownward();
+			PowerMinusDown = true;
+			break;
+	}
+}
+
+function HandleKeyUp(evt) {
+	if (evt.keyCode >= 0 && evt.keyCode < NumKeys) {
+		KeysDown[evt.keyCode] = false;
+	}
+
+	//console.log("keyup: " + evt + ", keyCode=" + evt.keyCode + "; charCode=" + evt.charCode);
+
+	switch (evt.keyCode) {
+		case KeyCodes.PageUp:
+			PowerPlusPlusDown = false;
+			break;
+		case KeyCodes.PageDown:
+			PowerMinusMinusDown = false;
+			break;
+		case KeyCodes.Left:
+			AngleMinusDown = false;
+			break;
+		case KeyCodes.Right:
+			AnglePlusDown = false;
+			break;
+		case KeyCodes.Up:
+			PowerPlusDown = false;
+			break;
+		case KeyCodes.Down:
+			PowerMinusDown = false;
 			break;
 	}
 }

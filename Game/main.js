@@ -52,8 +52,9 @@ function Millis() {
 
 function Main() {
 	console.log("All Assets Loaded");
-	
-	window.addEventListener('keydown', HandleKeyDown, true);
+
+	InitInput();
+
 	StartTimeMS = Date.now();
 	
 	// Reset time manager
