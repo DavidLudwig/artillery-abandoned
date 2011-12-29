@@ -68,7 +68,13 @@ Missile.prototype.update = function () {
 		}
 	}
 	
-	if (this.x < 0 || this.x >= ScreenWidth || this.y < 0 || this.y >= ScreenHeight) {
+	if (this.x < 0 || this.x >= ScreenWidth) {
+		Destroy(this, DeadMissiles);
+	} else if (this.y < 0 || this.y >= ScreenHeight) {
+		if (MissilesCreateExplosions == true) {
+			var explosion = new Explosion(this.x, this.y);
+			Explosions.push(explosion);
+		}
 		Destroy(this, DeadMissiles);
 	}
 }
