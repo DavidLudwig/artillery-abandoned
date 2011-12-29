@@ -91,10 +91,10 @@ document.getElementById('FireButton').onclick = function() {
 		return;
 	}
 	
-	var tmpContext = ShotLayer.getContext("2d");
-	tmpContext.fillStyle = "transparent black";
-	tmpContext.fillRect(ShotLayer.width, ShotLayer.height);
-	tmpContext = null;
+	// var tmpContext = ShotLayer.getContext("2d");
+	// tmpContext.fillStyle = "transparent black";
+	// tmpContext.fillRect(ShotLayer.width, ShotLayer.height);
+	// tmpContext = null;
 	
 	CurrentTank.fire();
 }
