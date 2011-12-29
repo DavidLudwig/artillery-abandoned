@@ -286,35 +286,22 @@ Tank.prototype.MoveByXOffset = function (xoffset) {
 	return true;
 }
 
-// var CollisionCallCount = 0;
-Tank.prototype.CollidesWithLineSegment = function (x1, y1, x2, y2, outputToArray) {
-	// CollisionCallCount++;
-	
-	// Figure out if the line segment was near the tank.  If not, report
-	// that no collision occurred.
-	var lineRectLeft = Math.min(x1, x2);
-	var lineRectTop = Math.min(y1, y2);
-	var lineRectRight = Math.max(x1, x2);
-	var lineRectBottom = Math.max(y1, y2);
-	
+Tank.prototype.CollidesWithBoundingBox = function (left, top, right, bottom) {
 	this._updateTankCanvas();
 	var bodyBoxLeft = this.cx - this.tankCanvasCX;
 	var bodyBoxTop = this.cy - this.tankCanvasCY;
 	var bodyBoxRight = bodyBoxLeft + this.tankCanvas.width;
 	var bodyBoxBottom = bodyBoxTop + this.tankCanvas.height;
-	
-	var didLineIntersectWithTankBodyCanvas = intersectRectRect(
-		lineRectLeft, lineRectTop, lineRectRight, lineRectBottom,
+	var doRectsIntersect = intersectRectRect(
+		left, top, right, bottom,
 		bodyBoxLeft, bodyBoxTop, bodyBoxRight, bodyBoxBottom);
-	
-	if ( ! didLineIntersectWithTankBodyCanvas ) {
-		return false;
-	}
-	
-	// Determine if the line intersected with any pixel on the tank's body.
-	// This is done by drawing the tank's body onto a separate canvas,
-	// then drawing the line on top of it using a composition mode that
-	// will only show the pixels where line intersects the body.
+	return doRectsIntersect;
+}
+
+Tank.prototype.BeginPixelCollisionDetection = function () {
+	this._updateTankCanvas();
+	var bodyBoxLeft = this.cx - this.tankCanvasCX;
+	var bodyBoxTop = this.cy - this.tankCanvasCY;
 	var ctx = this.collisionMaskCanvas.getContext("2d");
 	ctx.save();
 	ctx.clearRect(0, 0, this.collisionMaskCanvas.width, this.collisionMaskCanvas.height);
@@ -324,22 +311,16 @@ Tank.prototype.CollidesWithLineSegment = function (x1, y1, x2, y2, outputToArray
 	ctx.drawImage(this.tankCanvas, 0, 0);
 
 	// Draw the line onto the collision canvas
+	ctx.translate(-bodyBoxLeft, -bodyBoxTop);
 	ctx.globalCompositeOperation = "source-in";
-	ctx.strokeStyle = CollisionMaskColor;
 	ctx.fillStyle = CollisionMaskColor;
-	ctx.translate(x1 - bodyBoxLeft, y1 - bodyBoxTop);
-	var lineVectorX = x2 - x1;
-	var lineVectorY = y2 - y1;
-	ctx.rotate(Math.atan2(lineVectorY, lineVectorX));
-	var lineLength = Math.sqrt((lineVectorX * lineVectorX) + (lineVectorY * lineVectorY));
-	ctx.beginPath();
-	ctx.moveTo(0, -1);
-	ctx.lineTo(lineLength, -1);
-	ctx.lineTo(lineLength, 1);
-	ctx.lineTo(0, 1);
-	ctx.closePath();
-	ctx.fill();
-	
+	return ctx;
+}
+
+Tank.prototype.EndPixelCollisionDetection = function (ctx, outputCollisionPoint) {
+	var bodyBoxLeft = this.cx - this.tankCanvasCX;
+	var bodyBoxTop = this.cy - this.tankCanvasCY;
+
 	// All done with drawing to the collision canvas.  Clean up before moving on.
 	ctx.restore();
 	
@@ -354,18 +335,53 @@ Tank.prototype.CollidesWithLineSegment = function (x1, y1, x2, y2, outputToArray
 			var pixelAlpha = collidedImageData.data[index + 3];
 			// console.log("****: " + CollisionCallCount + "; {"+x+","+y+"}; index="+index+"; pixel={"+pixelR+","+pixelG+","+pixelB+","+pixelAlpha+"}");
 			if (pixelAlpha > 0) {
-				if (outputToArray != null) {
+				if (outputCollisionPoint != null) {
 					var collisionX = x + bodyBoxLeft;
 					var collisionY = y + bodyBoxTop;
-					outputToArray.splice(0, outputToArray.length);
-					outputToArray.push(collisionX);
-					outputToArray.push(collisionY);
+					outputCollisionPoint.splice(0, outputCollisionPoint.length);
+					outputCollisionPoint.push(collisionX);
+					outputCollisionPoint.push(collisionY);
 				}
 				// console.log("!!!!: collision detected")
 				return true;
 			}
 		}
 	}
+}
+
+// var CollisionCallCount = 0;
+Tank.prototype.CollidesWithLineSegment = function (x1, y1, x2, y2, outputCollisionPoint) {
+	// CollisionCallCount++;
 	
-	return false;
+	// Figure out if the line segment was near the tank.  If not, report
+	// that no collision occurred.
+	var lineRectLeft = Math.min(x1, x2);
+	var lineRectTop = Math.min(y1, y2);
+	var lineRectRight = Math.max(x1, x2);
+	var lineRectBottom = Math.max(y1, y2);
+	if ( ! this.CollidesWithBoundingBox(lineRectLeft, lineRectTop, lineRectRight, lineRectBottom) ) {
+		return false;
+	}
+
+	// Determine if the line intersected with any pixel on the tank's body.
+	// This is done by drawing the tank's body onto a separate canvas,
+	// then drawing the line on top of it using a composition mode that
+	// will only show the pixels where line intersects the body.
+	var ctx = this.BeginPixelCollisionDetection();
+
+	ctx.translate(x1, y1);
+	var lineVectorX = x2 - x1;
+	var lineVectorY = y2 - y1;
+	ctx.rotate(Math.atan2(lineVectorY, lineVectorX));
+	var lineLength = Math.sqrt((lineVectorX * lineVectorX) + (lineVectorY * lineVectorY));
+	ctx.beginPath();
+	ctx.moveTo(0, -1);
+	ctx.lineTo(lineLength, -1);
+	ctx.lineTo(lineLength, 1);
+	ctx.lineTo(0, 1);
+	ctx.closePath();
+	ctx.fill();
+
+	var doesPixelCollide = this.EndPixelCollisionDetection(ctx, outputCollisionPoint);
+	return doesPixelCollide;
 }
