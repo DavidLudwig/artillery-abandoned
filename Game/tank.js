@@ -234,8 +234,9 @@ Tank.prototype.AdjustDownward = function () {
 	var y = this.cy + yadjustment;
 	while (true) {
 		if (y >= ScreenHeight) {
-			//console.log("AdjustDownward hit bottom")
-			return false;
+			this.cy = ScreenHeight - yadjustment;
+			this._invalidateTankCanvas();
+			return true;
 		}
 		var alpha = HackedGetAlpha(TerrainLayerData, x, y);
 		//console.log("... x="+x+"; y="+y+"; alpha = " + alpha);
