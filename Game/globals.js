@@ -108,6 +108,13 @@ var Sunscape_Image;
 // Missile Drawing
 var MissileLineSegmentsToDraw;
 
+// Missile + Tank Collision Detection Debugging
+const ShowCollisionDebugInfo = false;
+var LastCollisionPoint = new Array();
+const CollisionPointDrawColor = "yellow";
+const CollisionPointSize = 6;
+const CollisionMaskColor = "yellow";
+
 // Game Objects
 var Tanks = new Array();
 var DeadTanks = new Array();
