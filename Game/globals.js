@@ -22,7 +22,7 @@ const InputIntervalInMS = 75;
 //
 // Player Input + HUD
 //
-const DefaultAngle = -30;
+const DefaultAngle = -30;		// only used if no angle is specified in TanksToSpawn[...]
 const PowerIncrementBig = 5;
 const PowerIncrementSmall = 0.5;
 const AngleIncrementBig = 2;
@@ -50,8 +50,15 @@ var TanksToSpawn = [
 	{
 		"color": "blue",
 		"x": 60,
-		"y": 1
-	}
+		"y": 1,
+		"angle": -30,
+	},
+	{
+		"color": "red",
+		"x": 452,
+		"y": 1,
+		"angle": -150,
+	},
 ];
 const TurretLengthFromTankCenter = 15;
 const TurretWeight = 4;

@@ -34,6 +34,15 @@ function ToBool(input, defaultOutput) {
 	}
 }
 
+function ToInt(input, defaultOutput) {
+	var value = parseInt(input);
+	if (isNaN(value)) {
+		return defaultOutput;
+	} else {
+		return value;
+	}
+}
+
 // Init game
 function InitGame() {
 	SetGameState(GameStates.INITIALIZING);
@@ -57,17 +66,26 @@ function InitGame() {
 		if (gameData) {
 			UseMonsters = ToBool(gameData.getAttribute("monsters"), UseMonsters);
 			
-			var tanks = gameData.getElementsByTagName("tanks")[0].getElementsByTagName("tank");
-			for (var i = 0; i < tanks.length; i++) {
-				var x = parseInt(tanks[i].getAttribute("x"));
-				var y = parseInt(tanks[i].getAttribute("y"));
-				var color = tanks[i].getAttribute("color") || "blue";
-				if ( ! isNaN(x) && ! isNaN(y) ) {
-					TanksToSpawn[i] = {
-						"x": x,
-						"y": y,
-						"color": color
-					};
+			var tanksElement = gameData.getElementsByTagName("tanks")[0];
+			if (tanksElement) {
+				var tanks = tanksElement.getElementsByTagName("tank");
+				if (tanks.length > 0) {
+					// If any tanks are specified, ignore the defaults for any tank provided.
+					TanksToSpawn = new Array();
+				}
+				for (var i = 0; i < tanks.length; i++) {
+					var x = parseInt(tanks[i].getAttribute("x"));
+					var y = parseInt(tanks[i].getAttribute("y"));
+					var color = tanks[i].getAttribute("color") || "blue";
+					var angle = ToInt(tanks[i].getAttribute("angle"), DefaultAngle);
+					if ( ! isNaN(x) && ! isNaN(y) && ! isNaN(angle) ) {
+						TanksToSpawn[i] = {
+							"x": x,
+							"y": y,
+							"color": color,
+							"angle": angle
+						};
+					}
 				}
 			}
 		}
@@ -141,8 +159,8 @@ function InitGame() {
 	// Init Tanks
 	for (var i = 0; i < TanksToSpawn.length; i++) {
 		var tankSpawnInfo = TanksToSpawn[i];
-		if (tankSpawnInfo.x && tankSpawnInfo.y && tankSpawnInfo.color) {
-			var tank = new Tank(tankSpawnInfo.x, tankSpawnInfo.y, tankSpawnInfo.color, DefaultAngle, DefaultPower, true, PlayerWidth, 0, 10);
+		if (tankSpawnInfo.x && tankSpawnInfo.y && tankSpawnInfo.color && tankSpawnInfo.angle) {
+			var tank = new Tank(tankSpawnInfo.x, tankSpawnInfo.y, tankSpawnInfo.color, tankSpawnInfo.angle, DefaultPower, true, PlayerWidth, 0, 10);
 			Tanks.push(tank);
 			tank.AdjustDownward();
 		}
@@ -211,7 +229,7 @@ function SpawnMonster() {
 	//console.log("SpawnMonster: fixedcount="+FixedUpdateCount);
 	var x = RandNum(SpawnXMin, SpawnXMax);
 	var monsterXStep = RandNum(MonsterXStepMin, MonsterXStepMax);
-	var monster = new Tank(x, 0, "red", DefaultAngle, DefaultPower, false, MonsterWidth, -1, monsterXStep);
+	var monster = new Tank(x, 0, "red", 0, DefaultPower, false, MonsterWidth, -1, monsterXStep);
 	monster.MoveByXOffset(0);	// make sure it's on the ground
 	Tanks.push(monster);
 }
