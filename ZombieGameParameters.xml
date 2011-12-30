@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<game monsters="1">
+	<tanks>
+		<tank x="60" y="1" color="blue"/>
+	</tanks>
+</game>
