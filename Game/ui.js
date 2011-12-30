@@ -87,16 +87,7 @@ document.getElementById('PowerPlusPlus').onmousedown = function () { PowerPlusPl
 document.getElementById('PowerPlusPlus').onmouseup = function () { PowerPlusPlusDown = false; }
 
 document.getElementById('FireButton').onclick = function() {
-	if (CurrentTank == null) {
-		return;
-	}
-	
-	// var tmpContext = ShotLayer.getContext("2d");
-	// tmpContext.fillStyle = "transparent black";
-	// tmpContext.fillRect(ShotLayer.width, ShotLayer.height);
-	// tmpContext = null;
-	
-	CurrentTank.fire();
+	FireShot();
 }
 
 function InitInput() {
@@ -125,9 +116,7 @@ function HandleKeyDown(evt) {
 	switch (evt.keyCode) {
 		case KeyCodes.Space:
 			if ( ! isKeyRepeating) {
-				if (CurrentTank != null) {
-					CurrentTank.fire();
-				}
+				FireShot();
 			}
 			break;
 		case KeyCodes.PageUp:

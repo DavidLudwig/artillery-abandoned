@@ -216,6 +216,42 @@ function SpawnMonster() {
 	Tanks.push(monster);
 }
 
+function FireShot() {
+	// Do nothing if no tank is active.
+	if (CurrentTank == null) {
+		return;
+	}
+
+	// Fire from the current tank.
+	CurrentTank.fire();
+
+	// Find the index of the current tank in Tanks[].
+	var prevTankIndex;
+	for (prevTankIndex = 0; prevTankIndex < Tanks.length; prevTankIndex++) {
+		if (CurrentTank == Tanks[prevTankIndex]) {
+			break;
+		}
+	}
+	
+	// Find the index of the next player tank in Tanks[].
+	var nextTankIndex = prevTankIndex;
+	while (true) {
+		nextTankIndex++;
+		if (nextTankIndex >= Tanks.length) {
+			nextTankIndex = 0;
+		}
+		
+		if (nextTankIndex == prevTankIndex) {
+			break;
+		} else if (Tanks[nextTankIndex].isPlayer) {
+			break;
+		}
+	}
+	
+	// Setup the current tank
+	CurrentTank = Tanks[nextTankIndex];
+}
+
 function Draw(ctx) {
 	ctx.save();	
 	DrawBackground(ctx);
