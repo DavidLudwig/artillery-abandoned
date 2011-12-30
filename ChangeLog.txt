@@ -1,6 +1,17 @@
 Artillery Game Change Log
 by David Ludwig, <dludwig -at- pobox.com>
 
+1.2, Dec 30, 2011:
+	- added keyboard input:
+		- Up, Down, Page Up, and Page Down control power
+		- Left and Right control angle
+		- Space fires
+	- explosions now destroy terrain
+	- moved buttons to top of screen, so they can't hide monsters
+	- bug fix: missiles weren't colliding with monsters or the tank
+	- bug fix: explosions weren't colliding with the tank's turret
+	- bug fix: the tank could fire missiles after having been destroyed
+
 1.1, Dec 17, 2011:
 	- Replaced processing.js calls with raw, HTML5 ones
 	- Performance enhancements (tested on Chrome 15 on Mac)
