@@ -75,7 +75,7 @@ const HighlightColor = "orange";
 //
 // Monsters
 //
-var UseMonsters = true;
+var UseMonsters = false;
 const MonsterWidth = 6;
 const SpawnXMin = 400;
 const SpawnXMax = 500;
