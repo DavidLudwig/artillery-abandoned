@@ -316,10 +316,62 @@ function DrawCollisionPoint(ctx) {
 	ctx.restore();
 }
 
+function FindNextTank(currentTank, tanksArray, deadTanksArray) {
+	var tankIndex = Tanks.indexOf(CurrentTank);
+	const originalTankIndex = tankIndex;
+	if (tankIndex == -1) {
+		// The Tank isn't being tracked at all.  At this point, just attempt to pick a valid tank.  If none are valid, then return null.
+		if (Tanks.length >= 0) {
+			return tanksArray[0];
+		} else {
+			return null;
+		}
+	} else {
+		// Try to find a live tank.
+		while (true) {
+			// Iterate to the next tank.
+			tankIndex++;
+			if (tankIndex >= Tanks.length) {
+				tankIndex = 0;
+			}
+			
+			// Get a reference to the tank (that's about to be inspected).
+			var tank = tanksArray[tankIndex];
+			
+			// See if the tank is alive, for future reference.
+			var isTankAlive = (deadTanksArray.indexOf(tank) == -1);
+			
+			// Check to see if we've gone through all the tanks.  If so, return an appropriate value.
+			if (tankIndex == originalTankIndex) {
+				// We've gone through the entire list.  See if the old 'current tank' is alive.
+				if (isTankAlive) {
+					// The tank is still alive.  Just keep the same 'current tank'.
+					return tank;
+				} else {
+					// The tank is now dead.  There are no tanks to pick from.
+					return null;
+				}
+			}
+			
+			// Check to see if this is a valid tank.  If so, stop here as we've found the new 'current tank'.
+			if (isTankAlive && tank.isPlayer) {
+				return tank;
+			}
+		}
+	}
+	
+}
+
 function CleanupFromUpdate() {
 	// Clean up garbage
 	CollectGarbage(Missiles, DeadMissiles);
 	CollectGarbage(Explosions, DeadExplosions);
+
+	// Before cleaning up dead tanks, make sure CurrentTank, if destroyed, gets reset.
+	if (DeadTanks.indexOf(CurrentTank) != -1) {
+		// CurrentTank is dead.  Find a new CurrentTank.
+		CurrentTank = FindNextTank(CurrentTank, Tanks, DeadTanks);
+	}
 	CollectGarbage(Tanks, DeadTanks);
 }
 
