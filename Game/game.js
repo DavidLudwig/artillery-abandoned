@@ -65,6 +65,7 @@ function InitGame() {
 		var gameData = gameParamsDoc.getElementsByTagName("game")[0];
 		if (gameData) {
 			UseMonsters = ToBool(gameData.getAttribute("monsters"), UseMonsters);
+			TerrainType = gameData.getAttribute("terrain", TerrainType);
 			
 			var tanksElement = gameData.getElementsByTagName("tanks")[0];
 			if (tanksElement) {
@@ -119,28 +120,15 @@ function InitGame() {
 	TerrainLayer.width = ScreenWidth;
 	TerrainLayer.height = ScreenHeight;
 	tmpContext = TerrainLayer.getContext("2d");
-	if (UseImageBasedTerrain) {
+	if (TerrainType == "image") {
 		tmpContext.fillStyle = "rgba(0,0,0,0);";
 		tmpContext.fillRect(0, 0, TerrainLayer.width, TerrainLayer.height);
 		tmpContext.drawImage(Background_2_Image, 0, 0);
 	} else {
-		var TerrainData = [
-			[0,300],
-			[200,280],
-			[400,220],
-			[512,270]
-		];
-		tmpContext.fillStyle = "#996600";
-		tmpContext.beginPath();
-		tmpContext.moveTo(0, ScreenHeight);
-		for (var pointIndex = 0; pointIndex < TerrainData.length; pointIndex++) {
-			var px = TerrainData[pointIndex][0];
-			var py = TerrainData[pointIndex][1];
-			tmpContext.lineTo(px, py);
+		if (TerrainType != "generated") {
+			console.log("Unknown terrain type of '" + String(TerrainType) + "'.  Using 'generated' instead.");
 		}
-		tmpContext.lineTo(ScreenWidth, ScreenHeight);
-		tmpContext.closePath();
-		tmpContext.fill();
+		GenerateTerrain(tmpContext);
 	}
 	TerrainLayerData = tmpContext.getImageData(0, 0, TerrainLayer.width, TerrainLayer.height);
 	tmpContext = null;
@@ -219,6 +207,40 @@ function FixedUpdate() {
 		CurrentTank = null;
 	}
 	CleanupFromUpdate();
+}
+
+function GenerateTerrain(ctx) {
+	// Generate a set of 2D coordinates with X coordinates in the range {0..<terrain width>} and Y coordinates in an ok range.
+	var coords = [];
+	const yA = ctx.canvas.height * TerrainHeightMultiplierA;
+	const yB = ctx.canvas.height * TerrainHeightMultiplierB;
+	for (var i = 0; i < NumTerrainCoords; i++) {
+		// First generate a number in the range {0..1} to serve as a base for the X coordinate.
+		var x = i * (1 / (NumTerrainCoords - 1));
+		//x *= (TerrainXVariance * Math.random());
+		
+		// Next, bring the number to the range {0..<terrain width>}
+		x *= ctx.canvas.width;
+		
+		// Generate a Y coordinate anywhere in the desired range.
+		y = RandNum(yA, yB);
+		
+		// Store the coordinate
+		coords[i] = [x, y];
+	}	
+	
+	// Draw the generated terrain.
+	ctx.fillStyle = "#996600";
+	ctx.beginPath();
+	ctx.moveTo(0, ctx.canvas.height);
+	for (var pointIndex = 0; pointIndex < coords.length; pointIndex++) {
+		var px = coords[pointIndex][0];
+		var py = coords[pointIndex][1];
+		ctx.lineTo(px, py);
+	}
+	ctx.lineTo(ctx.canvas.width, ctx.canvas.height);
+	ctx.closePath();
+	ctx.fill();
 }
 
 function SpawnMonster() {

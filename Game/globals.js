@@ -96,8 +96,15 @@ const ExplosionsDestroyLand = true;
 //
 // Terrain
 //
-var UseImageBasedTerrain = true;
-//var UseImageBasedTerrain = false;
+var TerrainType = "generated";	// Possible values: "image", "generated"
+
+//
+// Terrain Generation
+//
+const NumTerrainCoords = 8;
+// const TerrainXVariance = (1 / NumTerrainCoords) / 2;
+const TerrainHeightMultiplierA = 0.5;
+const TerrainHeightMultiplierB = 0.9;
 
 // Timing
 var StartTimeMS = null;
