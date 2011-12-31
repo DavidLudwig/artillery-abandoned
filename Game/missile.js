@@ -16,7 +16,7 @@ function HackedGetAlpha(layer, x, y) {
 	var index = (((layer.width * y) + x) * 4) + 3;
 	var value = layer.data[index];
 	if (value == null) {
-		console.log("undefined alpha value at {" + x + "," + y + "}");
+		//console.log("undefined alpha value at {" + x + "," + y + "}");
 	}
 	//console.log("value at "+x+","+y+": "+value);
 	return value;
@@ -38,7 +38,7 @@ Missile.prototype.update = function () {
 		return;
 	}
 	
-	// do collision detection against the ground
+	// do collision detection against the terrain
 	var detectedAlpha = HackedGetAlpha(TerrainLayerData, this.x, this.y);
 	//console.log("alpha at {"+this.x+","+this.y+"} = "+detectedAlpha);
 	if (detectedAlpha > 0) {
@@ -70,7 +70,7 @@ Missile.prototype.update = function () {
 	
 	if (this.x < 0 || this.x >= ScreenWidth) {
 		Destroy(this, DeadMissiles);
-	} else if (this.y < 0 || this.y >= ScreenHeight) {
+	} else if (this.y >= ScreenHeight) {
 		if (MissilesCreateExplosions == true) {
 			var explosion = new Explosion(this.x, this.y);
 			Explosions.push(explosion);
