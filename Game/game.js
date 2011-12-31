@@ -1,8 +1,12 @@
 
 var ImagesToLoad = [
 	"Game/Assets/Images/Background_2.png",
-	"Game/Assets/Images/Sunscape.png"
 ];
+
+// HACK: only load sunscape if screen resolution is of the proper size
+if (ScreenWidth == 512 && ScreenHeight == 384) {
+	ImagesToLoad.push("Game/Assets/Images/Sunscape.png");
+}
 
 var FilesToLoad = [
 ];
@@ -314,7 +318,9 @@ function DrawBackground(ctx) {
 	ctx.fillStyle = "black";
 	ctx.fillRect(0, 0, ScreenWidth, ScreenHeight);	
 	ctx.drawImage(BackgroundLayer, 0, 0);
-	ctx.drawImage(Sunscape_Image, 0, Sunscape_YPos);		
+	if (Sunscape_Image) {
+		ctx.drawImage(Sunscape_Image, 0, Sunscape_YPos);
+	}
 }
 
 function DrawTerrain(ctx) {
