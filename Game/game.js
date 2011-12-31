@@ -205,6 +205,9 @@ function FixedUpdate() {
 	// Cleanup
 	if (Tanks.indexOf(CurrentTank) == -1) {
 		CurrentTank = null;
+
+		// Update angle + power views
+		UpdateViewFromModel();
 	}
 	CleanupFromUpdate();
 }
@@ -290,6 +293,9 @@ function FireShot() {
 	
 	// Setup the current tank
 	CurrentTank = Tanks[nextTankIndex];
+
+	// Update angle + power views
+	UpdateViewFromModel();
 }
 
 function Draw(ctx) {
@@ -411,6 +417,8 @@ function CleanupFromUpdate() {
 	if (DeadTanks.indexOf(CurrentTank) != -1) {
 		// CurrentTank is dead.  Find a new CurrentTank.
 		CurrentTank = FindNextTank(CurrentTank, Tanks, DeadTanks);
+		// Update angle + power views
+		UpdateViewFromModel();
 	}
 	CollectGarbage(Tanks, DeadTanks);
 }
