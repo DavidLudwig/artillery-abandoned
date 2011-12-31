@@ -49,13 +49,13 @@ const KeyCodes = {
 var TanksToSpawn = [
 	{
 		"color": "blue",
-		"x": 60,
+		"x": "10%",
 		"y": 1,
 		"angle": -30,
 	},
 	{
 		"color": "red",
-		"x": 452,
+		"x": "90%",
 		"y": 1,
 		"angle": -150,
 	},

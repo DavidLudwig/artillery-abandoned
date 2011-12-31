@@ -79,7 +79,7 @@ function InitGame() {
 					TanksToSpawn = new Array();
 				}
 				for (var i = 0; i < tanks.length; i++) {
-					var x = parseInt(tanks[i].getAttribute("x"));
+					var x = ParseIntAsPotentialPercentage(tanks[i].getAttribute("x"), ScreenWidth);
 					var y = parseInt(tanks[i].getAttribute("y"));
 					var color = tanks[i].getAttribute("color") || "blue";
 					var angle = ToInt(tanks[i].getAttribute("angle"), DefaultAngle);
@@ -153,7 +153,8 @@ function InitGame() {
 	for (var i = 0; i < TanksToSpawn.length; i++) {
 		var tankSpawnInfo = TanksToSpawn[i];
 		if (tankSpawnInfo.x && tankSpawnInfo.y && tankSpawnInfo.color && tankSpawnInfo.angle) {
-			var tank = new Tank(tankSpawnInfo.x, tankSpawnInfo.y, tankSpawnInfo.color, tankSpawnInfo.angle, DefaultPower, true, PlayerWidth, 0, 10);
+			var tankX = ParseIntAsPotentialPercentage(tankSpawnInfo.x, ScreenWidth);
+			var tank = new Tank(tankX, tankSpawnInfo.y, tankSpawnInfo.color, tankSpawnInfo.angle, DefaultPower, true, PlayerWidth, 0, 10);
 			Tanks.push(tank);
 			tank.AdjustDownward();
 		}

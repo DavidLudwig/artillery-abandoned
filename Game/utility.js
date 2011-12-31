@@ -65,3 +65,34 @@ function DrawHighlight(ctx) {
 	ctx.fill();
 	ctx.restore();
 }
+
+const PercentageRegexp = /^(\d*)%/;
+function ParseIntAsPotentialPercentage(input, maxValueIfPercentage) {
+	var inputType = typeof input;
+	switch (inputType) {
+		case "number":
+			return Math.floor(input);
+		
+		case "string":
+		{
+			var matches = input.match(PercentageRegexp);
+			var isPercentage = false;
+			if (matches && matches.length == 2) {
+				input = matches[1];
+				isPercentage = true;
+			}
+			
+			var value = parseInt(input);
+			if ( ! isNaN(value)) {
+				if (isPercentage) {
+					value = (value / 100.0) * maxValueIfPercentage;
+				}
+			}
+			
+			return Math.floor(value);
+		}
+		
+		default:
+			return Number.NaN;
+	}
+}
