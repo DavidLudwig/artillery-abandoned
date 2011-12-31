@@ -2,8 +2,8 @@
 //
 // Screen Dimensions
 //
-const ScreenWidth = 512;
-const ScreenHeight = 384;
+const ScreenWidth = document.getElementById("GameCanvas").width;
+const ScreenHeight = document.getElementById("GameCanvas").height;
 
 //
 // World Properties
