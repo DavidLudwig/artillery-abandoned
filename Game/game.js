@@ -143,6 +143,7 @@ function InitGame() {
 	
 	// Init Missiles
 	MissileLineSegmentsToDraw = new Array();
+	MissileHighlightsToDraw = new Array();
 	
 	// Init Tanks
 	for (var i = 0; i < TanksToSpawn.length; i++) {
@@ -335,6 +336,13 @@ function DrawMissiles(ctx) {
 		MissileLineSegmentsToDraw.splice(0, MissileLineSegmentsToDraw.length);	// clear the array
 	}
 	ctx.drawImage(ShotLayer, 0, 0);
+	
+	if (DrawMissileHighlights && MissileHighlightsToDraw.length > 0) {
+		for (var i = 0; i < MissileHighlightsToDraw.length; i++) {
+			DrawMissileHighlight(ctx, MissileHighlightsToDraw[i]);
+		}
+		MissileHighlightsToDraw.splice(0, MissileHighlightsToDraw.length);
+	}
 }
 
 function DrawTanks(ctx) {

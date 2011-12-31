@@ -51,3 +51,17 @@ function intersectCircleAABB(Cx, Cy, Cradius, Rleft, Rtop, Rright, Rbottom) {
 
 	return [closestPointX, closestPointY];
 }
+
+function DrawHighlight(ctx) {
+	ctx.save();
+	ctx.beginPath();
+	ctx.fillStyle = HighlightColor;
+	ctx.beginPath();
+	ctx.beginPath();
+	ctx.moveTo(0, 0);
+	ctx.lineTo((HighlightWidth / 2), -HighlightHeight);
+	ctx.lineTo(-(HighlightWidth / 2), -HighlightHeight);
+	ctx.closePath();
+	ctx.fill();
+	ctx.restore();
+}

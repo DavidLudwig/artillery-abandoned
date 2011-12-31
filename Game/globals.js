@@ -69,7 +69,7 @@ const PlayerWidth = 16;
 var UseTankHighlights = false;
 const HighlightWidth = 10;
 const HighlightHeight = 5;
-const HighlightDistanceYFromTankCenter = 20;
+const HighlightDistanceYFromTankCenter = 25;
 const HighlightColor = "orange";
 
 //
@@ -126,6 +126,9 @@ var Sunscape_Image;
 
 // Missile Drawing
 var MissileLineSegmentsToDraw;
+var MissileHighlightsToDraw;
+const MissileHighlightY = 2;
+const DrawMissileHighlights = false; // disabled for now as this is a WIP
 
 // Missile + Tank Collision Detection Debugging
 const ShowCollisionDebugInfo = false;

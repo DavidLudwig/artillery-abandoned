@@ -23,6 +23,14 @@ function HackedGetAlpha(layer, x, y) {
 	//return 0;
 }
 
+function DrawMissileHighlight(ctx, highlightPosition) {
+	ctx.save();
+	ctx.translate(highlightPosition[0], highlightPosition[1]);
+	ctx.rotate(Math.PI);
+	DrawHighlight(ctx);
+	ctx.restore();
+}
+
 Missile.prototype.update = function () {
 	this.lastx = this.x;
 	this.lasty = this.y;
@@ -47,6 +55,7 @@ Missile.prototype.update = function () {
 			Explosions.push(explosion);
 		}
 		Destroy(this, DeadMissiles);
+		return;
 	}
 	
 	// do collision detection against each tank
@@ -65,16 +74,23 @@ Missile.prototype.update = function () {
 				Explosions.push(explosion);
 			}
 			Destroy(this, DeadMissiles);
+			return;
 		}
 	}
 	
 	if (this.x < 0 || this.x >= ScreenWidth) {
 		Destroy(this, DeadMissiles);
+		return;
 	} else if (this.y >= ScreenHeight) {
 		if (MissilesCreateExplosions == true) {
 			var explosion = new Explosion(this.x, this.y);
 			Explosions.push(explosion);
 		}
 		Destroy(this, DeadMissiles);
+		return;
+	}
+	
+	if (this.y < 0) {
+		MissileHighlightsToDraw.push([this.x, MissileHighlightY]);
 	}
 }
