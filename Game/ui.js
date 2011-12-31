@@ -137,6 +137,11 @@ function HandleKeyDown(evt) {
 		case KeyCodes.Down:
 			PowerMinusDown = true;
 			break;
+		case KeyCodes.C:
+			if ( ! isKeyRepeating) {
+				ClearShotLayer();
+			}
+			break;
 	}
 }
 

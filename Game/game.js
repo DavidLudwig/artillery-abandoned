@@ -140,10 +140,7 @@ function InitGame() {
 	ShotLayer = document.createElement("canvas");
 	ShotLayer.width = ScreenWidth;
 	ShotLayer.height = ScreenHeight;
-	tmpContext = ShotLayer.getContext("2d");
-	tmpContext.fillStyle = "rgba(0,0,0,0);";
-	tmpContext.fillRect(0, 0, ShotLayer.width, ShotLayer.height);
-	tmpContext = null;
+	ClearShotLayer();
 	
 	// Init Missiles
 	MissileLineSegmentsToDraw = new Array();
@@ -302,6 +299,11 @@ function FireShot() {
 
 	// Update angle + power views
 	UpdateViewFromModel();
+}
+
+function ClearShotLayer() {
+	var ctx = ShotLayer.getContext("2d");
+	ctx.clearRect(0, 0, ShotLayer.width, ShotLayer.height);
 }
 
 function Draw(ctx) {
