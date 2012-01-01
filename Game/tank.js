@@ -337,7 +337,6 @@ Tank.prototype.CollidesWithLineSegment = function (x1, y1, x2, y2, outputCollisi
 	ctx.lineTo(lineLength, 1);
 	ctx.lineTo(0, 1);
 	ctx.closePath();
-	ctx.fill();
 
 	var doesPixelCollide = this.EndPixelCollisionDetection(ctx, outputCollisionPoint);
 	return doesPixelCollide;
@@ -364,7 +363,6 @@ Tank.prototype.CollidesWithCircle = function (cx, cy, radius) {
 	
 	ctx.beginPath();
 	ctx.arc(cx, cy, radius, 0, Math.PI * 2, true);
-	ctx.fill();
 	
 	var doesPixelCollide = this.EndPixelCollisionDetection(ctx);
 	return doesPixelCollide;
@@ -410,6 +408,8 @@ _SourceInBasedTankCollisionDetector.prototype.Begin = function () {
 }
 
 _SourceInBasedTankCollisionDetector.prototype.End = function (ctx, outputCollisionPoint) {
+	ctx.fill();
+	
 	var bodyBoxLeft = this.tank.cx - this.tank.tankCanvasCX;
 	var bodyBoxTop = this.tank.cy - this.tank.tankCanvasCY;
 
