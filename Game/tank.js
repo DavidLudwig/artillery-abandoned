@@ -296,7 +296,8 @@ Tank.prototype._doesRectCollideWithBoundingBox = function (left, top, right, bot
 }
 
 Tank.prototype.BeginPixelCollisionDetection = function () {
-	this.collisionDetector = new _SourceInBasedTankCollisionDetector(this);
+	//this.collisionDetector = new _SourceInBasedTankCollisionDetector(this);
+	this.collisionDetector = new _ClipBasedTankCollisionDetector(this);
 	return this.collisionDetector.Begin();
 }
 
@@ -417,6 +418,71 @@ _SourceInBasedTankCollisionDetector.prototype.End = function (ctx, outputCollisi
 	ctx.restore();
 	
 	// Check for any collisions.
+	var collidedImageData = ctx.getImageData(0, 0, this.tank.collisionMaskCanvas.width, this.tank.collisionMaskCanvas.height);
+	for (var y = 0; y < this.tank.collisionMaskCanvas.height; y++) {
+		for (var x = 0; x < this.tank.collisionMaskCanvas.width; x++) {
+			var index = (((this.tank.collisionMaskCanvas.width * y) + x) * 4);
+			// var pixelR = collidedImageData.data[index + 0];
+			// var pixelG = collidedImageData.data[index + 1];
+			// var pixelB = collidedImageData.data[index + 2];
+			var pixelAlpha = collidedImageData.data[index + 3];
+			// console.log("****: " + CollisionCallCount + "; {"+x+","+y+"}; index="+index+"; pixel={"+pixelR+","+pixelG+","+pixelB+","+pixelAlpha+"}");
+			if (pixelAlpha > 0) {
+				if (outputCollisionPoint != null) {
+					var collisionX = x + bodyBoxLeft;
+					var collisionY = y + bodyBoxTop;
+					outputCollisionPoint.splice(0, outputCollisionPoint.length);
+					outputCollisionPoint.push(collisionX);
+					outputCollisionPoint.push(collisionY);
+				}
+				// console.log("!!!!: collision detected")
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+
+// ----------------------------------------------------------------------
+//  Tank Collision Detection via clip()
+// ----------------------------------------------------------------------
+
+function _ClipBasedTankCollisionDetector(tank) {
+	this.tank = tank;
+}
+
+_ClipBasedTankCollisionDetector.prototype.Begin = function () {
+	this.tank._updateTankCanvas();
+	var bodyBoxLeft = this.tank.cx - this.tank.tankCanvasCX;
+	var bodyBoxTop = this.tank.cy - this.tank.tankCanvasCY;
+	var ctx = this.tank.collisionMaskCanvas.getContext("2d");
+	ctx.save();
+	ctx.clearRect(0, 0, this.tank.collisionMaskCanvas.width, this.tank.collisionMaskCanvas.height);
+	
+	// Draw the collision-checking path onto the canvas.
+	ctx.translate(-bodyBoxLeft, -bodyBoxTop);
+	return ctx;
+}
+
+_ClipBasedTankCollisionDetector.prototype.End = function (ctx, outputCollisionPoint) {
+	// Convert the just-drawn path into a clipping path.
+	ctx.clip();
+	
+	// Clean up a bit.
+	ctx.setTransform(1, 0, 0, 1, 0, 0);	// set the transformation to the identity matrix
+	
+	// Draw the tank onto the collision canvas.
+	ctx.globalCompositeOperation = "source-over";
+	ctx.drawImage(this.tank.tankCanvas, 0, 0);
+	
+	// All done with drawing to the collision canvas.  Clean up before moving on.
+	ctx.restore();
+	
+	// Check for any collisions.
+	var bodyBoxLeft = this.tank.cx - this.tank.tankCanvasCX;
+	var bodyBoxTop = this.tank.cy - this.tank.tankCanvasCY;
 	var collidedImageData = ctx.getImageData(0, 0, this.tank.collisionMaskCanvas.width, this.tank.collisionMaskCanvas.height);
 	for (var y = 0; y < this.tank.collisionMaskCanvas.height; y++) {
 		for (var x = 0; x < this.tank.collisionMaskCanvas.width; x++) {
