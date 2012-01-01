@@ -91,7 +91,7 @@ const MonsterXStepMax = 250;
 const DefaultExplosionRadius = 10;
 const DefaultExplosionDuration = 0.3;
 const PlayerExplodedRadius = 50;
-const ExplosionsDestroyTanks = true;
+const ExplosionsDestroyTanks = true;		// DEBUG FLAG
 const ExplosionsDestroyLand = true;
 
 //
@@ -132,12 +132,13 @@ const MissileHighlightY = 2;
 const DrawMissileHighlights = false; // disabled for now as this is a WIP
 
 // Missile + Tank Collision Detection Debugging
-const ShowCollisionDebugInfo = false;
+const ShowCollisionDebugInfo = false;		// DEBUG FLAG
+const CollisionDebugInfoYPosition = 60;		// DEBUG FLAG
 var LastCollisionPoint = new Array();
 const CollisionPointDrawColor = "yellow";
 const CollisionPointSize = 6;
 const CollisionMaskColor = "yellow";
-const MissilesCreateExplosions = true;
+const MissilesCreateExplosions = true;		// DEBUG FLAG
 
 // Game Objects
 var Tanks = new Array();

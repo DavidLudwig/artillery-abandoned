@@ -167,7 +167,7 @@ Tank.prototype.draw = function (ctx, a, b, c, d) {
 	// Draw collision mask, if requested.
 	if (ShowCollisionDebugInfo) {
 		ctx.save();
-		ctx.translate(tankCanvasGlobalLeft, 4);
+		ctx.translate(tankCanvasGlobalLeft, CollisionDebugInfoYPosition);
 		ctx.drawImage(this.collisionMaskCanvas, 0, 0);
 		ctx.strokeStyle = "white";
 		ctx.lineWidth = 1;
@@ -343,6 +343,8 @@ Tank.prototype.EndPixelCollisionDetection = function (ctx, outputCollisionPoint)
 			}
 		}
 	}
+	
+	return false;
 }
 
 // var CollisionCallCount = 0;
