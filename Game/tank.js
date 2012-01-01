@@ -17,6 +17,7 @@ function Tank(cx, cy, color, angle, power, isPlayer, width, xstep, xstepInterval
 	// The tank's body.
 	this.tankCanvas = null;
 	this.collisionMaskCanvas = null;
+	this.collisionDetector = null;
 	this._isTankCanvasValid = false;
 	
 	// Tank canvas center point: a point on this.tankCanvas's coordinate space that translates to this.cx and this.cy in the world's coordinate space.
@@ -295,56 +296,14 @@ Tank.prototype._doesRectCollideWithBoundingBox = function (left, top, right, bot
 }
 
 Tank.prototype.BeginPixelCollisionDetection = function () {
-	this._updateTankCanvas();
-	var bodyBoxLeft = this.cx - this.tankCanvasCX;
-	var bodyBoxTop = this.cy - this.tankCanvasCY;
-	var ctx = this.collisionMaskCanvas.getContext("2d");
-	ctx.save();
-	ctx.clearRect(0, 0, this.collisionMaskCanvas.width, this.collisionMaskCanvas.height);
-	
-	// Draw the tank onto the collision canvas.
-	ctx.globalCompositeOperation = "source-over";
-	ctx.drawImage(this.tankCanvas, 0, 0);
-
-	// Draw the line onto the collision canvas
-	ctx.translate(-bodyBoxLeft, -bodyBoxTop);
-	ctx.globalCompositeOperation = "source-in";
-	ctx.fillStyle = CollisionMaskColor;
-	return ctx;
+	this.collisionDetector = new _SourceInBasedTankCollisionDetector(this);
+	return this.collisionDetector.Begin();
 }
 
 Tank.prototype.EndPixelCollisionDetection = function (ctx, outputCollisionPoint) {
-	var bodyBoxLeft = this.cx - this.tankCanvasCX;
-	var bodyBoxTop = this.cy - this.tankCanvasCY;
-
-	// All done with drawing to the collision canvas.  Clean up before moving on.
-	ctx.restore();
-	
-	// Check for any collisions.
-	var collidedImageData = ctx.getImageData(0, 0, this.collisionMaskCanvas.width, this.collisionMaskCanvas.height);
-	for (var y = 0; y < this.collisionMaskCanvas.height; y++) {
-		for (var x = 0; x < this.collisionMaskCanvas.width; x++) {
-			var index = (((this.collisionMaskCanvas.width * y) + x) * 4);
-			// var pixelR = collidedImageData.data[index + 0];
-			// var pixelG = collidedImageData.data[index + 1];
-			// var pixelB = collidedImageData.data[index + 2];
-			var pixelAlpha = collidedImageData.data[index + 3];
-			// console.log("****: " + CollisionCallCount + "; {"+x+","+y+"}; index="+index+"; pixel={"+pixelR+","+pixelG+","+pixelB+","+pixelAlpha+"}");
-			if (pixelAlpha > 0) {
-				if (outputCollisionPoint != null) {
-					var collisionX = x + bodyBoxLeft;
-					var collisionY = y + bodyBoxTop;
-					outputCollisionPoint.splice(0, outputCollisionPoint.length);
-					outputCollisionPoint.push(collisionX);
-					outputCollisionPoint.push(collisionY);
-				}
-				// console.log("!!!!: collision detected")
-				return true;
-			}
-		}
-	}
-	
-	return false;
+	var collisionResult = this.collisionDetector.End(ctx, outputCollisionPoint);
+	this.collisionDetector = null;
+	return collisionResult;
 }
 
 // var CollisionCallCount = 0;
@@ -409,4 +368,77 @@ Tank.prototype.CollidesWithCircle = function (cx, cy, radius) {
 	
 	var doesPixelCollide = this.EndPixelCollisionDetection(ctx);
 	return doesPixelCollide;
+}
+
+
+// ----------------------------------------------------------------------
+//  Tank Collision Detection via a "source-in" fill operation
+//
+//  This algorithm requires that the browser, when performing a source-in
+//  fill() operation, clears all of the canvas' image data except
+//  for those areas were there is a union between visible source and
+//  destination pixels.  That is to say, the browser will clear any pixel
+//  data that isn't drawn over by the fill() operation.  Chrome 15 and
+//  Firefox 9 support this.  Some older browsers, such as Mobile Safari
+//  on iOS 5.0, when asked to perform the same compositing operation,
+//  will not clear these pixels.  If a pixel was on the canvas before
+//  the source-in fill(), and it wasn't drawn over, it'll still be there
+//  after the fill().
+// ----------------------------------------------------------------------
+
+function _SourceInBasedTankCollisionDetector(tank) {
+	this.tank = tank;
+}
+
+_SourceInBasedTankCollisionDetector.prototype.Begin = function () {
+	this.tank._updateTankCanvas();
+	var bodyBoxLeft = this.tank.cx - this.tank.tankCanvasCX;
+	var bodyBoxTop = this.tank.cy - this.tank.tankCanvasCY;
+	var ctx = this.tank.collisionMaskCanvas.getContext("2d");
+	ctx.save();
+	ctx.clearRect(0, 0, this.tank.collisionMaskCanvas.width, this.tank.collisionMaskCanvas.height);
+	
+	// Draw the tank onto the collision canvas.
+	ctx.globalCompositeOperation = "source-over";
+	ctx.drawImage(this.tank.tankCanvas, 0, 0);
+
+	// Draw the line onto the collision canvas
+	ctx.translate(-bodyBoxLeft, -bodyBoxTop);
+	ctx.globalCompositeOperation = "source-in";
+	ctx.fillStyle = CollisionMaskColor;
+	return ctx;
+}
+
+_SourceInBasedTankCollisionDetector.prototype.End = function (ctx, outputCollisionPoint) {
+	var bodyBoxLeft = this.tank.cx - this.tank.tankCanvasCX;
+	var bodyBoxTop = this.tank.cy - this.tank.tankCanvasCY;
+
+	// All done with drawing to the collision canvas.  Clean up before moving on.
+	ctx.restore();
+	
+	// Check for any collisions.
+	var collidedImageData = ctx.getImageData(0, 0, this.tank.collisionMaskCanvas.width, this.tank.collisionMaskCanvas.height);
+	for (var y = 0; y < this.tank.collisionMaskCanvas.height; y++) {
+		for (var x = 0; x < this.tank.collisionMaskCanvas.width; x++) {
+			var index = (((this.tank.collisionMaskCanvas.width * y) + x) * 4);
+			// var pixelR = collidedImageData.data[index + 0];
+			// var pixelG = collidedImageData.data[index + 1];
+			// var pixelB = collidedImageData.data[index + 2];
+			var pixelAlpha = collidedImageData.data[index + 3];
+			// console.log("****: " + CollisionCallCount + "; {"+x+","+y+"}; index="+index+"; pixel={"+pixelR+","+pixelG+","+pixelB+","+pixelAlpha+"}");
+			if (pixelAlpha > 0) {
+				if (outputCollisionPoint != null) {
+					var collisionX = x + bodyBoxLeft;
+					var collisionY = y + bodyBoxTop;
+					outputCollisionPoint.splice(0, outputCollisionPoint.length);
+					outputCollisionPoint.push(collisionX);
+					outputCollisionPoint.push(collisionY);
+				}
+				// console.log("!!!!: collision detected")
+				return true;
+			}
+		}
+	}
+	
+	return false;
 }
